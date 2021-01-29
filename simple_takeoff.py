@@ -26,5 +26,3 @@ if success:
 
     print("disconnect")
     mambo.disconnect()
-    print("end")
-    print("hello")
