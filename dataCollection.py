@@ -14,10 +14,11 @@ if success:
     print("sleeping")
     mambo.smart_sleep(2)
 
-    # print("getting status")
-    # mambo.ask_for_state_update()
-    # mambo.smart_sleep(2)
-    # print("end of getting status")
+    print("getting status")
+    mambo.ask_for_state_update()
+    mambo.smart_sleep(2)
+    print("end of getting status")
+
 
     print(f'''battery status is {mambo.sensors.battery}''')
     print(f'''flying status is {mambo.sensors.flying_state}''')
