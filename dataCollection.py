@@ -13,13 +13,13 @@ if success:
     print("sleeping")
     mambo.smart_sleep(2)
 
-    # print("getting status")
-    # mambo.ask_for_state_update()
-    # mambo.smart_sleep(2)
-    # print("end of getting status")
+    print("getting status")
+    mambo.ask_for_state_update()
+    mambo.smart_sleep(2)
+    print("end of getting status")
 
 
-    pic_success = mambo.take_picture()
+    # pic_success = mambo.take_picture()
  
 
     print("disconnect")
