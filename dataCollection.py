@@ -1,4 +1,4 @@
-from pyparrot.Minidrone import Mambo
+from pyparrot.Minidrone import Mambo, Minidrone
 
 mamboMac = "7A:64:62:66:4B:67"
 mambo_bluetooth_adress = "80:19:34:EB:35:56" 
@@ -18,6 +18,9 @@ if success:
     mambo.smart_sleep(2)
     print("end of getting status")
 
+
+    # print("user sensor callback")
+    # Minidrone.set_user_sensor_callback()
 
     # pic_success = mambo.take_picture()
  
