@@ -9,18 +9,25 @@ print("trying to connect")
 
 success = mambo.connect(num_retries=3)
 print(f""" connected >>>> {success}""")
-pyparrot.commandsandsensors.DroneSensorParser.get_data_format_and_size()
 
 if success:
     print("sleeping")
     mambo.smart_sleep(2)
 
-    print("getting status")
-    mambo.ask_for_state_update()
-    mambo.smart_sleep(2)
-    print("end of getting status")
-    
-    
+    # print("getting status")
+    # mambo.ask_for_state_update()
+    # mambo.smart_sleep(2)
+    # print("end of getting status")
+
+    print(f'''battery status is {mambo.sensors.battery}''')
+    print(f'''flying status is {mambo.sensors.flying_state}''')
+
+
+    print(f'''X is {mambo.sensors.quaternion_x}''')
+    print(f'''Y is {mambo.sensors.quaternion_y}''')
+    print(f'''Z is {mambo.sensors.quaternion_z}''')
+
+
     print("disconnect")
     mambo.disconnect()
 
