@@ -67,10 +67,11 @@ class ReflexAgent:
         pass
 
 mambo = Drone("7A:64:62:66:4B:67")
-mambo.get_battery()
-# mambo.get_action_status()
-# mambo.get_xyz()
 # mambo.connected()
-# mambo.get_altitude()
+# mambo.get_battery()
+# mambo.get_flying_state()
+# mambo.get_xyz()
+
+mambo.get_altitude()
 # mambo.get_battery()
 mambo.disconnect()
