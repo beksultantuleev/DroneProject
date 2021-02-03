@@ -19,7 +19,7 @@ class Drone():
         success = self._drone_id.connect(num_retries=3)
         print("Connection established")
         return success
-    
+
     def request_all_sensor_data(self):
         self._drone_id.ask_for_state_update()
         sensors = self._drone_id.sensors.__dict__
@@ -37,35 +37,42 @@ class Drone():
         return state
 
     def get_battery(self):
-        self._drone_id.ask_for_state_update()
-        battery = self.request_all_sensor_data()[]
+        battery = self.request_all_sensor_data()["battery"]
         print(battery)
         return battery
 
     def get_xyz(self):
-        self._drone_id.ask_for_state_update()
-        x = self.request_all_sensor_data()["quaternion_y"]
-        y = self.request_all_sensor_data()["quaternion_y"]
-        z = self.request_all_sensor_data()["quaternion_z"]
+        sensors_dict = self.request_all_sensor_data()
+        x = sensors_dict["quaternion_x"]
+        y = sensors_dict["quaternion_y"]
+        z = sensors_dict["quaternion_z"]
         orientation = {"X": x, "Y": y, "Z": z}
+        return orientation
+
+    def get_pos_xyz(self):
+        sensors_dict = self.request_all_sensor_data()
+        x = sensors_dict["sensors_dict"]["DronePosition_posx"]
+        y = sensors_dict["sensors_dict"]["DronePosition_posy"]
+        z = sensors_dict["sensors_dict"]["DronePosition_posz"]
+        orientation = [{"pos_X": x, "pos_Y": y, "pos_Z": z}]
+        orientation.append(self.get_xyz())
         print(orientation)
         return orientation
 
-    
-    
-
-
     def take_off(self):
+        self._drone_id.ask_for_state_update()
         self._drone_id.smart_sleep(2)
         print("Safe take off!")
-        self._drone_id.safe_takeoff(5)
-        self._drone_id.smart_sleep(3)
+        self._drone_id.safe_takeoff(3)
 
     def land(self):
         print("Landing!")
         self._drone_id.safe_land(5)
         self._drone_id.smart_sleep(5)
-        self.disconnect()
+
+    def fly_direct(self, roll, pitch, yaw, vertical_movement, duration):
+        self._drone_id.fly_direct(roll=roll, pitch=pitch, yaw=yaw,
+                                  vertical_movement=vertical_movement, duration=duration)
 
 
 class ReflexAgent(Drone):
@@ -80,6 +87,7 @@ class ReflexAgent(Drone):
         #     if self.get_flying_state() == "emergency":
         #         self.land()
         # self.emergency = emergency
+
 
 class ModelBasedAgent(Drone):
     def __init__(self):
@@ -96,22 +104,28 @@ class ModelBasedAgent(Drone):
         # f.update(z)
 
         def program():
-
             pass
+# class Flight
+
 
 mambo = Drone("7A:64:62:66:4B:67")
 # mambo = Drone("84:20:96:6c:22:67") #lab drone
 mambo.connected()
+print("data collection begin!!")
+mambo.get_battery()
+mambo.get_pos_xyz()
+mambo.take_off()
+print(" take off data, look for Z!! its like base from air!!!")
+mambo.get_pos_xyz()
 
-# mambo.take_off()
-# mambo.get_battery()
-mambo.get_flying_state()
-# mambo.get_altitude()
-# mambo.get_xyz()
-# mambo.get_xyz()
-# mambo.land()
-# mambo.get_altitude()
-# mambo.get_battery()
+print("moving forward (pitch 50)")
+mambo.fly_direct(0, 50, 0, 0, 1)
+print("end of movement")
+mambo.get_pos_xyz()
+
+mambo.land()
+print("after landing")
+mambo.get_pos_xyz()
 mambo.disconnect()
 
 # mambo = ReflexAgent("7A:64:62:66:4B:67")

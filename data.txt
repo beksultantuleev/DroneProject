@@ -1,0 +1,180 @@
+ mambo = Drone("7A:64:62:66:4B:67")
+# mambo = Drone("84:20:96:6c:22:67") #lab drone
+mambo.connected()
+print("data collection begin!!")
+mambo.get_battery()
+mambo.take_off()
+print(" take off data, look for Z!! its like base from air!!!")
+mambo.get_all_sensor_data()
+mambo.get_xyz()
+
+print("moving forward (pitch 50)")
+mambo.fly_direct(0, 50, 0, 0, 1)
+print("end of movement")
+mambo.get_all_sensor_data()
+mambo.get_xyz()
+
+mambo.land()
+print("after landing")
+mambo.get_all_sensor_data()
+mambo.get_xyz()
+mambo.disconnect()
+ 
+ ############################################################################ values in excell
+ Success in setting up the wifi network to the drone! 
+Connection established
+data collection begin!!
+
+99
+
+Safe take off!
+ take off data, look for Z!! its like base from air!!!
+{'battery': 99, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'C', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 0, 'MassStorageInfoStateListChanged_size': 32, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 1, 'MassStorageInfoStateListChanged_full': 0, 'MassStorageInfoStateListChanged_internal': 1, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': -1.0416877269744873, 'DronePosition_posy': -0.47444525361061096, 'DronePosition_posz': -86, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 0.0786171704530716, 'speed_y': -0.028565585613250732, 'speed_z': 0.06095156818628311, 'speed_ts': 25851, 'altitude': 0.8601581454277039, 'altitude_ts': 25851, 'quaternion_w': 0.9777218699455261, 'quaternion_x': 0.0030142797622829676, 'quaternion_y': -0.004052553791552782, 'quaternion_z': 0.20984376966953278, 'quaternion_ts': 25851, 'user_callback_function': None}
+
+{'X': 0.01020783744752407, 'Y': -0.008868261240422726, 'Z': 0.198402538895607}
+moving forward (pitch 50)
+end of movement
+
+{'battery': 98, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'C', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'IMU', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 100.25696563720703, 'DronePosition_posy': 42.98370361328125, 'DronePosition_posz': -70, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 1.0630450248718262, 'speed_y': -0.005763145629316568, 'speed_z': -0.03279571980237961, 'speed_ts': 28815, 'altitude': 0.6737775802612305, 'altitude_ts': 28815, 'quaternion_w': 0.9768437147140503, 'quaternion_x': 0.01685301586985588, 'quaternion_y': -0.06922740489244461, 'quaternion_z': 0.2017422616481781, 'quaternion_ts': 28815, 'user_callback_function': None}
+
+{'X': 0.014690452255308628, 'Y': 0.10834343731403351, 'Z': 0.20271600782871246}
+Landing!
+ trying to land 
+
+ trying to land 
+
+ trying to land 
+ trying to land 
+
+
+{'battery': 93, 'flying_state': 'landed', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'\x00', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'ultrasound', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 159.2594757080078, 'DronePosition_posy': 69.81409454345703, 'DronePosition_posz': 0, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': -0.0305172149091959, 'speed_y': 0.007736751344054937, 'speed_z': -0.0, 'speed_ts': 31834, 'altitude': 0.0, 'altitude_ts': 31834, 'quaternion_w': 0.9784163236618042, 'quaternion_x': 0.0002713371650315821, 'quaternion_y': -0.005888794083148241, 'quaternion_z': 0.2065591961145401, 'quaternion_ts': 31834, 'user_callback_function': None}
+
+{'X': 0.0002713371650315821, 'Y': -0.005888794083148241, 'Z': 0.2065591961145401}
+disconnecting
+
+about 1 meter difference 
+##############another IT was BAD
+Success in setting up the wifi network to the drone! 
+Connection established
+data collection begin!!
+
+93
+
+Safe take off!
+ take off data, look for Z!! its like base from air!!!
+
+{'battery': 93, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'1', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': -0.9534577131271362, 'DronePosition_posy': -2.206183671951294, 'DronePosition_posz': -82, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 0.04570421203970909, 'speed_y': -0.00929425098001957, 'speed_z': 0.04810280725359917, 'speed_ts': 45252, 'altitude': 0.8227662444114685, 'altitude_ts': 45252, 'quaternion_w': 0.9752784371376038, 'quaternion_x': 0.012011513113975525, 'quaternion_y': -0.00885814055800438, 'quaternion_z': 0.22047488391399384, 'quaternion_ts': 45252, 'user_callback_function': None}
+
+{'X': 0.0024700488429516554, 'Y': -0.007666199933737516, 'Z': 0.2255711704492569}
+moving forward (pitch 50)
+end of movement
+
+{'battery': 93, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'1', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 105.08960723876953, 'DronePosition_posy': 59.48500061035156, 'DronePosition_posz': -68, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 1.5414398908615112, 'speed_y': 0.07784867286682129, 'speed_z': -0.0893670842051506, 'speed_ts': 48731, 'altitude': 0.6245380640029907, 'altitude_ts': 48231, 'quaternion_w': 0.9715425372123718, 'quaternion_x': 0.017142053693532944, 'quaternion_y': -0.07120709866285324, 'quaternion_z': 0.22525697946548462, 'quaternion_ts': 48231, 'user_callback_function': None}
+
+{'X': 0.017221573740243912, 'Y': 0.12885214388370514, 'Z': 0.21025507152080536}
+Landing!
+ trying to land 
+
+ trying to land 
+
+ trying to land 
+ Could not find sensor in list - ignoring for now.  Packet info below. 
+
+ trying to land 
+after landing
+
+{'battery': 85, 'flying_state': 'landed', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'\x00', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'ultrasound', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 153.03842163085938, 'DronePosition_posy': 80.16563415527344, 'DronePosition_posz': 34, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': -0.18088659644126892, 'speed_y': 1.0046114921569824, 'speed_z': 0.22710365056991577, 'speed_ts': 54721, 'altitude': -0.34123921394348145, 'altitude_ts': 54721, 'quaternion_w': 0.993141233921051, 'quaternion_x': 0.0434611551463604, 'quaternion_y': -0.012817607261240482, 'quaternion_z': -0.10778459906578064, 'quaternion_ts': 54721, 'user_callback_function': None}
+
+
+
+{'X': 0.0434611551463604, 'Y': -0.012817607261240482, 'Z': -0.10778459906578064}
+disconnecting
+ disconnecting 
+
+moved 2 meters
+
+ ############################this time was better
+ Success in setting up the wifi network to the drone! 
+Connection established
+data collection begin!!
+
+85
+
+Safe take off!
+ take off data, look for Z!! its like base from air!!!
+
+
+{'battery': 85, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'C', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': -0.13427220284938812, 'DronePosition_posy': -2.223407745361328, 'DronePosition_posz': -86, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 0.06626333296298981, 'speed_y': -0.010949349962174892, 'speed_z': 0.07060457766056061, 'speed_ts': 10111, 'altitude': 0.8659770488739014, 'altitude_ts': 10111, 'quaternion_w': 0.9770155549049377, 'quaternion_x': 0.013727349229156971, 'quaternion_y': -0.0032076146453619003, 'quaternion_z': 0.2127014398574829, 'quaternion_ts': 10111, 'user_callback_function': None}
+
+
+{'X': 0.004986522253602743, 'Y': -0.009787479415535927, 'Z': 0.22266167402267456}
+moving forward (pitch 50)
+end of movement
+
+{'battery': 85, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'C', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 102.02400970458984, 'DronePosition_posy': 45.704139709472656, 'DronePosition_posz': -75, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 1.0644235610961914, 'speed_y': 0.0037884425837546587, 'speed_z': -0.019027553498744965, 'speed_ts': 13051, 'altitude': 0.6908684372901917, 'altitude_ts': 13051, 'quaternion_w': 0.9768233895301819, 'quaternion_x': 0.013831889256834984, 'quaternion_y': -0.07014831900596619, 'quaternion_z': 0.20175272226333618, 'quaternion_ts': 13051, 'user_callback_function': None}
+
+{'X': 0.012968978844583035, 'Y': 0.11213912814855576, 'Z': 0.19386033713817596}
+Landing!
+ trying to land 
+
+ trying to land 
+
+
+
+ trying to land 
+
+
+after landing
+
+
+{'battery': 80, 'flying_state': 'landed', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'\x00', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 163.44842529296875, 'DronePosition_posy': 71.6070327758789, 'DronePosition_posz': -58, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': -0.0032398109324276447, 'speed_y': -0.0036094458773732185, 'speed_z': 0.9176014065742493, 'speed_ts': 15545, 'altitude': 0.5804197788238525, 'altitude_ts': 15545, 'quaternion_w': 0.9800581336021423, 'quaternion_x': 0.0016853644046932459, 'quaternion_y': -0.0002802665112540126, 'quaternion_z': 0.198703795671463, 'quaternion_ts': 15545, 'user_callback_function': None}
+
+
+{'X': 0.0016853644046932459, 'Y': -0.0002802665112540126, 'Z': 0.198703795671463}
+disconnecting
+ disconnecting 
+
+ moved 1 meter
+(droneVirtEnv) root@helios-300:/mnt/d/study/distributed systems and automation/project/drone project# 
+
+
+###############################it was good 
+
+Success in setting up the wifi network to the drone! 
+Connection established
+data collection begin!!
+80
+
+
+Safe take off!
+ take off data, look for Z!! its like base from air!!!
+
+{'battery': 80, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'8', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'vertical_camera', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 0, 'MassStorageInfoStateListChanged_size': 32, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 1, 'MassStorageInfoStateListChanged_full': 0, 'MassStorageInfoStateListChanged_internal': 1, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 1.7299115657806396, 'DronePosition_posy': -0.40134721994400024, 'DronePosition_posz': -80, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 0.02085612155497074, 'speed_y': 0.0016124597750604153, 'speed_z': 0.050804007798433304, 'speed_ts': 5294, 'altitude': 0.8456277251243591, 'altitude_ts': 5294, 'quaternion_w': 0.9853825569152832, 'quaternion_x': 0.022178011015057564, 'quaternion_y': 0.004274105187505484, 'quaternion_z': 0.1688520610332489, 'quaternion_ts': 5294, 'user_callback_function': None}
+
+{'X': -0.0023758087772876024, 'Y': -0.008981010876595974, 'Z': 0.16170373558998108}
+moving forward (pitch 50)
+
+
+end of movement
+{'battery': 80, 'flying_state': 'hovering', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'8', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'IMU', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 93.28642272949219, 'DronePosition_posy': 37.54652404785156, 'DronePosition_posz': -72, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': 1.3346222639083862, 'speed_y': 0.09909363090991974, 'speed_z': -0.03810280188918114, 'speed_ts': 8794, 'altitude': 0.6876857280731201, 'altitude_ts': 8294, 'quaternion_w': 0.9853851795196533, 'quaternion_x': 0.012003517709672451, 'quaternion_y': -0.07067149132490158, 'quaternion_z': 0.15452361106872559, 'quaternion_ts': 8294, 'user_callback_function': None}
+
+{'X': 0.012133913114666939, 'Y': 0.10519794374704361, 'Z': 0.15991075336933136}
+Landing!
+ trying to land 
+
+ trying to land 
+
+ trying to land 
+
+
+after landing
+
+
+{'battery': 71, 'flying_state': 'landed', 'sensors_dict': {'DeviceLibARCommandsVersion_version': b'4', 'RunIdChanged_runId': b'\x00', 'DeprecatedMassStorageContentChanged_mass_storage_id': 0, 'DeprecatedMassStorageContentChanged_nbPhotos': 2, 'DeprecatedMassStorageContentChanged_nbVideos': 0, 'DeprecatedMassStorageContentChanged_nbPuds': 0, 'DeprecatedMassStorageContentChanged_nbCrashLogs': 0, 'ChargingInfo_phase': 'DISCHARGING', 'ChargingInfo_rate': 'UNKNOWN', 'ChargingInfo_intensity': 0, 'ChargingInfo_fullChargingTime': 0, 'ConnectionChanged_state': 0, 'LightState_id': 0, 'LightState_state': 'FIXED', 'LightState_intensity': 0, 'LightState_list_flags': 0, 'ClawState_list_flags': 0, 'GunState_list_flags': 0, 'StateChanged_state': 'ready', 'VersionChanged_software': b'P', 'VersionChanged_hardware': b'1', 'AutoTakeOffModeChanged_state': 0, 'SensorsStatesListChanged_sensorName': 'IMU', 'SensorsStatesListChanged_sensorState': 0, 'PictureStateChangedV2_state': 'ready', 'PictureStateChangedV2_error': 'ok', 'AllStatesChanged': True, 'AlertStateChanged_state': 'none', 'MassStorageStateListChanged_mass_storage_id': 0, 'MassStorageStateListChanged_name': b'i', 'MassStorageInfoStateListChanged_mass_storage_id': 1, 'MassStorageInfoStateListChanged_size': 0, 'MassStorageInfoStateListChanged_used_size': 0, 'MassStorageInfoStateListChanged_plugged': 0, 'MassStorageInfoStateListChanged_full': 1, 'MassStorageInfoStateListChanged_internal': 0, 'ProductSerialChanged_serial_number': b'3', 'PowerModeChanged_power_mode': 'normal', 'VideoStateChanged_state': 'stopped', 'VideoStateChanged_error': 'ok', 'DronePosition_posx': 151.1204833984375, 'DronePosition_posy': 59.79835510253906, 'DronePosition_posz': 49, 'DronePosition_psi': 0, 'DronePosition_ts': 0}, 'gun_id': 0, 'gun_state': 'READY', 'claw_id': 0, 'claw_state': 'OPENED', 'flying_mode': 'quadricopter', 'plane_gear_box': 'gear_1', 'speed_x': -0.06735502183437347, 'speed_y': -0.006271044723689556, 'speed_z': 1.1986238956451416, 'speed_ts': 12299, 'altitude': -0.49405381083488464, 'altitude_ts': 12299, 'quaternion_w': 0.9851577281951904, 'quaternion_x': 0.005278118886053562, 'quaternion_y': 0.009330317378044128, 'quaternion_z': 0.171316996216774, 'quaternion_ts': 12299, 'user_callback_function': None}
+
+
+{'X': 0.005278118886053562, 'Y': 0.009330317378044128, 'Z': 0.171316996216774}
+disconnecting
+ disconnecting 
+
+ moved 1 meter as previous

@@ -15,45 +15,45 @@ if success:
 
 
     print("taking off!")
-    mambo.safe_takeoff(5)
-    mambo.smart_sleep(3)
+    mambo.safe_takeoff(3)
+    # mambo.smart_sleep(3)
 
-    print("Flying direct: going forward (positive pitch)")
-    mambo.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=1)
+    # print("Flying direct: going forward (positive pitch)")
+    # mambo.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=1)
 
-    #mambo.smart_sleep(5)
+    # #mambo.smart_sleep(5)
 
-    print("Showing turning (in place) using turn_degrees")
-    mambo.turn_degrees(90)
-    mambo.smart_sleep(5)
-
-    mambo.turn_degrees(90)
-    mambo.smart_sleep(5)
-
-    print("Flying direct: going forward (positive pitch)")
-    mambo.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=1)
-
-    mambo.smart_sleep(5)
-
-    mambo.turn_degrees(90)
-    mambo.smart_sleep(5)
-
-    mambo.turn_degrees(90)
-    mambo.smart_sleep(5)
-
-    # # save movement
     # print("Showing turning (in place) using turn_degrees")
     # mambo.turn_degrees(90)
     # mambo.smart_sleep(5)
 
     # mambo.turn_degrees(90)
-    # mambo.smart_sleep(2)
+    # mambo.smart_sleep(5)
+
+    # print("Flying direct: going forward (positive pitch)")
+    # mambo.fly_direct(roll=0, pitch=50, yaw=0, vertical_movement=0, duration=1)
+
+    # mambo.smart_sleep(5)
 
     # mambo.turn_degrees(90)
-    # mambo.smart_sleep(2)
+    # mambo.smart_sleep(5)
 
     # mambo.turn_degrees(90)
-    # mambo.smart_sleep(10)
+    # mambo.smart_sleep(5)
+
+    # # save movement
+    print("Showing turning (in place) using turn_degrees")
+    mambo.turn_degrees(90)
+    mambo.smart_sleep(5)
+
+    mambo.turn_degrees(90)
+    mambo.smart_sleep(2)
+
+    mambo.turn_degrees(90)
+    mambo.smart_sleep(2)
+
+    mambo.turn_degrees(90)
+    mambo.smart_sleep(10) #howers for 10 sec
 
 
     # print("Flying direct: going up")
