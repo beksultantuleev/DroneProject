@@ -5,6 +5,7 @@ from filterpy.kalman import KalmanFilter
 from filterpy.common import Q_discrete_white_noise
 
 
+
 class Drone():
     def __init__(self, drone_mac):
         self._drone_id = None
@@ -20,14 +21,24 @@ class Drone():
         print("Connection established")
         return success
 
+    def smart_sleep(self, time = None):
+        if time is None:
+            self._drone_id.smart_sleep(2)
+        else:
+            self._drone_id.smart_sleep(time)
+
     def request_all_sensor_data(self):
+        self.smart_sleep(1)
         self._drone_id.ask_for_state_update()
         sensors = self._drone_id.sensors.__dict__
+        self.smart_sleep(1)
         return sensors
 
     def get_all_sensor_data(self):
+        self.smart_sleep(1)
         self._drone_id.ask_for_state_update()
         sensors = self._drone_id.sensors.__dict__
+        self.smart_sleep(1)
         print(sensors)
         return sensors
 
@@ -41,43 +52,127 @@ class Drone():
         print(battery)
         return battery
 
-    def get_xyz(self):
+    def get_altitude(self):
         sensors_dict = self.request_all_sensor_data()
-        x = sensors_dict["quaternion_x"]
-        y = sensors_dict["quaternion_y"]
-        z = sensors_dict["quaternion_z"]
-        orientation = {"X": x, "Y": y, "Z": z}
-        return orientation
+        altitude = sensors_dict["altitude"]
+        altitude_ts = sensors_dict["altitude_ts"]
+        print(altitude, altitude_ts)
+        return (altitude, altitude_ts)
+
+    def ask_for_state_update(self):
+        self._drone_id.ask_for_state_update()
 
     def get_pos_xyz(self):
         sensors_dict = self.request_all_sensor_data()
         x = sensors_dict["sensors_dict"]["DronePosition_posx"]
         y = sensors_dict["sensors_dict"]["DronePosition_posy"]
         z = sensors_dict["sensors_dict"]["DronePosition_posz"]
-        orientation = [{"pos_X": x, "pos_Y": y, "pos_Z": z}]
-        orientation.append(self.get_xyz())
+        orientation = {"pos_X": x, "pos_Y": y, "pos_Z": z}
         print(orientation)
         return orientation
 
     def take_off(self):
-        self._drone_id.ask_for_state_update()
-        self._drone_id.smart_sleep(2)
+        self.smart_sleep(1)
         print("Safe take off!")
-        self._drone_id.safe_takeoff(3)
+        self._drone_id.safe_takeoff(2)
 
     def land(self):
+        self.smart_sleep(1)
         print("Landing!")
-        self._drone_id.safe_land(5)
-        self._drone_id.smart_sleep(5)
+        self._drone_id.safe_land(2)
+        self.smart_sleep(1)
 
-    def fly_direct(self, roll, pitch, yaw, vertical_movement, duration):
-        self._drone_id.fly_direct(roll=roll, pitch=pitch, yaw=yaw,
+    def fly_direct(self, roll, pitch, vertical_movement, duration):
+        self._drone_id.fly_direct(roll=roll, pitch=pitch, yaw=0,
                                   vertical_movement=vertical_movement, duration=duration)
 
+    def turn_right(self):
+        # self.smart_sleep()
+        self._drone_id.turn_degrees(90)
+
+    def turn_left(self):
+        # self.smart_sleep()
+        self._drone_id.turn_degrees(-90)
+    
+    def turn_around(self):
+        # self.smart_sleep()
+        self._drone_id.turn_degrees(180)
+
+    def destination_no_sensor(self, x, y):
+        if y > 0:
+            while y!=0:  
+                self.fly_direct(0, 50, 0, 1)
+                y -= 1
+        elif y < 0:
+            while y != 0:
+                # self.smart_sleep()
+                self.fly_direct(0, -50, 0, 1)
+                y+=1
+        elif y == 0:
+            pass
+        # self.smart_sleep()
+        if x > 0:
+            self.turn_right()
+            while x!=0:
+                
+                self.fly_direct(0, 50, 0, 1)
+                x-=1
+        elif x<0:
+            self.turn_left()
+            while x!=0:
+                # self.smart_sleep()
+                self.fly_direct(0, 50, 0, 1)
+                x+=1
+        elif x==0:
+            pass
+        # self.smart_sleep()
+
+    def destination_sensor_based(self, x, y, z):
+        one_meter_in_sensor = 160 #sensor scale
+        pos_x_y_z = self.get_pos_xyz()
+
+        stop_value_y = y*one_meter_in_sensor
+        stop_value_x = x*one_meter_in_sensor
+        stop_value_z = z*70
+
+        pos_x = int(pos_x_y_z["pos_X"])
+        pos_y = int(pos_x_y_z["pos_Y"])
+        pos_z = int(pos_x_y_z["pos_Z"])
+        if y>0:
+            while pos_x<stop_value_y:
+                self.fly_direct(0,50,0,1)
+                pos_x =int(self.get_pos_xyz()["pos_X"])
+        elif y<0:
+            while pos_x>stop_value_y:
+                self.fly_direct(0,-50,0,1)
+                pos_x = int(self.get_pos_xyz()["pos_X"])
+        elif y==0:
+            pass
+        if x>0:
+            while pos_y<stop_value_x:
+                self.fly_direct(50,0,0,1)
+                pos_y = int(self.get_pos_xyz()["pos_Y"])
+        elif x<0:
+            while pos_y>stop_value_x:
+                self.fly_direct(-50,0,0,1)
+                pos_y = int(self.get_pos_xyz()["pos_Y"])
+        elif x ==0:
+            pass
+        
+        if z>0:
+            while pos_z<stop_value_z:
+                self.fly_direct(0,0,1,1)
+                pos_z = int(self.get_pos_xyz()["pos_Z"])
+        elif z<0:
+            while pos_z>stop_value_z:
+                self.fly_direct(0,0,-1,1)
+                pos_z = int(self.get_pos_xyz()["pos_Z"])
+        elif z==0:
+            pass
 
 class ReflexAgent(Drone):
-    def __init__(self):
-        Drone.__init__(self)
+    def __init__(self, drone_mac):
+        Drone.__init__(self, drone_mac)
         '''safe landing during emergency'''
         def hover():
             if self.get_flying_state() == "hovering":
@@ -92,44 +187,25 @@ class ReflexAgent(Drone):
 class ModelBasedAgent(Drone):
     def __init__(self):
         Drone.__init__(self)
-        # f = KalmanFilter(dim_x=2, dim_z=1)
-        # f.x = np.array([2., 0.])
-        # f.F = np.array([[1., 1.], [0., 1.]])
-        # f.H = np.array([[1.,0.]])
-        # f.P *= 1000
-        # f.R = 5
-        # f.Q = Q_discrete_white_noise(dim=2, dt= 0.1, var=0.13)
-        # z = self.get_altitude()
-        # f.predict()
-        # f.update(z)
 
         def program():
             pass
 # class Flight
 
-
+# mambo = ReflexAgent("7A:64:62:66:4B:67")
 mambo = Drone("7A:64:62:66:4B:67")
 # mambo = Drone("84:20:96:6c:22:67") #lab drone
 mambo.connected()
-print("data collection begin!!")
 mambo.get_battery()
-mambo.get_pos_xyz()
-mambo.take_off()
-print(" take off data, look for Z!! its like base from air!!!")
-mambo.get_pos_xyz()
 
-print("moving forward (pitch 50)")
-mambo.fly_direct(0, 50, 0, 0, 1)
-print("end of movement")
-mambo.get_pos_xyz()
+mambo.take_off()
+
+mambo.destination_sensor_based(-1,2,1)
+
+#straight is x plus,
+# mambo.fly_direct(0,50,0,1)#170 is 1 meter, + is right, - is left. x is straight, y is left, z is up
 
 mambo.land()
-print("after landing")
-mambo.get_pos_xyz()
-mambo.disconnect()
+mambo.smart_sleep(3)
 
-# mambo = ReflexAgent("7A:64:62:66:4B:67")
-# mambo.connected()
-# mambo.get_altitude()
-# mambo.get_battery()
-# mambo.disconnect()
+mambo.disconnect()
