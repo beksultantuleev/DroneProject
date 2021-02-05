@@ -1,8 +1,8 @@
 from pyparrot.Minidrone import Mambo
 import pyparrot
-import numpy as np
-from filterpy.kalman import KalmanFilter
-from filterpy.common import Q_discrete_white_noise
+# import numpy as np
+# from filterpy.kalman import KalmanFilter
+# from filterpy.common import Q_discrete_white_noise
 
 
 
@@ -72,7 +72,7 @@ class Drone():
         return orientation
 
     def take_off(self):
-        self.smart_sleep(1)
+        # self.smart_sleep(1)
         print("Safe take off!")
         self._drone_id.safe_takeoff(2)
 
@@ -128,7 +128,7 @@ class Drone():
         # self.smart_sleep()
 
     def destination_sensor_based(self, x, y, z):
-        one_meter_in_sensor = 160 #sensor scale
+        one_meter_in_sensor = 150 #sensor scale
         one_meter_in_sensor_z = 100
         pos_x_y_z = self.get_pos_xyz()
 
@@ -139,9 +139,12 @@ class Drone():
         pos_x = int(pos_x_y_z["pos_X"])
         pos_y = int(pos_x_y_z["pos_Y"])
         pos_z = int(pos_x_y_z["pos_Z"])
+        if x==y==z==0:
+            print("not gonna fly")
+            return "not gonna fly"
         if y>0:
             while pos_x<stop_value_y:
-                self.fly_direct(0,50,0,1)
+                self.fly_direct(0,50,0,1.5)
                 pos_x =int(self.get_pos_xyz()["pos_X"])
         elif y<0:
             while pos_x>stop_value_y:
@@ -193,15 +196,15 @@ class ModelBasedAgent(Drone):
             pass
 # class Flight
 
-# mambo = ReflexAgent("7A:64:62:66:4B:67")
-mambo = Drone("7A:64:62:66:4B:67")
+mambo = ReflexAgent("7A:64:62:66:4B:67")
+# mambo = Drone("7A:64:62:66:4B:67")
 # mambo = Drone("84:20:96:6c:22:67") #lab drone
 mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-
-mambo.destination_sensor_based(0,1,0)
+# mambo.fly_direct(0,50,0,1)
+mambo.destination_sensor_based(0,0,0)
 
 mambo.land()
 mambo.smart_sleep(3)
