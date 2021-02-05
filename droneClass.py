@@ -207,5 +207,3 @@ mambo.land()
 mambo.smart_sleep(3)
 
 mambo.disconnect()
-
-print("j")
