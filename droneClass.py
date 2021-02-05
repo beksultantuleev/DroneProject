@@ -2,7 +2,6 @@ from pyparrot.Minidrone import Mambo
 import pyparrot
 
 
-
 class Drone():
     def __init__(self, drone_mac):
         self._drone_id = None
@@ -18,7 +17,7 @@ class Drone():
         print("Connection established")
         return success
 
-    def smart_sleep(self, time = None):
+    def smart_sleep(self, time=None):
         if time is None:
             self._drone_id.smart_sleep(2)
         else:
@@ -90,87 +89,83 @@ class Drone():
     def turn_left(self):
         # self.smart_sleep()
         self._drone_id.turn_degrees(-90)
-    
+
     def turn_around(self):
         # self.smart_sleep()
         self._drone_id.turn_degrees(180)
 
     def destination_no_sensor(self, x, y):
         if y > 0:
-            while y!=0:  
+            while y != 0:
                 self.fly_direct(0, 50, 0, 1)
                 y -= 1
         elif y < 0:
             while y != 0:
                 # self.smart_sleep()
                 self.fly_direct(0, -50, 0, 1)
-                y+=1
+                y += 1
         elif y == 0:
             pass
         # self.smart_sleep()
         if x > 0:
             self.turn_right()
-            while x!=0:
-                
+            while x != 0:
+
                 self.fly_direct(0, 50, 0, 1)
-                x-=1
-        elif x<0:
+                x -= 1
+        elif x < 0:
             self.turn_left()
-            while x!=0:
+            while x != 0:
                 # self.smart_sleep()
                 self.fly_direct(0, 50, 0, 1)
-                x+=1
-        elif x==0:
+                x += 1
+        elif x == 0:
             pass
         # self.smart_sleep()
 
     def destination_sensor_based(self, x, y, z):
-        one_meter_in_sensor_x = 100 #sensor scale in pos X
-        one_meter_in_sensor_y = 50
+        one_meter_in_sensor_x = 100  # sensor scale in pos X aka y in cartesian plane
+        one_meter_in_sensor_y = 100 #sensor scale in pos Y aka x in cartesian plane
         one_meter_in_sensor_z = 100
         pos_x_y_z = self.get_pos_xyz()
 
-        stop_value_x = x*one_meter_in_sensor_x
-        stop_value_y = y*one_meter_in_sensor_y
+        stop_value_x = x*one_meter_in_sensor_y
+        stop_value_y = y*one_meter_in_sensor_x
         stop_value_z = (-z)*one_meter_in_sensor_z
 
         pos_x = int(pos_x_y_z["pos_X"])
         pos_y = int(pos_x_y_z["pos_Y"])
         pos_z = int(pos_x_y_z["pos_Z"])
-        if x==y==z==0:
+        if x == y == z == 0:
             print("not gonna fly")
             return "not gonna fly"
-        if y>0:
-            while pos_x<stop_value_y:
-                self.fly_direct(0,35,0,0.5)
-                pos_x =int(self.get_pos_xyz()["pos_X"])
-        elif y<0:
-            while pos_x>stop_value_y:
-                self.fly_direct(0,-35,0,0.5)
-                pos_x = int(self.get_pos_xyz()["pos_X"])
-        elif y==0:
-            pass
-        if x>0:
-            while pos_y<stop_value_x:
-                self.fly_direct(35,0,0,0.5)
-                pos_y = int(self.get_pos_xyz()["pos_Y"])
-        elif x<0:
-            while pos_y>stop_value_x:
-                self.fly_direct(-35,0,0,0.5)
-                pos_y = int(self.get_pos_xyz()["pos_Y"])
-        elif x ==0:
-            pass
         
-        if z>0:
-            while pos_z>stop_value_z: #-50to -85 || -100
-                self.fly_direct(0,0,50,1)
+        if y > 0:
+            while pos_x < stop_value_y:
+                self.fly_direct(0, 35, 0, 0.5)
+                pos_x = int(self.get_pos_xyz()["pos_X"])
+        elif y < 0:
+            while pos_x > stop_value_y:
+                self.fly_direct(0, -35, 0, 0.5)
+                pos_x = int(self.get_pos_xyz()["pos_X"])
+        
+        if x > 0:
+            while pos_y < stop_value_x:
+                self.fly_direct(20, 0, 0, 0.1)
+                pos_y = int(self.get_pos_xyz()["pos_Y"])
+        elif x < 0:
+            while pos_y > stop_value_x:
+                self.fly_direct(-20, 0, 0, 0.1)
+                pos_y = int(self.get_pos_xyz()["pos_Y"])     
+        
+        if z > 0:
+            while pos_z > stop_value_z:  # -50to -85 || -100
+                self.fly_direct(0, 0, 50, 1)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
-        elif z<0:
-            while pos_z<(-stop_value_z): #0 to 50 || 100
-                self.fly_direct(0,0,-50,1)
+        elif z < 0:
+            while pos_z < (-stop_value_z):  # 0 to 50 || 100
+                self.fly_direct(0, 0, -50, 1)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
-        elif z==0:
-            pass
 
 class ReflexAgent(Drone):
     def __init__(self, drone_mac):
@@ -194,6 +189,7 @@ class ModelBasedAgent(Drone):
             pass
 # class Flight
 
+
 mambo = ReflexAgent("7A:64:62:66:4B:67")
 # mambo = Drone("7A:64:62:66:4B:67")
 # mambo = Drone("84:20:96:6c:22:67") #lab drone
@@ -201,8 +197,8 @@ mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-mambo.destination_sensor_based(1,0,0)
+mambo.destination_sensor_based(1, 1, 0)
 mambo.land()
-# mambo.get_pos_xyz()
+mambo.get_pos_xyz()
 mambo.smart_sleep(3)
 mambo.disconnect()
