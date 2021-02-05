@@ -202,9 +202,10 @@ mambo.get_battery()
 mambo.take_off()
 
 mambo.destination_sensor_based(0,1,0)
-# mambo.fly_direct(0,-50,0,1)
 
 mambo.land()
 mambo.smart_sleep(3)
 
 mambo.disconnect()
+
+print("j")
