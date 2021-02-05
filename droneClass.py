@@ -1,8 +1,5 @@
 from pyparrot.Minidrone import Mambo
 import pyparrot
-# import numpy as np
-# from filterpy.kalman import KalmanFilter
-# from filterpy.common import Q_discrete_white_noise
 
 
 
@@ -72,7 +69,7 @@ class Drone():
         return orientation
 
     def take_off(self):
-        # self.smart_sleep(1)
+        self.smart_sleep(1)
         print("Safe take off!")
         self._drone_id.safe_takeoff(2)
 
