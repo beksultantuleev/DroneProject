@@ -25,17 +25,17 @@ class Drone():
             self._drone_id.smart_sleep(time)
 
     def request_all_sensor_data(self):
-        self.smart_sleep(1)
+        # self.smart_sleep(1)
         self._drone_id.ask_for_state_update()
         sensors = self._drone_id.sensors.__dict__
-        self.smart_sleep(1)
+        # self.smart_sleep(1)
         return sensors
 
     def get_all_sensor_data(self):
-        self.smart_sleep(1)
+        # self.smart_sleep(1)
         self._drone_id.ask_for_state_update()
         sensors = self._drone_id.sensors.__dict__
-        self.smart_sleep(1)
+        # self.smart_sleep(1)
         print(sensors)
         return sensors
 
@@ -71,7 +71,7 @@ class Drone():
     def take_off(self):
         self.smart_sleep(1)
         print("Safe take off!")
-        self._drone_id.safe_takeoff(2)
+        self._drone_id.safe_takeoff(1)
 
     def land(self):
         self.smart_sleep(1)
@@ -125,12 +125,13 @@ class Drone():
         # self.smart_sleep()
 
     def destination_sensor_based(self, x, y, z):
-        one_meter_in_sensor = 150 #sensor scale
+        one_meter_in_sensor_x = 100 #sensor scale in pos X
+        one_meter_in_sensor_y = 50
         one_meter_in_sensor_z = 100
         pos_x_y_z = self.get_pos_xyz()
 
-        stop_value_y = y*one_meter_in_sensor
-        stop_value_x = x*one_meter_in_sensor
+        stop_value_x = x*one_meter_in_sensor_x
+        stop_value_y = y*one_meter_in_sensor_y
         stop_value_z = (-z)*one_meter_in_sensor_z
 
         pos_x = int(pos_x_y_z["pos_X"])
@@ -141,21 +142,21 @@ class Drone():
             return "not gonna fly"
         if y>0:
             while pos_x<stop_value_y:
-                self.fly_direct(0,50,0,1.5)
+                self.fly_direct(0,35,0,0.5)
                 pos_x =int(self.get_pos_xyz()["pos_X"])
         elif y<0:
             while pos_x>stop_value_y:
-                self.fly_direct(0,-50,0,1)
+                self.fly_direct(0,-35,0,0.5)
                 pos_x = int(self.get_pos_xyz()["pos_X"])
         elif y==0:
             pass
         if x>0:
             while pos_y<stop_value_x:
-                self.fly_direct(50,0,0,1)
+                self.fly_direct(35,0,0,0.5)
                 pos_y = int(self.get_pos_xyz()["pos_Y"])
         elif x<0:
             while pos_y>stop_value_x:
-                self.fly_direct(-50,0,0,1)
+                self.fly_direct(-35,0,0,0.5)
                 pos_y = int(self.get_pos_xyz()["pos_Y"])
         elif x ==0:
             pass
@@ -200,10 +201,8 @@ mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-# mambo.fly_direct(0,50,0,1)
-mambo.destination_sensor_based(0,0,0)
-
+mambo.destination_sensor_based(1,0,0)
 mambo.land()
+# mambo.get_pos_xyz()
 mambo.smart_sleep(3)
-
 mambo.disconnect()
