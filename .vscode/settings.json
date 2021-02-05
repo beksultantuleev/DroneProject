@@ -1,3 +1,6 @@
 {
-    "python.pythonPath": "droneVirtEnv/bin/python"
+    "python.pythonPath": "DroneVenv/bin/python",
+    "editor.letterSpacing": 1,
+    "editor.fontFamily": "Cantarell",
+    "terminal.integrated.fontFamily": "monospace"
 }
