@@ -129,11 +129,12 @@ class Drone():
 
     def destination_sensor_based(self, x, y, z):
         one_meter_in_sensor = 160 #sensor scale
+        one_meter_in_sensor_z = 100
         pos_x_y_z = self.get_pos_xyz()
 
         stop_value_y = y*one_meter_in_sensor
         stop_value_x = x*one_meter_in_sensor
-        stop_value_z = z*70
+        stop_value_z = (-z)*one_meter_in_sensor_z
 
         pos_x = int(pos_x_y_z["pos_X"])
         pos_y = int(pos_x_y_z["pos_Y"])
@@ -160,12 +161,12 @@ class Drone():
             pass
         
         if z>0:
-            while pos_z<stop_value_z:
-                self.fly_direct(0,0,1,1)
+            while pos_z>stop_value_z: #-50to -85 || -100
+                self.fly_direct(0,0,50,1)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
         elif z<0:
-            while pos_z>stop_value_z:
-                self.fly_direct(0,0,-1,1)
+            while pos_z<(-stop_value_z): #0 to 50 || 100
+                self.fly_direct(0,0,-50,1)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
         elif z==0:
             pass
@@ -200,10 +201,8 @@ mambo.get_battery()
 
 mambo.take_off()
 
-mambo.destination_sensor_based(-1,2,1)
-
-#straight is x plus,
-# mambo.fly_direct(0,50,0,1)#170 is 1 meter, + is right, - is left. x is straight, y is left, z is up
+mambo.destination_sensor_based(0,1,0)
+# mambo.fly_direct(0,-50,0,1)
 
 mambo.land()
 mambo.smart_sleep(3)
