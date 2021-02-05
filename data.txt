@@ -178,3 +178,28 @@ disconnecting
  disconnecting 
 
  moved 1 meter as previous
+
+ ###############################################
+  Success in setting up the wifi network to the drone! 
+Connection established
+data collection begin!!
+
+76
+
+Safe take off!
+ take off data, look for Z!! its like base from air!!!
+
+[{'pos_X': -0.3710940480232239, 'pos_Y': -0.7091701030731201, 'pos_Z': -83}, {'X': 0.006177982781082392, 'Y': -0.0003870915388688445, 'Z': 0.005952384322881699}]
+moving forward (pitch 50)
+
+end of movement
+
+[{'pos_X': 114.79256439208984, 'pos_Y': 11.369291305541992, 'pos_Z': -57}, {'X': 0.0008706115768291056, 'Y': -0.060068484395742416, 'Z': -0.005889412946999073}]
+Landing!
+ trying to land 
+
+after landing
+
+[{'pos_X': 181.17515563964844, 'pos_Y': 15.515266418457031, 'pos_Z': -53}, {'X': -8.826665180095006e-06, 'Y': 0.04038301482796669, 'Z': -0.00869385153055191}]
+disconnecting
+ disconnecting 
