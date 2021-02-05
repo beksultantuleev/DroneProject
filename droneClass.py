@@ -124,9 +124,9 @@ class Drone():
         # self.smart_sleep()
 
     def destination_sensor_based(self, x, y, z):
-        one_meter_in_sensor_x = 100  # sensor scale in pos X aka y in cartesian plane #move forward and backward
-        one_meter_in_sensor_y = 100 #sensor scale in pos Y aka x in cartesian plane #move sideways
-        one_meter_in_sensor_z = 100 #move up and down
+        one_meter_in_sensor_x = 90  # sensor scale in pos X aka y in cartesian plane #move forward and backward
+        one_meter_in_sensor_y = 90 #sensor scale in pos Y aka x in cartesian plane #move sideways
+        one_meter_in_sensor_z = 90 #move up and down
         pos_x_y_z = self.get_pos_xyz()
 
         stop_value_x = x*one_meter_in_sensor_y
@@ -143,21 +143,21 @@ class Drone():
         #move forward and backward
         if y > 0:
             while pos_x < stop_value_y:
-                self.fly_direct(0, 40, 0, 0.9)
+                self.fly_direct(0, 45, 0, 1)
                 pos_x = int(self.get_pos_xyz()["pos_X"])
         elif y < 0:
             while pos_x > stop_value_y:
-                self.fly_direct(0, -40, 0, 0.9)
+                self.fly_direct(0, -45, 0, 1)
                 pos_x = int(self.get_pos_xyz()["pos_X"])
         
         #move sideway
         if x > 0:
             while pos_y < stop_value_x:
-                self.fly_direct(20, 0, 0, 0.1)
+                self.fly_direct(45, 0, 0, 1)
                 pos_y = int(self.get_pos_xyz()["pos_Y"])
         elif x < 0:
             while pos_y > stop_value_x:
-                self.fly_direct(-20, 0, 0, 0.1)
+                self.fly_direct(-45, 0, 0, 1)
                 pos_y = int(self.get_pos_xyz()["pos_Y"])     
         
         #moves up and down
@@ -200,7 +200,7 @@ mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-mambo.destination_sensor_based(0, 1, 0)
+mambo.destination_sensor_based(1, 1, 0)
 mambo.land()
 mambo.get_pos_xyz()
 mambo.smart_sleep(3)
