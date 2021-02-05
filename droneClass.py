@@ -142,11 +142,7 @@ class Drone():
             return "not gonna fly"
         if y>0:
             while pos_x<stop_value_y:
-<<<<<<< HEAD
                 self.fly_direct(0,50,0,1)
-=======
-                self.fly_direct(0,35,0,0.5)
->>>>>>> 288f79237ea21f6520a7151bd47739cdbea53b85
                 pos_x =int(self.get_pos_xyz()["pos_X"])
         elif y<0:
             while pos_x>stop_value_y:
