@@ -80,7 +80,7 @@ class Drone():
 
     def fly_direct_fixed(self):
         #this function is adjustable to fly straight
-        self.fly_direct(0,50,0,1)
+        self.fly_direct(0,45,0,1)
 
     def turn_right(self):
         self._drone_id.turn_degrees(90)
@@ -205,7 +205,7 @@ class FlightPlanner(Drone):
         # sensor scale in pos Y #move sideways, right is +
         # sensor in pos Z  # move up and down, move up is -
         pos_x_y_z = self.get_pos_xyz()
-        coefficient = 0.8 #adjusting variable
+        coefficient = 0.7 #adjusting variable
 
         stop_value_x = (x) * coefficient
         stop_value_y = (y) * coefficient
@@ -260,6 +260,9 @@ class FlightPlanner(Drone):
                 self.smart_sleep(0.5)
                 pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
 
+    def reset(self):
+        self.destination_sensor_based_improved(0,0,0)
+
     def square(self):
         self.destination_sensor_based_improved(1, -1, 0)
         self.smart_sleep(1)
@@ -272,7 +275,7 @@ class FlightPlanner(Drone):
     
     def forward_and_back(self):
         self.destination_sensor_based_improved(1,0,0)
-        self.smart_sleep()
+        self.smart_sleep(0.5)
         self.destination_sensor_based_improved(-1,0,0)
 
 
@@ -287,6 +290,7 @@ mambo.take_off()
 # mambo.destination_sensor_based_improved(0,0,1)
 # mambo.square()
 # mambo.test_shape()
+# mambo.reset()
 mambo.forward_and_back()
 
 # mambo.get_pos_xyz()
