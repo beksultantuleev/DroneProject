@@ -286,8 +286,8 @@ mambo.get_battery()
 mambo.take_off()
 # mambo.destination_sensor_based_improved(0,0,1)
 # mambo.square()
-mambo.test_shape()
-# mambo.forward_and_back()
+# mambo.test_shape()
+mambo.forward_and_back()
 
 # mambo.get_pos_xyz()
 
