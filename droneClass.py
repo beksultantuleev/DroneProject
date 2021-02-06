@@ -78,6 +78,10 @@ class Drone():
         self._drone_id.fly_direct(roll=roll, pitch=pitch, yaw=0,
                                   vertical_movement=vertical_movement, duration=duration)
 
+    def fly_direct_fixed(self):
+        #this function is adjustable to fly straight
+        self.fly_direct(0,50,0,1)
+
     def turn_right(self):
         self._drone_id.turn_degrees(90)
 
@@ -219,13 +223,13 @@ class FlightPlanner(Drone):
         # move forward and backward
         if x > 0:
             while pos_x < stop_value_x:
-                self.fly_direct(0, 45, 0, 1)
+                self.fly_direct_fixed()
                 self.smart_sleep(1)
                 pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100), 2)
         elif x < 0:
             self.turn_around()
             while pos_x > stop_value_x:
-                self.fly_direct(0, 45, 0, 1)
+                self.fly_direct_fixed()
                 self.smart_sleep(1)
                 pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100), 2)
             self.turn_around()
@@ -233,14 +237,14 @@ class FlightPlanner(Drone):
         if y > 0:
             self.turn_right()
             while pos_y < stop_value_y:
-                self.fly_direct(0, 45, 0, 1)
+                self.fly_direct_fixed()
                 self.smart_sleep(1)
                 pos_y = np.round(int(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_left()
         elif y < 0:
             self.turn_left()
             while pos_y > stop_value_y:
-                self.fly_direct(0, 45, 0, 1)
+                self.fly_direct_fixed()
                 self.smart_sleep(1)
                 pos_y = np.round(int(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_right()
@@ -258,7 +262,18 @@ class FlightPlanner(Drone):
 
     def square(self):
         self.destination_sensor_based_improved(1, -1, 0)
+        self.smart_sleep(1)
         self.destination_sensor_based_improved(-1, -1, 0)
+    
+    def test_shape(self):
+        self.destination_sensor_based_improved(1, -1, 0)
+        self.smart_sleep(1)
+        self.destination_sensor_based_improved(2, 0, 0)
+    
+    def forward_and_back(self):
+        self.destination_sensor_based_improved(1,0,0)
+        self.smart_sleep(1)
+        self.destination_sensor_based_improved(-1,0,0)
 
 
 mambo = FlightPlanner("7A:64:62:66:4B:67")
@@ -269,8 +284,10 @@ mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-# mambo.destination_sensor_based_improved(-1,0,0)
+# mambo.destination_sensor_based_improved(0,0,1)
 # mambo.square()
+# mambo.test_shape()
+mambo.forward_and_back()
 
 # mambo.get_pos_xyz()
 
