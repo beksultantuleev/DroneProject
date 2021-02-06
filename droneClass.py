@@ -212,8 +212,7 @@ class FlightPlanner(Drone):
         pos_y = int(pos_x_y_z["pos_Y"]/100)
         pos_z = int(pos_x_y_z["pos_Z"]/100)
 
-        # if previous_state == None:
-        #     first_start = True
+
 
         if x==y==0:
             print("i am already here")
