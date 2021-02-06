@@ -221,13 +221,13 @@ class FlightPlanner(Drone):
             while pos_x < stop_value_x:
                 self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
-                pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100),2)
+                pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100), 2)
         elif x < 0:
             self.turn_around()
             while pos_x > stop_value_x:
                 self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
-                pos_x = int(self.get_pos_xyz()["pos_X"]/100)
+                pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100), 2)
             self.turn_around()
         # move sideways
         if y > 0:
@@ -235,27 +235,26 @@ class FlightPlanner(Drone):
             while pos_y < stop_value_y:
                 self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
-                pos_y = int(self.get_pos_xyz()["pos_Y"]/100)
+                pos_y = np.round(int(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_left()
         elif y < 0:
             self.turn_left()
             while pos_y > stop_value_y:
                 self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
-                pos_y = int(self.get_pos_xyz()["pos_Y"]/100)
+                pos_y = np.round(int(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_right()
         # move up and down
         if z > 0:
             while pos_z > stop_value_z:
                 self.fly_direct(0, 0, 60, 1)
                 self.smart_sleep(1)
-                pos_z = int(self.get_pos_xyz()["pos_Z"]/100)
+                pos_z = np.round(int(self.get_pos_xyz()["pos_Z"]/100), 2)
         elif z < 0:
             while pos_z < (-stop_value_z):
                 self.fly_direct(0, 0, -50, 1)
                 self.smart_sleep(1)
-                pos_z = int(self.get_pos_xyz()["pos_Z"]/100)
-        # previous_state = {}
+                pos_z = np.round(int(self.get_pos_xyz()["pos_Z"]/100), 2)
 
     def square(self):
         self.destination_sensor_based_improved(1, -1, 0)
@@ -270,8 +269,8 @@ mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-# mambo.destination_sensor_based_improved(1,-1,0)
-mambo.square()
+# mambo.destination_sensor_based_improved(-1,0,0)
+# mambo.square()
 
 # mambo.get_pos_xyz()
 
