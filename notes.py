@@ -1,4 +1,4 @@
-# import numpy as np
+import numpy as np
 # a = [[2, 3], 
 #     [1, 2]]
 
