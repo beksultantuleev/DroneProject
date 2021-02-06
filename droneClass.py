@@ -1,5 +1,6 @@
 from pyparrot.Minidrone import Mambo
 import pyparrot
+import numpy as np
 
 
 class Drone():
@@ -207,7 +208,7 @@ class FlightPlanner(Drone):
         stop_value_z = int(-z)
 
         #get initial positions
-        pos_x = int(pos_x_y_z["pos_X"]/100)
+        pos_x = np.round(float(pos_x_y_z["pos_X"]/100),2)
         pos_y = int(pos_x_y_z["pos_Y"]/100)
         pos_z = int(pos_x_y_z["pos_Z"]/100)
 
