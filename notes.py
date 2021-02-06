@@ -11,4 +11,6 @@ import numpy as np
 # ]
 
 # print(np.dot(a,b))
-print(int(5/100))
+# print(int(5/100))
+a = 1.21651651
+print(np.round(a, 2))

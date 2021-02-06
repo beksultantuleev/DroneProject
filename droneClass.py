@@ -169,7 +169,6 @@ class Drone():
                 self.smart_sleep(0.5)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
 
-    
 
 class ReflexAgent(Drone):
     def __init__(self, drone_mac):
@@ -192,11 +191,12 @@ class ModelBasedAgent(Drone):
         def program():
             pass
 
+
 class FlightPlanner(Drone):
     def __init__(self, drone_mac):
         super().__init__(drone_mac)
-    
-    def destination_sensor_based_improved(self, x, y, z= None):
+
+    def destination_sensor_based_improved(self, x, y, z=None):
         # sensor scale in pos X  #move forward and backward, headlight of drone +
         # sensor scale in pos Y #move sideways, right is +
         # sensor in pos Z  # move up and down, move up is -
@@ -207,59 +207,60 @@ class FlightPlanner(Drone):
         stop_value_y = int(y)
         stop_value_z = int(-z)
 
-        #get initial positions
-        pos_x = np.round(float(pos_x_y_z["pos_X"]/100),2)
-        pos_y = int(pos_x_y_z["pos_Y"]/100)
-        pos_z = int(pos_x_y_z["pos_Z"]/100)
+        # get initial positions
+        pos_x = np.round(float(pos_x_y_z["pos_X"]/100), 2)
+        pos_y = np.round(int(pos_x_y_z["pos_Y"]/100), 2)
+        pos_z = np.round(int(pos_x_y_z["pos_Z"]/100), 2)
 
-        if x==y==z==0:
+        if x == y == z == 0:
             print("i am already here")
             return "I am already here"
 
-        #move forward and backward
-        if x>0:
-            while pos_x<stop_value_x:
-                self.fly_direct(0,45,0,1)
+        # move forward and backward
+        if x > 0:
+            while pos_x < stop_value_x:
+                self.fly_direct(0, 45, 0, 1)
+                self.smart_sleep(1)
+                pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100),2)
+        elif x < 0:
+            self.turn_around()
+            while pos_x > stop_value_x:
+                self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
                 pos_x = int(self.get_pos_xyz()["pos_X"]/100)
-        elif x <0:
             self.turn_around()
-            while pos_x>stop_value_x:
-                self.fly_direct(0,45,0,1)
-                self.smart_sleep(1)
-                pos_x = int(self.get_pos_xyz()["pos_X"]/100)
-            self.turn_around()
-        #move sideways
-        if y>0:
+        # move sideways
+        if y > 0:
             self.turn_right()
-            while pos_y<stop_value_y:
-                self.fly_direct(0,45,0,1)
+            while pos_y < stop_value_y:
+                self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
                 pos_y = int(self.get_pos_xyz()["pos_Y"]/100)
             self.turn_left()
-        elif y<0:
+        elif y < 0:
             self.turn_left()
-            while pos_y>stop_value_y:
-                self.fly_direct(0,45,0,1)
+            while pos_y > stop_value_y:
+                self.fly_direct(0, 45, 0, 1)
                 self.smart_sleep(1)
-                pos_y =  int(self.get_pos_xyz()["pos_Y"]/100)
+                pos_y = int(self.get_pos_xyz()["pos_Y"]/100)
             self.turn_right()
-        #move up and down
-        if z>0:
-            while pos_z>stop_value_z:
-                self.fly_direct(0,0,60,1)
+        # move up and down
+        if z > 0:
+            while pos_z > stop_value_z:
+                self.fly_direct(0, 0, 60, 1)
                 self.smart_sleep(1)
                 pos_z = int(self.get_pos_xyz()["pos_Z"]/100)
-        elif z<0:
-            while pos_z< (-stop_value_z):
-                self.fly_direct(0,0,-50,1)
+        elif z < 0:
+            while pos_z < (-stop_value_z):
+                self.fly_direct(0, 0, -50, 1)
                 self.smart_sleep(1)
                 pos_z = int(self.get_pos_xyz()["pos_Z"]/100)
         # previous_state = {}
 
     def square(self):
-        self.destination_sensor_based_improved(1,-1,0)
-        self.destination_sensor_based_improved(-1,-1,0)
+        self.destination_sensor_based_improved(1, -1, 0)
+        self.destination_sensor_based_improved(-1, -1, 0)
+
 
 mambo = FlightPlanner("7A:64:62:66:4B:67")
 # mambo = ReflexAgent("7A:64:62:66:4B:67")
