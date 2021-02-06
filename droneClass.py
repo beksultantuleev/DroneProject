@@ -80,7 +80,7 @@ class Drone():
 
     def fly_direct_fixed(self):
         #this function is adjustable to fly straight
-        self.fly_direct(0,50,0,1)
+        self.fly_direct(0,45,0,1)
 
     def turn_right(self):
         self._drone_id.turn_degrees(90)
@@ -205,11 +205,11 @@ class FlightPlanner(Drone):
         # sensor scale in pos Y #move sideways, right is +
         # sensor in pos Z  # move up and down, move up is -
         pos_x_y_z = self.get_pos_xyz()
-        coefficient = 1 #adjusting variable
+        coefficient = 0.8 #adjusting variable
 
-        stop_value_x = int(x) * coefficient
-        stop_value_y = int(y) * coefficient
-        stop_value_z = int(-z) * coefficient
+        stop_value_x = (x) * coefficient
+        stop_value_y = (y) * coefficient
+        stop_value_z = (-z) * coefficient
 
         # get initial positions
         pos_x = np.round(float(pos_x_y_z["pos_X"]/100), 2)
@@ -238,26 +238,26 @@ class FlightPlanner(Drone):
             self.turn_right()
             while pos_y < stop_value_y:
                 self.fly_direct_fixed()
-                self.smart_sleep(1)
+                self.smart_sleep(0.5)
                 pos_y = np.round(float(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_left()
         elif y < 0:
             self.turn_left()
             while pos_y > stop_value_y:
                 self.fly_direct_fixed()
-                self.smart_sleep(1)
+                self.smart_sleep(0.5)
                 pos_y = np.round(float(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_right()
         # move up and down
         if z > 0:
             while pos_z > stop_value_z:
                 self.fly_direct(0, 0, 60, 1)
-                self.smart_sleep(1)
+                self.smart_sleep(0.5)
                 pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
         elif z < 0:
             while pos_z < (-stop_value_z):
                 self.fly_direct(0, 0, -50, 1)
-                self.smart_sleep(1)
+                self.smart_sleep(0.5)
                 pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
 
     def square(self):
@@ -267,12 +267,12 @@ class FlightPlanner(Drone):
     
     def test_shape(self):
         self.destination_sensor_based_improved(1, -1, 0)
-        self.smart_sleep(1)
+        self.smart_sleep()
         self.destination_sensor_based_improved(2, 0, 0)
     
     def forward_and_back(self):
         self.destination_sensor_based_improved(1,0,0)
-        self.smart_sleep(1)
+        self.smart_sleep()
         self.destination_sensor_based_improved(-1,0,0)
 
 
@@ -286,8 +286,8 @@ mambo.get_battery()
 mambo.take_off()
 # mambo.destination_sensor_based_improved(0,0,1)
 # mambo.square()
-# mambo.test_shape()
-mambo.forward_and_back()
+mambo.test_shape()
+# mambo.forward_and_back()
 
 # mambo.get_pos_xyz()
 
