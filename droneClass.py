@@ -9,6 +9,7 @@ class Drone():
 
     def disconnect(self):
         print("disconnecting")
+        self.smart_sleep()
         self._drone_id.disconnect()
 
     def connected(self):
@@ -23,33 +24,29 @@ class Drone():
         else:
             self._drone_id.smart_sleep(time)
 
-    def request_all_sensor_data(self):
-        # self.smart_sleep(1)
-        self._drone_id.ask_for_state_update()
+    def print_all_sensor_data(self):
+        # self._drone_id.ask_for_state_update() #try without it
         sensors = self._drone_id.sensors.__dict__
-        # self.smart_sleep(1)
-        return sensors
+        print(sensors)
 
     def get_all_sensor_data(self):
-        # self.smart_sleep(1)
-        self._drone_id.ask_for_state_update()
+        # self._drone_id.ask_for_state_update()
         sensors = self._drone_id.sensors.__dict__
-        # self.smart_sleep(1)
-        print(sensors)
         return sensors
 
     def get_flying_state(self):
-        state = self.request_all_sensor_data()["flying_state"]
+        state = self.get_all_sensor_data()["flying_state"]
         print(state)
         return state
 
     def get_battery(self):
-        battery = self.request_all_sensor_data()["battery"]
+        self.ask_for_state_update()
+        battery = self.get_all_sensor_data()["battery"]
         print(battery)
         return battery
 
     def get_altitude(self):
-        sensors_dict = self.request_all_sensor_data()
+        sensors_dict = self.get_all_sensor_data()
         altitude = sensors_dict["altitude"]
         altitude_ts = sensors_dict["altitude_ts"]
         print(altitude, altitude_ts)
@@ -59,7 +56,7 @@ class Drone():
         self._drone_id.ask_for_state_update()
 
     def get_pos_xyz(self):
-        sensors_dict = self.request_all_sensor_data()
+        sensors_dict = self.get_all_sensor_data()
         x = sensors_dict["sensors_dict"]["DronePosition_posx"]
         y = sensors_dict["sensors_dict"]["DronePosition_posy"]
         z = sensors_dict["sensors_dict"]["DronePosition_posz"]
@@ -73,60 +70,52 @@ class Drone():
         self._drone_id.safe_takeoff(1)
 
     def land(self):
-        self.smart_sleep(1)
         print("Landing!")
         self._drone_id.safe_land(2)
-        self.smart_sleep(1)
 
     def fly_direct(self, roll, pitch, vertical_movement, duration):
         self._drone_id.fly_direct(roll=roll, pitch=pitch, yaw=0,
                                   vertical_movement=vertical_movement, duration=duration)
 
     def turn_right(self):
-        # self.smart_sleep()
         self._drone_id.turn_degrees(90)
 
     def turn_left(self):
-        # self.smart_sleep()
         self._drone_id.turn_degrees(-90)
 
     def turn_around(self):
-        # self.smart_sleep()
-        self._drone_id.turn_degrees(180)
+        self._drone_id.turn_degrees(-180)
 
     def destination_no_sensor(self, x, y):
         if y > 0:
             while y != 0:
-                self.fly_direct(0, 50, 0, 1)
+                self.fly_direct(0, 45, 0, 1)
+                self.smart_sleep(1)
                 y -= 1
         elif y < 0:
             while y != 0:
-                # self.smart_sleep()
-                self.fly_direct(0, -50, 0, 1)
+                self.fly_direct(0, -45, 0, 1)
+                self.smart_sleep(1)
                 y += 1
-        elif y == 0:
-            pass
-        # self.smart_sleep()
+        self.smart_sleep()
         if x > 0:
             self.turn_right()
             while x != 0:
-
-                self.fly_direct(0, 50, 0, 1)
+                self.fly_direct(0, 45, 0, 1)
                 x -= 1
         elif x < 0:
             self.turn_left()
             while x != 0:
-                # self.smart_sleep()
-                self.fly_direct(0, 50, 0, 1)
+                self.fly_direct(0, 45, 0, 1)
+                self.smart_sleep(1)
                 x += 1
-        elif x == 0:
-            pass
-        # self.smart_sleep()
 
     def destination_sensor_based(self, x, y, z):
-        one_meter_in_sensor_x = 90  # sensor scale in pos X aka y in cartesian plane #move forward and backward
-        one_meter_in_sensor_y = 90 #sensor scale in pos Y aka x in cartesian plane #move sideways
-        one_meter_in_sensor_z = 90 #move up and down
+        # sensor scale in pos X aka y in cartesian plane #move forward and backward
+        one_meter_in_sensor_x = 80
+        # sensor scale in pos Y aka x in cartesian plane #move sideways
+        one_meter_in_sensor_y = 80
+        one_meter_in_sensor_z = 90  # move up and down
         pos_x_y_z = self.get_pos_xyz()
 
         stop_value_x = x*one_meter_in_sensor_y
@@ -139,36 +128,47 @@ class Drone():
         if x == y == z == 0:
             print("not gonna fly")
             return "not gonna fly"
-        
-        #move forward and backward
+
+        # move forward and backward
         if y > 0:
             while pos_x < stop_value_y:
                 self.fly_direct(0, 45, 0, 1)
+                self.smart_sleep(0.5)
                 pos_x = int(self.get_pos_xyz()["pos_X"])
+
         elif y < 0:
             while pos_x > stop_value_y:
                 self.fly_direct(0, -45, 0, 1)
+                self.smart_sleep(0.5)
                 pos_x = int(self.get_pos_xyz()["pos_X"])
-        
-        #move sideway
+        # self.smart_sleep(1)
+
+        # move sideway
         if x > 0:
             while pos_y < stop_value_x:
                 self.fly_direct(45, 0, 0, 1)
+                self.smart_sleep(0.5)
                 pos_y = int(self.get_pos_xyz()["pos_Y"])
         elif x < 0:
             while pos_y > stop_value_x:
                 self.fly_direct(-45, 0, 0, 1)
-                pos_y = int(self.get_pos_xyz()["pos_Y"])     
-        
-        #moves up and down
+                self.smart_sleep(0.5)
+                pos_y = int(self.get_pos_xyz()["pos_Y"])
+        # self.smart_sleep(1)
+
+        # moves up and down
         if z > 0:
             while pos_z > stop_value_z:  # -50to -85 || -100
                 self.fly_direct(0, 0, 50, 1)
+                self.smart_sleep(0.5)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
         elif z < 0:
             while pos_z < (-stop_value_z):  # 0 to 50 || 100
                 self.fly_direct(0, 0, -50, 1)
+                self.smart_sleep(0.5)
                 pos_z = int(self.get_pos_xyz()["pos_Z"])
+
+    
 
 class ReflexAgent(Drone):
     def __init__(self, drone_mac):
@@ -190,18 +190,93 @@ class ModelBasedAgent(Drone):
 
         def program():
             pass
-# class Flight
 
+class FlightPlanner(Drone):
+    def __init__(self, drone_mac):
+        super().__init__(drone_mac)
+    
+    def destination_sensor_based_improved(self, x, y, z= None):
+        # sensor scale in pos X  #move forward and backward, headlight of drone +
+        # sensor scale in pos Y #move sideways, right is +
+        # sensor in pos Z  # move up and down, move up is -
+        pos_x_y_z = self.get_pos_xyz()
+        # previous_state = None
 
-mambo = ReflexAgent("7A:64:62:66:4B:67")
+        stop_value_x = int(x)
+        stop_value_y = int(y)
+        stop_value_z = int(-z)
+
+        #get initial positions
+        pos_x = int(pos_x_y_z["pos_X"]/100)
+        pos_y = int(pos_x_y_z["pos_Y"]/100)
+        pos_z = int(pos_x_y_z["pos_Z"]/100)
+
+        # if previous_state == None:
+        #     first_start = True
+
+        if x==y==0:
+            print("i am already here")
+            return "I am already here"
+
+        #move forward and backward
+        if x>0:
+            while pos_x<stop_value_x:
+                self.fly_direct(0,45,0,1)
+                self.smart_sleep(1)
+                pos_x = int(self.get_pos_xyz()["pos_X"]/100)
+        elif x <0:
+            self.turn_around()
+            while pos_x>stop_value_x:
+                self.fly_direct(0,45,0,1)
+                self.smart_sleep(1)
+                pos_x = int(self.get_pos_xyz()["pos_X"]/100)
+            self.turn_around()
+        #move sideways
+        if y>0:
+            self.turn_right()
+            while pos_y<stop_value_y:
+                self.fly_direct(0,45,0,1)
+                self.smart_sleep(1)
+                pos_y = int(self.get_pos_xyz()["pos_Y"]/100)
+            self.turn_left()
+        elif y<0:
+            self.turn_left()
+            while pos_y>stop_value_y:
+                self.fly_direct(0,45,0,1)
+                self.smart_sleep(1)
+                pos_y =  int(self.get_pos_xyz()["pos_Y"]/100)
+            self.turn_right()
+        #move up and down
+        if z>0:
+            while pos_z>stop_value_z:
+                self.fly_direct(0,0,60,1)
+                self.smart_sleep(1)
+                pos_z = int(self.get_pos_xyz()["pos_Z"]/100)
+        elif z<0:
+            while pos_z< (-stop_value_z):
+                self.fly_direct(0,0,-50,1)
+                self.smart_sleep(1)
+                pos_z = int(self.get_pos_xyz()["pos_Z"]/100)
+        # previous_state = {}
+
+    def square(self):
+        self.destination_sensor_based_improved(1,-1,0)
+        self.destination_sensor_based_improved(-1,-1,0)
+
+mambo = FlightPlanner("7A:64:62:66:4B:67")
+# mambo = ReflexAgent("7A:64:62:66:4B:67")
 # mambo = Drone("7A:64:62:66:4B:67")
 # mambo = Drone("84:20:96:6c:22:67") #lab drone
 mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-mambo.destination_sensor_based(1, 1, 0)
+# mambo.destination_sensor_based_improved(1,-1,0)
+mambo.square()
+
+# mambo.get_pos_xyz()
+
 mambo.land()
 mambo.get_pos_xyz()
-mambo.smart_sleep(3)
+# mambo.smart_sleep(3)
 mambo.disconnect()
