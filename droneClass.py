@@ -205,16 +205,16 @@ class FlightPlanner(Drone):
         # sensor scale in pos Y #move sideways, right is +
         # sensor in pos Z  # move up and down, move up is -
         pos_x_y_z = self.get_pos_xyz()
-        # previous_state = None
+        coefficient = 1 #adjusting variable
 
-        stop_value_x = int(x)
-        stop_value_y = int(y)
-        stop_value_z = int(-z)
+        stop_value_x = int(x) * coefficient
+        stop_value_y = int(y) * coefficient
+        stop_value_z = int(-z) * coefficient
 
         # get initial positions
         pos_x = np.round(float(pos_x_y_z["pos_X"]/100), 2)
-        pos_y = np.round(int(pos_x_y_z["pos_Y"]/100), 2)
-        pos_z = np.round(int(pos_x_y_z["pos_Z"]/100), 2)
+        pos_y = np.round(float(pos_x_y_z["pos_Y"]/100), 2)
+        pos_z = np.round(float(pos_x_y_z["pos_Z"]/100), 2)
 
         if x == y == z == 0:
             print("i am already here")
@@ -225,13 +225,13 @@ class FlightPlanner(Drone):
             while pos_x < stop_value_x:
                 self.fly_direct_fixed()
                 self.smart_sleep(1)
-                pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100), 2)
+                pos_x = np.round(float(self.get_pos_xyz()["pos_X"]/100), 2)
         elif x < 0:
             self.turn_around()
             while pos_x > stop_value_x:
                 self.fly_direct_fixed()
                 self.smart_sleep(1)
-                pos_x = np.round(int(self.get_pos_xyz()["pos_X"]/100), 2)
+                pos_x = np.round(float(self.get_pos_xyz()["pos_X"]/100), 2)
             self.turn_around()
         # move sideways
         if y > 0:
@@ -239,26 +239,26 @@ class FlightPlanner(Drone):
             while pos_y < stop_value_y:
                 self.fly_direct_fixed()
                 self.smart_sleep(1)
-                pos_y = np.round(int(self.get_pos_xyz()["pos_Y"]/100), 2)
+                pos_y = np.round(float(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_left()
         elif y < 0:
             self.turn_left()
             while pos_y > stop_value_y:
                 self.fly_direct_fixed()
                 self.smart_sleep(1)
-                pos_y = np.round(int(self.get_pos_xyz()["pos_Y"]/100), 2)
+                pos_y = np.round(float(self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_right()
         # move up and down
         if z > 0:
             while pos_z > stop_value_z:
                 self.fly_direct(0, 0, 60, 1)
                 self.smart_sleep(1)
-                pos_z = np.round(int(self.get_pos_xyz()["pos_Z"]/100), 2)
+                pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
         elif z < 0:
             while pos_z < (-stop_value_z):
                 self.fly_direct(0, 0, -50, 1)
                 self.smart_sleep(1)
-                pos_z = np.round(int(self.get_pos_xyz()["pos_Z"]/100), 2)
+                pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
 
     def square(self):
         self.destination_sensor_based_improved(1, -1, 0)
