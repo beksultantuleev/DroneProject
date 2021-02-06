@@ -212,6 +212,11 @@ class FlightPlanner(Drone):
         pos_y = int(pos_x_y_z["pos_Y"]/100)
         pos_z = int(pos_x_y_z["pos_Z"]/100)
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 43f59a7dcf2581984f9c52e6712cd16239ec9f13
         if x==y==0:
             print("i am already here")
             return "I am already here"
