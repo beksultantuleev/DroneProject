@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "DroneVenv/bin/python",
+    "python.pythonPath": "FedoraDroneVenv/bin/python",
     "editor.letterSpacing": 1,
     "editor.fontFamily": "Cantarell",
     "terminal.integrated.fontFamily": "monospace"
