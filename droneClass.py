@@ -80,7 +80,7 @@ class Drone():
 
     def fly_direct_fixed(self):
         #this function is adjustable to fly straight
-        self.fly_direct(0,45,0,1)
+        self.fly_direct(0,50,0,1)
 
     def turn_right(self):
         self._drone_id.turn_degrees(90)
