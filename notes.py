@@ -70,7 +70,7 @@ F = np.matrix([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]])
 H = np.matrix([[1, 0, 0, 0], [0, 1, 0, 0]])
 u = np.matrix([[0, 0, 0, 0]]).transpose()
 Q = np.eye(4)
-R = 0.01 ** 2
+R = 0.1 ** 2
 
 N = 20
 true_x = np.linspace(0.0, 50.0, N)
@@ -84,8 +84,8 @@ for measurements in zip(sensed_x, sensed_y):
     result.append((x[:2]).tolist())
 kalman_x, kalman_y = zip(*result)
 
-# plt.plot(kalman_x, kalman_y, 'b-', label='Kalman Estimate')
-# # plt.title("Kalman Filtering")
-# # plt.legend(loc='upper left')
-# plt.show()
+plt.plot(kalman_x, kalman_y, 'b-', label='Kalman Estimate')
+plt.title("Kalman Filtering")
+plt.legend(loc='upper left')
+plt.show()
 
