@@ -66,13 +66,13 @@ def kalman_filter(x, P, measurement, R, u, Q, F, H):
 
 x = np.matrix([0, 0, 0, 0]).transpose()  # Initial state, at (0,0), at rest.
 P = np.matrix(np.eye(4))*1000  # initial uncertainty
-F = np.matrix([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]])
-H = np.matrix([[1, 0, 0, 0], [0, 1, 0, 0]])
-u = np.matrix([[0, 0, 0, 0]]).transpose()
-Q = np.eye(4)
-R = 0.1 ** 2
+F = np.matrix([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]])  #next state function
+H = np.matrix([[1, 0, 0, 0], [0, 1, 0, 0]]) # Measurement function
+u = np.matrix([[0, 0, 0, 0]]).transpose() # external motion
+Q = np.eye(4) # motion noise
+R = 0.01 ** 2 #measurement noise, unseartinty
 
-N = 20
+N = 40
 true_x = np.linspace(0.0, 50.0, N)
 true_y = true_x*2
 sensed_x = true_x + 0.05*np.random.random(N)*true_x
@@ -84,8 +84,8 @@ for measurements in zip(sensed_x, sensed_y):
     result.append((x[:2]).tolist())
 kalman_x, kalman_y = zip(*result)
 
-plt.plot(kalman_x, kalman_y, 'b-', label='Kalman Estimate')
-plt.title("Kalman Filtering")
-plt.legend(loc='upper left')
-plt.show()
+# plt.plot(kalman_x, kalman_y, 'b-', label='Kalman Estimate')
+# plt.title("Kalman Filtering")
+# plt.legend(loc='upper left')
+# plt.show()
 
