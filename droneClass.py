@@ -84,19 +84,19 @@ class Drone():
 
     def fly_direct_fixed(self):
         #this function is adjustable to fly straight
-        self.fly_direct(0,45,0,1)
+        self.fly_direct(0,43,0,1.1) #try 40 and 1.3
 
     def turn_right(self):
         self._drone_id.turn_degrees(90)
-        self.smart_sleep()
+        self.smart_sleep(1.2)
 
     def turn_left(self):
         self._drone_id.turn_degrees(-90)
-        self.smart_sleep()
+        self.smart_sleep(1.2)
 
     def turn_around(self):
         self._drone_id.turn_degrees(-180)
-        self.smart_sleep()
+        self.smart_sleep(1.2)
 
     def destination_no_sensor(self, x, y):
         if y > 0:
@@ -236,7 +236,7 @@ class FlightPlanner(Drone):
         # sensor scale in pos Y #move sideways, right is +
         # sensor in pos Z  # move up and down, move up is -
         pos_x_y_z = self.get_pos_xyz()
-        coefficient = 0.75 #adjusting variable
+        coefficient = 1 #adjusting variable
 
         stop_value_x = (x) * coefficient
         stop_value_y = (y) * coefficient
@@ -255,13 +255,13 @@ class FlightPlanner(Drone):
         if x > 0:
             while pos_x < stop_value_x:
                 self.fly_direct_fixed()
-                self.smart_sleep(0.2)
+                self.smart_sleep(1)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
         elif x < 0:
             self.turn_around()
             while pos_x > stop_value_x:
                 self.fly_direct_fixed()
-                self.smart_sleep(0.2)
+                self.smart_sleep(1)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
             self.turn_around()
         # move sideways
@@ -269,20 +269,20 @@ class FlightPlanner(Drone):
             self.turn_right()
             while pos_y < stop_value_y:
                 self.fly_direct_fixed()
-                self.smart_sleep(0.2)
+                self.smart_sleep(1)
                 pos_y = np.round((self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_left()
         elif y < 0:
             self.turn_left()
             while pos_y > stop_value_y:
                 self.fly_direct_fixed()
-                self.smart_sleep(0.2)
+                self.smart_sleep(1)
                 pos_y = np.round((self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_right()
         # move up and down
         if z > 0:
             while pos_z > stop_value_z:
-                self.fly_direct(0, 0, 60, 1)
+                self.fly_direct(0, 0, 50, 1)
                 self.smart_sleep(0.2)
                 pos_z = np.round((self.get_pos_xyz()["pos_Z"]/100), 2)
         elif z < 0:
@@ -305,9 +305,9 @@ class FlightPlanner(Drone):
         self.destination_sensor_based_improved(2, 0, 0)
     
     def forward_and_back(self):
-        self.destination_sensor_based_improved(1,0,0)
+        self.destination_sensor_based_improved(2,0,0)
         # self.smart_sleep(0.5)
-        self.destination_sensor_based_improved(-1,0,0)
+        self.destination_sensor_based_improved(-2,0,0)
 
 
 mambo = FlightPlanner("7A:64:62:66:4B:67")
@@ -318,7 +318,7 @@ mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-# mambo.destination_sensor_based_improved(0,0,1)
+# mambo.destination_sensor_based_improved(-1,0,0)
 # mambo.square()
 # mambo.test_shape()
 # mambo.reset()
