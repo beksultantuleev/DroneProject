@@ -10,12 +10,16 @@ class Drone():
 
     def disconnect(self):
         print("disconnecting")
-        self.smart_sleep()
+        self.smart_sleep(5) 
         self._drone_id.disconnect()
 
     def connected(self):
         self._drone_id = Mambo(self._drone_mac.islower(), use_wifi=True)
         success = self._drone_id.connect(num_retries=3)
+        print("Sleeping")
+        self.smart_sleep()
+        self.ask_for_state_update()
+        self.smart_sleep()
         print("Connection established")
         return success
 
@@ -41,7 +45,7 @@ class Drone():
         return state
 
     def get_battery(self):
-        self.ask_for_state_update()
+        # self.ask_for_state_update()
         battery = self.get_all_sensor_data()["battery"]
         print(battery)
         return battery
@@ -72,7 +76,7 @@ class Drone():
 
     def land(self):
         print("Landing!")
-        self._drone_id.safe_land(2)
+        self._drone_id.safe_land(5) #5 in tutorial, but i put 2?
 
     def fly_direct(self, roll, pitch, vertical_movement, duration):
         self._drone_id.fly_direct(roll=roll, pitch=pitch, yaw=0,
@@ -84,12 +88,15 @@ class Drone():
 
     def turn_right(self):
         self._drone_id.turn_degrees(90)
+        self.smart_sleep()
 
     def turn_left(self):
         self._drone_id.turn_degrees(-90)
+        self.smart_sleep()
 
     def turn_around(self):
         self._drone_id.turn_degrees(-180)
+        self.smart_sleep()
 
     def destination_no_sensor(self, x, y):
         if y > 0:
@@ -192,8 +199,32 @@ class ModelBasedAgent(Drone):
     def __init__(self):
         Drone.__init__(self)
 
-        def program():
-            pass
+    def kalman_filter(x, P, measurement, R, u, Q, F, H):
+        """
+            Implements a basic Kalman Filter Algorithm algorithm
+            Input:
+            x - initial state, [x1, x2, x0_dot, x1_dot]
+            P - Covariance matrix, initial uncertainty
+            measurement, observed position
+            R - Measurement Noise/Uncertainty.
+            u - external motion
+            Q - Motion Noise
+            F - Next State Function
+            H - Measurement Function
+            """
+        # Update:
+        y = np.matrix(measurement).transpose() - H * x
+        S = H * P * H.transpose() + R  # residual convariance
+        K_t = P * H.transpose() * S.I  # Kalman gain
+        x = x + K_t*y  #state update estimate
+        I = np.matrix(np.eye(F.shape[0])) # identity matrix
+        P = (I - K_t*H)*P
+
+        # Predict:
+        x = F*x + u
+        P = F*P*F.transpose() + Q
+
+        return x, P
 
 
 class FlightPlanner(Drone):
@@ -205,16 +236,16 @@ class FlightPlanner(Drone):
         # sensor scale in pos Y #move sideways, right is +
         # sensor in pos Z  # move up and down, move up is -
         pos_x_y_z = self.get_pos_xyz()
-        coefficient = 0.7 #adjusting variable
+        coefficient = 0.75 #adjusting variable
 
         stop_value_x = (x) * coefficient
         stop_value_y = (y) * coefficient
         stop_value_z = (-z) * coefficient
 
         # get initial positions
-        pos_x = np.round(float(pos_x_y_z["pos_X"]/100), 2)
-        pos_y = np.round(float(pos_x_y_z["pos_Y"]/100), 2)
-        pos_z = np.round(float(pos_x_y_z["pos_Z"]/100), 2)
+        pos_x = np.round((pos_x_y_z["pos_X"]/100), 2)
+        pos_y = np.round((pos_x_y_z["pos_Y"]/100), 2)
+        pos_z = np.round((pos_x_y_z["pos_Z"]/100), 2)
 
         if x == y == z == 0:
             print("i am already here")
@@ -224,58 +255,58 @@ class FlightPlanner(Drone):
         if x > 0:
             while pos_x < stop_value_x:
                 self.fly_direct_fixed()
-                self.smart_sleep(1)
-                pos_x = np.round(float(self.get_pos_xyz()["pos_X"]/100), 2)
+                self.smart_sleep(0.2)
+                pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
         elif x < 0:
             self.turn_around()
             while pos_x > stop_value_x:
                 self.fly_direct_fixed()
-                self.smart_sleep(1)
-                pos_x = np.round(float(self.get_pos_xyz()["pos_X"]/100), 2)
+                self.smart_sleep(0.2)
+                pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
             self.turn_around()
         # move sideways
         if y > 0:
             self.turn_right()
             while pos_y < stop_value_y:
                 self.fly_direct_fixed()
-                self.smart_sleep(0.5)
-                pos_y = np.round(float(self.get_pos_xyz()["pos_Y"]/100), 2)
+                self.smart_sleep(0.2)
+                pos_y = np.round((self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_left()
         elif y < 0:
             self.turn_left()
             while pos_y > stop_value_y:
                 self.fly_direct_fixed()
-                self.smart_sleep(0.5)
-                pos_y = np.round(float(self.get_pos_xyz()["pos_Y"]/100), 2)
+                self.smart_sleep(0.2)
+                pos_y = np.round((self.get_pos_xyz()["pos_Y"]/100), 2)
             self.turn_right()
         # move up and down
         if z > 0:
             while pos_z > stop_value_z:
                 self.fly_direct(0, 0, 60, 1)
-                self.smart_sleep(0.5)
-                pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
+                self.smart_sleep(0.2)
+                pos_z = np.round((self.get_pos_xyz()["pos_Z"]/100), 2)
         elif z < 0:
             while pos_z < (-stop_value_z):
                 self.fly_direct(0, 0, -50, 1)
-                self.smart_sleep(0.5)
-                pos_z = np.round(float(self.get_pos_xyz()["pos_Z"]/100), 2)
+                self.smart_sleep(0.2)
+                pos_z = np.round((self.get_pos_xyz()["pos_Z"]/100), 2)
 
     def reset(self):
         self.destination_sensor_based_improved(0,0,0)
 
     def square(self):
         self.destination_sensor_based_improved(1, -1, 0)
-        self.smart_sleep(1)
+        # self.smart_sleep(1)
         self.destination_sensor_based_improved(-1, -1, 0)
     
     def test_shape(self):
         self.destination_sensor_based_improved(1, -1, 0)
-        self.smart_sleep()
+        # self.smart_sleep()
         self.destination_sensor_based_improved(2, 0, 0)
     
     def forward_and_back(self):
         self.destination_sensor_based_improved(1,0,0)
-        self.smart_sleep(0.5)
+        # self.smart_sleep(0.5)
         self.destination_sensor_based_improved(-1,0,0)
 
 
