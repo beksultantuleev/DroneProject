@@ -82,10 +82,12 @@ result = []
 for measurements in zip(sensed_x, sensed_y):
     x, P = kalman_filter(x, P, measurements, R, u, Q, F, H)
     result.append((x[:2]).tolist())
-kalman_x, kalman_y = zip(*result)
 
-# plt.plot(kalman_x, kalman_y, 'b-', label='Kalman Estimate')
-# plt.title("Kalman Filtering")
-# plt.legend(loc='upper left')
-# plt.show()
+kalman_x, kalman_y = zip(*result)
+# print(result[-1][0])
+
+plt.plot(kalman_x, kalman_y, 'b-', label='Kalman Estimate')
+plt.title("Kalman Filtering")
+plt.legend(loc='upper left')
+plt.show()
 
