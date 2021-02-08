@@ -274,7 +274,15 @@ class ModelBasedAgent(ReflexAgent):
 
         return x, P
 
-    def kalman_applyer(self, x, P, R, u, Q, F, H):
+    def kalman_applyer(self):
+        x = np.matrix([0, 0, 0, 0]).transpose()  # Initial state, at (0,0), at rest.
+        P = np.matrix(np.eye(4))*1000  # initial uncertainty
+        F = np.matrix([[1, 0, 1, 0], [0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 1]])  #next state function
+        H = np.matrix([[1, 0, 0, 0], [0, 1, 0, 0]]) # Measurement function
+        u = np.matrix([[0, 0, 0, 0]]).transpose() # external motion
+        Q = np.eye(4) # motion noise
+        R = 0.01 ** 2 #measurement noise, unseartinty
+
         pos_x_data = []
         pos_y_data = []
         result = []
@@ -311,6 +319,7 @@ class ModelBasedAgent(ReflexAgent):
         if x == y == z == 0:
             print("i am already here")
             return "I am already here"
+
         # move forward and backward
         if x > 0:
             while pos_x < stop_value_x:
