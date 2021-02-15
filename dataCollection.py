@@ -3,7 +3,7 @@ import pyparrot
 from pyparrot.commandsandsensors.DroneSensorParser import DroneSensorParser
 
 mamboMac = "7A:64:62:66:4B:67"
-mambo_bluetooth_adress = "80:19:34:EB:35:56" 
+mambo_bluetooth_adress = "84:20:96:6c:22:67"#"80:19:34:EB:35:56" #"84:20:96:6c:22:67" 
 mambo = Mambo(mamboMac.islower(), use_wifi=True)
 # mambo = Mambo(mambo_bluetooth_adress.islower(), use_wifi=False)
 print("trying to connect")

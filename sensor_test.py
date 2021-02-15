@@ -6,7 +6,7 @@ import time
 
 # If you are using BLE: you will need to change this to the address of YOUR mambo
 # if you are using Wifi, this can be ignored
-mamboAddr = "84:20:96:6c:22:67"
+mamboAddr = "84:20:96:6c:22:67"#"84:20:96:6c:22:67"
 
 # make my mambo object
 # remember to set True/False for the wifi depending on if you are using the wifi or the BLE to connect

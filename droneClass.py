@@ -66,7 +66,10 @@ class Drone():
         y = sensors_dict["sensors_dict"]["DronePosition_posy"]
         z = sensors_dict["sensors_dict"]["DronePosition_posz"]
         orientation = {"pos_X": x, "pos_Y": y, "pos_Z": z}
-        print(orientation)
+        try:
+            print( orientation)
+        except:
+            print("no data")
         return orientation
 
     def take_off(self):
@@ -84,7 +87,7 @@ class Drone():
 
     def fly_direct_fixed(self):
         #this function is adjustable to fly straight
-        self.fly_direct(0,45,0,1.1) #try 40 and 1.3
+        self.fly_direct(0,5,0,0.5) #try 40 and 1.3
 
     def turn_right(self):
         self._drone_id.turn_degrees(90)
@@ -187,12 +190,13 @@ class ReflexAgent(Drone):
         if x > 0:
             while pos_x < stop_value_x:
                 self.fly_direct_fixed()
-                self.smart_sleep(1)
+                # self.smart_sleep(0.01)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
+                print( pos_x)
+            print("end while")
+            self.fly_direct(0,-45,0,0.1)
+            print("negatve")
         elif x < 0:
-            # self.turn_around()
-            while pos_x > stop_value_x:
-                # self.fly_direct_fixed()
                 self.fly_direct(0,-45,0,1.1)
                 self.smart_sleep(1)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
@@ -361,21 +365,22 @@ class ModelBasedAgent(ReflexAgent):
                 self.smart_sleep(0.2)
                 pos_z = np.round((self.get_pos_xyz()["pos_Z"]/100), 2)
 
-mambo = ModelBasedAgent("7A:64:62:66:4B:67")
+# mambo = ModelBasedAgent("7A:64:62:66:4B:67")
 # mambo = ReflexAgent("7A:64:62:66:4B:67")
 # mambo = ReflexAgent("7A:64:62:66:4B:67")
 # mambo = Drone("7A:64:62:66:4B:67")
 # mambo = Drone("84:20:96:6c:22:67") #lab drone
+mambo = ReflexAgent("84:20:96:6c:22:67") #lab drone
 mambo.connected()
 mambo.get_battery()
 
 mambo.take_off()
-mambo.destination_sensor_based_kalman(1,0,0)
-# mambo.destination_sensor_based_improved(-1,0,0)
+# mambo.destination_sensor_based_kalman(1,0,0)
+mambo.destination_sensor_based(1,0,0)
 # mambo.square()
 # mambo.test_shape()
 # mambo.reset()
-mambo.forward_and_back()
+# mambo.forward_and_back()
 
 # mambo.get_pos_xyz()
 
@@ -383,3 +388,4 @@ mambo.land()
 mambo.get_pos_xyz()
 # mambo.smart_sleep(3)
 mambo.disconnect()
+#first drone
