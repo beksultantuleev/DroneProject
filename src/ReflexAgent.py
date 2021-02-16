@@ -1,4 +1,4 @@
-from src import Drone
+from MainDrone import Drone
 import numpy as np
 
 
@@ -82,3 +82,10 @@ class ReflexAgent(Drone):
         self.setCoordinates(2,0,0)
         # self.smart_sleep(0.5)
         self.setCoordinates(-2,0,0)
+
+
+if __name__ == "__main__":
+    mambo = ReflexAgent("7A:64:62:66:4B:67")
+    mambo.connected()
+    mambo.get_battery()
+    mambo.disconnect()

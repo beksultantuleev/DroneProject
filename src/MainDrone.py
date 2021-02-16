@@ -100,3 +100,9 @@ class Drone():
     def turn_around(self):
         self._drone_id.turn_degrees(-180)
         self.smart_sleep(1.2)
+
+if __name__ == "__main__":
+    mambo = Drone("7A:64:62:66:4B:67")
+    mambo.connected()
+    mambo.get_battery()
+    mambo.disconnect()

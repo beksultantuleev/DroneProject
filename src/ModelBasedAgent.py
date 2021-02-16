@@ -1,4 +1,4 @@
-from src import ReflexAgent
+from ReflexAgent import ReflexAgent
 import numpy as np
 
 class ModelBasedAgent(ReflexAgent):
