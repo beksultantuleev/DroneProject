@@ -108,6 +108,8 @@ class DetectionDrone(Drone):
         self.mambo.fly_direct(roll=30, pitch=-30, yaw=0,
                               vertical_movement=0, duration=3)
 
+    
+    
     def flight_func(self, args):
         """
         Takeoff, slowly climb altitude until the vision_cb triggers detection
@@ -116,37 +118,49 @@ class DetectionDrone(Drone):
         Can choose between doing the trajectory using PositonController and
         KalmanFilter, or just as a dumb "fly up" trajectory.
         """
+        print(f"battery level is {self.mambo.sensors.__dict__['battery']}")
+        
         print('taking off')
-        self.mambo.safe_takeoff(2)
+        self.mambo.safe_takeoff(3)
 
         if self.mambo.sensors.flying_state != 'emergency':
 
-            print('sensor calib:')
+            print("Sensor Calibration...")
             while self.mambo.sensors.speed_ts == 0:
                 continue
             self.start_measure = True
 
-            print('getting first state')
-            while self.current_state == []:
-                continue
+            # print('getting first state')
+            # while self.current_state == []:
+            #     continue
 
-            # set first desired state:
+            # # set first desired state:
             # self.desired_state = self.current_state
 
-           #smth here
-            print("going to...")
+            print("goin to ...")
             self.go_to_xyz([1,0,1])
+            # dumb fly option:
+            # while not self.target_acquired:
+            #     jump = self.dumb_fly_up()
+            #     if not jump:
+            #         print('failure')
+            #         break
+            #     elif jump:
+            #         break
 
             self.mambo.smart_sleep(2)
-
         
         print('landing')
         self.mambo.safe_land(2)
-      
-        self.mambo.disconnect()
+        # self.mamboVision.close_video()
+        # self.mambo.disconnect()
 
-    def execute(self):
-        super().execute()
+    # def execute(self):
+    #     super().execute()
+
+    #     print('done closing')
+
+    #     return self.firing_position
 
 
 
@@ -157,4 +171,4 @@ use_wifi = True
 
 if __name__ == "__main__":
     detecDrone = DetectionDrone(drone_mac)
-    firing_pos = detecDrone.execute()
+    detecDrone.execute()
