@@ -1,4 +1,4 @@
-from Drone import Drone
+from Drone_main import Drone
 
 class DetectionDroneTest(Drone):
     def flight_func(self, args):
