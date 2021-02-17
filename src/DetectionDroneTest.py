@@ -4,9 +4,10 @@ class DetectionDroneTest(Drone):
     def flight_func(self, args):
         if self.test_flying:
             print(f"battery level is {self.mambo.sensors.__dict__['battery']}")
-            print(self.mambo.sensors.__dict__)
-            print("Taking off!!")
-            self.mambo.safe_takeoff(5)
+            self.mambo.ask_for_state_update()
+            # print(f"all dictionary is here >> {self.mambo.sensors.sensors_dict['DronePosition_posx']}")
+            # print("Taking off!!")
+            # self.mambo.safe_takeoff(5)
 
             if self.mambo.sensors.flying_state != "emergency":
                 print("Sensor Calibration...")
@@ -25,12 +26,12 @@ class DetectionDroneTest(Drone):
             else:
                 print("not gonna fly! smth wrong")
     
-    def sensor_callback(self, args):
+    def sensor_cb(self, args):
         print([
             self.mambo.sensors.speed_x,
             self.mambo.sensors.speed_y,
             self.mambo.sensors.speed_z
-            # self.mambo.sensors.__dict__["sensors_dict"]['DronePosition_posx']
+            # self.mambo.sensors.sensors_dict['DronePosition_posx']
         ])   
 
 test_flying = True

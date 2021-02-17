@@ -120,8 +120,8 @@ class DetectionDrone(Drone):
         """
         print(f"battery level is {self.mambo.sensors.__dict__['battery']}")
         
-        print('taking off')
-        self.mambo.safe_takeoff(3)
+        # print('taking off')
+        # self.mambo.safe_takeoff(3)
 
         if self.mambo.sensors.flying_state != 'emergency':
 
