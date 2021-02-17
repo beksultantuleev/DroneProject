@@ -10,10 +10,11 @@ mambo = ReflexAgent("7A:64:62:66:4B:67")
 mambo.connected()
 mambo.get_battery()
 
-# mambo.take_off()
+mambo.take_off()
+mambo.fly_direct(0,50,0,None)
 # mambo.setCoordinates()
 
-# mambo.land()
+mambo.land()
 # mambo.get_pos_xyz()
 # mambo.smart_sleep(3)
 mambo.disconnect()

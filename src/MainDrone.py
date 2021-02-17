@@ -1,5 +1,4 @@
 from pyparrot.Minidrone import Mambo
-import pyparrot
 import numpy as np
 
 
