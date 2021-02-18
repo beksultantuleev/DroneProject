@@ -28,14 +28,12 @@ class ReflexAgent(Drone):
         # move forward and backward
         if x > 0:
             while pos_x < stop_value_x:
-                self.fly_direct_fixed()
+                self.fly_direct(0,45,0,1)
                 # self.smart_sleep(0.01)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
                 print( pos_x)
-            print("end while")
-            self.fly_direct(0,-45,0,0.1)
-            print("negatve")
         elif x < 0:
+            while pos_x > stop_value_x:
                 self.fly_direct(0,-45,0,1.1)
                 self.smart_sleep(1)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
@@ -87,5 +85,7 @@ class ReflexAgent(Drone):
 if __name__ == "__main__":
     mambo = ReflexAgent("7A:64:62:66:4B:67")
     mambo.connected()
-    mambo.get_battery()
+    print(f"The Battery level is >>{mambo.get_battery()}")
+
+
     mambo.disconnect()

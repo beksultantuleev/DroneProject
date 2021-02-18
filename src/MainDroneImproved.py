@@ -8,7 +8,7 @@ class Drone():
         self.drone_mac = drone_mac
         self.use_wifi = use_wifi
         self.mambo = Mambo(self.drone_mac.islower(), use_wifi=self.use_wifi)
-        self.mambo.set_user_sensor_callback(self.sensor_cb, args=None)
+        
 
     def execute(self):
         print("Connecting...")
@@ -20,6 +20,8 @@ class Drone():
             self.mambo.smart_sleep(2)
 
             self.mambo.safe_takeoff(3)
+
+            self.mambo.set_user_sensor_callback(self.sensor_cb, args=None)
 
             self.flight_func(None)
 

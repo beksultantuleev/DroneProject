@@ -5,7 +5,10 @@ import numpy as np
 class Drone():
     def __init__(self, drone_mac):
         self.drone_mac = drone_mac
-        # self.mambo.set_user_sensor_callback(self.sensor_cb, args=None)
+        # self.mambo.set_user_sensor_callback(self.mambo.sensors.sensors_dict, args=None)
+    
+    def sensor_callback(self, args):
+        pass
     
     def flight_function(self, args):
         ''' any flight function in other classes '''
@@ -23,6 +26,8 @@ class Drone():
 
         print("Taking off!")
         self.mambo.safe_takeoff(3)
+
+        self.mambo.set_user_sensor_callback(self.sensor_callback, args=None) #this needs to put after take off. wont show pos if u put before
 
         self.flight_function(None)
 

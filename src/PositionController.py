@@ -124,7 +124,7 @@ class MamboPositionController(PositionController):
 if __name__ == "__main__":
     mambo = MamboPositionController()
 
-    mambo.set_desired_state([1, 2, 1])
+    mambo.set_desired_state([1, 0, 1])
     mambo.set_current_state([0, 0, 1])
     u = mambo.calculate_cmd_input()
     print('you need to input this:',u)
