@@ -1,5 +1,5 @@
-from legacy_src.MainDrone import Drone
-# from MainDrone import Drone
+# from legacy_src.MainDrone import Drone
+from MainDrone import Drone
 import numpy as np
 
 

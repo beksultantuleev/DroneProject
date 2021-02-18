@@ -21,14 +21,15 @@ class Drone():
         print("Sleeping")
         self.mambo.smart_sleep(2)
         self.mambo.ask_for_state_update()
-        print(f"Battery level is >> {self.mambo.sensors.__dict__['battery']}")
+        print(f"Battery level is >> {self.mambo.sensors.__dict__['battery']}%")
         self.mambo.smart_sleep(2)
 
         print("Taking off!")
-        self.mambo.safe_takeoff(3)
+        self.mambo.safe_takeoff(2)
 
         self.mambo.set_user_sensor_callback(self.sensor_callback, args=None) #this needs to put after take off. wont show pos if u put before
-        self.mambo.smart_sleep(2)
+        
+        self.mambo.smart_sleep(2) #it needs to give time for data collection
         self.flight_function(None)
 
         print("Landing")

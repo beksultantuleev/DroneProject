@@ -81,7 +81,7 @@ class PositionController:
         u_d will be the zero vector to maintain hover at desired coordinates.
         """
         x_er = np.subtract(self.current_state, self.desired_state)
-        u = np.dot(-1 *mself.K,  x_er).tolist()[0]
+        u = np.dot(-1 *self.K,  x_er).tolist()[0]
 
         self.cmd_input = u
         return self.get_current_input()
@@ -156,7 +156,7 @@ class MamboPositionController(PositionController):
 # test:
 if __name__ == "__main__":
     mambo = MamboPositionController()
-    mambo.set_desired_state([1, 0, 1])
+    mambo.set_desired_state([1, 0, 0])
     mambo.set_current_state([0, 0, 0])
     u = mambo.calculate_cmd_input()
     print('you need to input this:',u)
