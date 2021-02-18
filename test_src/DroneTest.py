@@ -18,18 +18,15 @@ class DetectionDroneTest(Drone):
             # self.mambo.fly_direct(0,30,0,0,3)
             # print("all sensors")
             # print(self.mambo.sensors.sensors_dict)
-
             # print("Flying forward")
-            self.mambo.fly_direct(0,50,0,0,1)
-            # self.mambo.smart_sleep(1)
-            # print("going back")
-            # self.mambo.fly_direct(0,-20,0,0,1)
+            # self.mambo.fly_direct(0,50,0,0,1)
+
 
         else:
             print("not gonna fly! smth wrong")
     
     def sensor_callback(self, args):
-        print([self.mambo.sensors.speex_x])
+        print([self.mambo.sensors.sensors_dict['DronePosition_posx']])
 
 if __name__ == "__main__":
     detection_drone = DetectionDroneTest("7A:64:62:66:4B:67")

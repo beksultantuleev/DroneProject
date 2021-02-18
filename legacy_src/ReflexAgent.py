@@ -1,4 +1,5 @@
-from MainDrone import Drone
+from legacy_src.MainDrone import Drone
+# from MainDrone import Drone
 import numpy as np
 
 
@@ -28,16 +29,17 @@ class ReflexAgent(Drone):
         # move forward and backward
         if x > 0:
             while pos_x < stop_value_x:
-                self.fly_direct(0,45,0,1)
-                # self.smart_sleep(0.01)
+                self.fly_direct_fixed()
+                self.smart_sleep(0.5)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
                 print( pos_x)
         elif x < 0:
+            self.turn_around()
             while pos_x > stop_value_x:
-                self.fly_direct(0,-45,0,1.1)
-                self.smart_sleep(1)
+                self.fly_direct_fixed()
+                self.smart_sleep(0.5)
                 pos_x = np.round((self.get_pos_xyz()["pos_X"]/100), 2)
-            # self.turn_around()
+            self.turn_around()
         # move sideways
         if y > 0:
             self.turn_right()

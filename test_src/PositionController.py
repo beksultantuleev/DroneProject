@@ -114,7 +114,7 @@ class MamboPositionController(PositionController):
                       [0.0, 0.0, 1.0]])
         super().__init__(A, B, Q, R)
 
-        self.max_input_power = [40, 40, 40, 40]
+        self.max_input_power = [30, 30, 30, 30]
         self.max_velocity = 1.0 # m/s, this is a guess.
 
     def calculate_cmd_input(self):
@@ -156,7 +156,7 @@ class MamboPositionController(PositionController):
 # test:
 if __name__ == "__main__":
     mambo = MamboPositionController()
-    mambo.set_desired_state([1, 1, 0])
+    mambo.set_desired_state([1, 0, 1])
     mambo.set_current_state([0, 0, 0])
     u = mambo.calculate_cmd_input()
     print('you need to input this:',u)

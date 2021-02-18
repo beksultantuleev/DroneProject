@@ -28,11 +28,12 @@ class Drone():
         self.mambo.safe_takeoff(3)
 
         self.mambo.set_user_sensor_callback(self.sensor_callback, args=None) #this needs to put after take off. wont show pos if u put before
-
+        self.mambo.smart_sleep(2)
         self.flight_function(None)
 
         print("Landing")
         self.mambo.safe_land(3)
+        print([self.mambo.sensors.__dict__["sensors_dict"]['DronePosition_posx'], self.mambo.sensors.__dict__["sensors_dict"]['DronePosition_posy'],self.mambo.sensors.__dict__["sensors_dict"]['DronePosition_posz']])
 
         self.mambo.disconnect()
     
