@@ -1,4 +1,3 @@
-# from test_src.Drone_main import Drone
 from Drone_main import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
@@ -20,8 +19,8 @@ class ModelBasedAgent(Drone):
         self.current_velocity = [self.mambo.sensors.speed_x,self.mambo.sensors.speed_y, self.mambo.sensors.speed_z]
         self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement, self.current_velocity)
        
-        # print(f"after kalman filter>> {self.current_state}")
-        # print(f"before kalman filter >> {self.current_measurement}")
+        # print(f" kalman filter>> {self.current_state}")
+        # print(f"only sensors >> {self.current_measurement}")
 
     # def fly_with_position_controller(self):
     #     self.controller.set_current_state([0,0,0])
