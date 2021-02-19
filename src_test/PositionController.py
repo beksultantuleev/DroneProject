@@ -17,32 +17,24 @@ class PositionController:
                             of the following commands:
                             [roll, pitch, yaw, vertical_movement]
         cmd_input       : list of commands (the u vector) for to get convergence
-                            to desired state from current state.
-        Reference:
-        https://github.com/ssloy/tutorials/blob/master/tutorials/pendulum/lqr.py
-        Solve the discrete LQR problem for the instance system.
-        Return the solution to the Ricatti equation and the K gains matrix.
-            x[k+1] = Ax[k] + Bu[k]
-            cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
-        """
+                            to desired state from current state."""
         self.desired_state = []
         self.current_state = []
+        # self.necessary_input = []
         self.cmd_input = []
+
         self.A = A
         self.B = B
         self.Q = Q
         self.R = R
-        self.P = np.matrix(scipy.linalg.solve_discrete_are(self.A, self.B,
-                                self.Q, self.R))
-        self.K = np.matrix(scipy.linalg.inv(self.B.T*self.P*self.B+self.R)*(
-                                self.B.T*self.P*self.A))
+        self.P = np.matrix(scipy.linalg.solve_discrete_are(
+            self.A, self.B, self.Q, self.R))
 
-    def get_eig(self):
-        """
-        Return system eigenvalues and eigenvectors for checking stability and
-        response character.
-        """
-        return scipy.linalg.eig(self.A-self.B*self.K)
+        self.K = np.matrix(scipy.linalg.inv(
+            self.B.T*self.P*self.B+self.R) * (self.B.T*self.P*self.A))
+        
+        def get_eig(self):
+            return scipy.linalg.eig(self.A-self.B*self.K)
 
     def get_current_input(self):
         """
@@ -88,17 +80,8 @@ class PositionController:
 
 class MamboPositionController(PositionController):
     def __init__(self):
-        """
-        Initializes the PositionController with Mambo system and weight
-        matrices.
-        Change Q and R to change weights on the states and inputs.
-        The Mambo system is modeled the following way:
-            x = [x_pos, y_pos, z_pos]'
-            u = [x_vel, y_vel, z_vel]'
-            sensing x; fully observable system
-        """
-        self.dt = 0.5 # seconds; sample time (2hz on WiFi)
 
+        self.dt = 0.5 # seconds; sample time (2hz on WiFi)
         # This system is in discrete time:
         A = np.array([[1.0, 0.0, 0.0],
                       [0.0, 1.0, 0.0],
@@ -114,50 +97,35 @@ class MamboPositionController(PositionController):
                       [0.0, 0.0, 1.0]])
         super().__init__(A, B, Q, R)
 
-        self.max_input_power = [30, 30, 30, 30]
-        self.max_velocity = 1.0 # m/s, this is a guess.
+        self.max_input_power = [40, 40, 40, 40]
+        self.max_velocity = 1.0 # m/s, I guess.
 
-    def calculate_cmd_input(self):
-        """
-        Determine x y z velocities required to converge to the desired state
-        from the current state. These become roll, pitch, yaw "commands" in the
-        pyparrot fly_direct() method.
-        Our implementation drives a tracking error to zero. The generalized
-        formulation of the control law is:
-            u = -K_lqr * (x - x_d) + u_d
-        where x_d is desired state and u_d is the input required to maintain
-        the desired state. Inputs to the system are velocities, so the
-        u_d will be the zero vector to maintain hover at desired coordinates.
-        Final self.cmd_input will be normalized to the power range determined
-        for input to the pyparrot fly_direct() method.
-            returns [r, p, y, vm] : r = roll power
-                                    p = pitch power
-                                    y = yaw power
-                                    vm = vertical_movement power
-        """
-        x_er = np.subtract(self.current_state, self.desired_state)
-        u = np.dot(-1 *self.K, x_er).tolist()[0] # python list structure
-        yaw = 0 # shouldn't have to yaw for our purposes.
-        u_scaled = [0 for i in range(len(u))]
+        def calculate_cmd_input(self):
+            x_er = np.subtract(self.current_state, self.desired_state)
+            u = np.dot(-1 *self.K, x_er).tolist()[0] # python list structure
+            yaw = 0 # shouldn't have to yaw for our purposes.
+            u_scaled = [0 for i in range(len(u))]
 
-        # constraint checks:
-        for i in range(len(u)):
-            if u[i] > self.max_velocity:
-                u[i] = self.max_velocity
-            if u[i] < -1 * self.max_velocity:
-                u[i] = -1 * self.max_velocity
+            # constraint checks:
+            for i in range(len(u)):
+                if u[i] > self.max_velocity:
+                    u[i] = self.max_velocity
+                if u[i] < -1 * self.max_velocity:
+                    u[i] = -1 * self.max_velocity
 
-            # scaling command input to power maximums:
-            u_scaled[i] = u[i] / self.max_velocity * self.max_input_power[i]
-        self.cmd_input = [u_scaled[1], u_scaled[0], yaw, u_scaled[2]]
+                # scaling command input to power maximums:
+                u_scaled[i] = u[i] / self.max_velocity * self.max_input_power[i]
+            self.cmd_input = [u_scaled[0], u_scaled[1], yaw, u_scaled[2]]
 
-        return self.get_current_input()
+            return self.get_current_input()
+
 
 # test:
 if __name__ == "__main__":
     mambo = MamboPositionController()
-    mambo.set_desired_state([1, 0, 0])
-    mambo.set_current_state([0, 0, 0])
+
+    mambo.set_desired_state([1, 0, 1])
+    mambo.set_current_state([0, 0, 1])
     u = mambo.calculate_cmd_input()
     print('you need to input this:',u)
 
