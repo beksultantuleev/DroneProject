@@ -2,76 +2,67 @@ from Drone_main import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 
-
-class StateEstimator(Drone):
-    def __init__(self, drone_mac):
-        super().__init__(drone_mac)
+class PosCtrlDrone(Drone):
+    def __init__(self,mambo_addr):
+        super().__init__(mambo_addr)
         self.controller = MamboPositionController()
-        self.kalmanfilter = MamboKalman([0, 0, 1], [0, 0, 0]) #pos and vel
-        self.current_velocity = []
-        self.current_state = []
-        self.desired_state = []
+        self.kalmanfilter = MamboKalman([0,0,0], [0,0,0])
+        self.current_vels = [] # for use with KalmanFilter (used as u (input))
+        self.current_state = [] # meters
+        self.desired_state = [1, 0, 1] # meters
         self.eps = 0.08
-        self.max_alt = 2
-        self.start_measure = False #not implemented yet
+        self.start_measure = False
 
     def sensor_callback(self, args):
-        self.current_measurement = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,self.mambo.sensors.sensors_dict['DronePosition_posy']/100,self.mambo.sensors.sensors_dict['DronePosition_posz']/-100 ]
-        self.current_velocity = [self.mambo.sensors.speed_x,self.mambo.sensors.speed_y, self.mambo.sensors.speed_z]
-        self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement, self.current_velocity)
-        self.controller.set_current_state(self.current_state)
-        # print(f"the current state is {self.current_state[0]}")
-        
-        
-    
-    def go_to_xyz(self, desired_state):
-        self.desired_state = desired_state
-        self.controller.set_desired_state(self.desired_state)
+        if self.start_measure:
+            self.current_measurement = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
+                                        self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
+                                        self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]
+            self.current_vels = [self.mambo.sensors.speed_x,
+                                    self.mambo.sensors.speed_y,
+                                    self.mambo.sensors.speed_z]
+            self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
+                                                                        self.current_vels)
+            self.controller.set_current_state(self.current_state)
 
-        dist = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-                (self.current_state[2] - self.desired_state[2])**2)**0.5
-        # print(dist)
-        while dist> self.eps:
-            cmd = self.controller.calculate_cmd_input()
-            self.mambo.fly_direct(roll=cmd[1],
-                                  pitch=cmd[0],
-                                  yaw=cmd[2],
-                                  vertical_movement=cmd[3],
-                                  duration=None)
-            print(dist)
-            dist = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-                (self.current_state[2] - self.desired_state[2])**2)**0.5
-        
+
     def flight_function(self, args):
+        """
+        Takeoff, fly to (1, 0, 1) with units (m), land.
+        """
 
-        if self.mambo.sensors.flying_state != "emergency":
-            print("Sensor Calibration...")
-            while self.mambo.sensors.speed_ts==0:
+        if self.mambo.sensors.flying_state != 'emergency':
+
+            print('sensor calib:')
+            while self.mambo.sensors.speed_ts == 0:
                 continue
-            # self.start_measure = True
-            # print("moving")
-            # self.mambo.fly_direct(0,30,0,0,3)
-            # print("all sensors")
-            # print(self.mambo.sensors.sensors_dict)
+            self.start_measure = True
 
-            # print("Flying forward")
-            self.mambo.fly_direct(0,1,0,0,0.5) #you need to start flying to avoid error
-            print("my boy here")
-            self.go_to_xyz([-1,0,1])
+            print('getting first state')
+            while self.current_state == []:
+                continue
 
-            # self.mambo.smart_sleep(1)
-            # print("going back")
-            # self.mambo.fly_direct(0,-20,0,0,1)
+            self.controller.set_desired_state(self.desired_state)
+            print('flying to position ', self.desired_state)
+            while ( (self.current_state[0] - self.desired_state[0])**2 +
+                    (self.current_state[1] - self.desired_state[1])**2 +
+                    (self.current_state[2] - self.desired_state[2])**2 )**0.5 > self.eps:
+                cmd = self.controller.calculate_cmd_input()
+                print('current state:',self.current_state)
+                print('cmd:          ',cmd)
+                self.mambo.fly_direct(roll=cmd[0],
+                                        pitch=cmd[1],
+                                        yaw=cmd[2],
+                                        vertical_movement=cmd[3],
+                                        duration=None)
+                self.mambo.smart_sleep(0.5)
+        print('landing')
+        self.mambo.safe_land(3)
 
-        else:
-            print("not gonna fly! smth wrong")
-    
-    
+
+
 
 if __name__ == "__main__":
-    detection_drone = StateEstimator("7A:64:62:66:4B:67")
+    detection_drone = PosCtrlDrone("84:20:96:91:73:F1")
     detection_drone.run()
-    
- 
+    #"84:20:96:91:73:F1" #"7A:64:62:66:4B:67"

@@ -1,0 +1,3 @@
+[submodule "CooperativeMambois"]
+	path = CooperativeMambois
+	url = https://github.com/tsun34/CooperativeMambois.git

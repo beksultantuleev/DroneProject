@@ -1,21 +1,25 @@
 """
   KalmanFilter.py
   Abbie Lee | 16.30
+
   Implementation of a Kalman filter for position estimation using the position,
   velocity and quaternion sensor readings.
+
   Based on 16.30 Lec 19 Notes from Fall 2018
 """
 import numpy as np
-
 
 class KalmanFilter:
     def __init__(self, A, B, C, D, Rw, Rv, X0, U0):
         """
         Give matrices for an estimator of the form
+
         xhat' = Axhat + Bu + L(y - yhat)
         yhat = Cxhat + Du
+
         X0: initial state matrix
         U0: control input matrix
+
         type of all matrices is np.array
         """
         self.A = A
@@ -40,7 +44,9 @@ class KalmanFilter:
     def init_P(self):
         """
         Computes initial state covariance matrix from
+
         P[0] = E[X0*X0.T]
+
         NOTE: expected value of a constant is just the constant
         """
         self.P = np.dot(self.X, self.X.T)
@@ -48,9 +54,10 @@ class KalmanFilter:
     def update_L(self):
         """
         Computes L[k] from P[k] and state matrices
+
         L[k] = AP[K]C.T(Rv + CP[k]C.T)^-1
         """
-        M = np.linalg.inv(self.Rv + np.dot(self.C, np.dot(self.P, self.C.T)))
+        M = np.linalg.inv(self.Rv  + np.dot(self.C, np.dot(self.P, self.C.T)))
         self.L = np.dot(self.A, np.dot(self.P, np.dot(self.C.T, M)))
 
         return None
@@ -58,16 +65,16 @@ class KalmanFilter:
     def update_estim(self, Y):
         """
         Computes next state estimate
+
         xhat[k+1] = Axhat[k] + Bu[k] + L[k](y[k] - yhat[k])
         P[k+1] = (A-L[k]C)P[k](A-L[k]C).T + Rv + L[k]RwL[k].T
+
         Y: numpy array of sensor values at timestep k
         """
-        self.X = np.dot(self.A, self.X) + np.dot(self.B,
-                                                 self.U) + np.dot(self.L, Y - self.Yhat)
+        self.X = np.dot(self.A, self.X) + np.dot(self.B, self.U) + np.dot(self.L, Y - self.Yhat)
 
         Acl = self.A - np.dot(self.L, self.C)
-        self.P = np.dot(Acl, np.dot(self.P, Acl.T)) + self.Rv + \
-            np.dot(self.L, np.dot(self.Rw, self.L))
+        self.P = np.dot(Acl, np.dot(self.P, Acl.T)) + self.Rv + np.dot(self.L, np.dot(self.Rw, self.L))
 
         self.Yhat = np.dot(self.C, self.X) + np.dot(self.D, self.U)
         return None
@@ -82,21 +89,22 @@ class KalmanFilter:
 
         return self.X.tolist()[0]
 
-
 class MamboKalman(KalmanFilter):
     def __init__(self, X0, U0):
         """
         Initializes KalmanFilter for a parrot mambo
+
         Model is discrete-time and is based on a simplified view of the drone
         where input is linear velocity and the states are position only.
         The system is fully observable; we use the position estimation of the
         drone as a "sensor".
+
         states: x y z (coordinate positions)
         inputs: u v w (coordinate velocities)
         """
         X0 = np.matrix(X0).T
         U0 = np.matrix(U0).T
-        self.dt = 0.5  # sample time in seconds. 2hz over WiFi.
+        self.dt = 0.5 # sample time in seconds. 2hz over WiFi.
         A = np.array([[1.0, 0.0, 0.0],
                       [0.0, 1.0, 0.0],
                       [0.0, 0.0, 1.0]])
@@ -108,6 +116,6 @@ class MamboKalman(KalmanFilter):
         Rw = np.eye(3)
         Rv = np.array([[1.0, 0.0, 0.0],
                        [0.0, 1.0, 0.0],
-                       [0.0, 0.0, 1.0], ])
+                       [0.0, 0.0, 1.0],])
 
         super().__init__(A, B, C, D, Rw, Rv, X0, U0)

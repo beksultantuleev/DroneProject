@@ -1,6 +1,23 @@
-import scipy.linalg
-import numpy as np
+"""
+    PositionController.py
+    Marcus Abate | 16.30
+    12/1/18
 
+    Calculates control input required to converge to a desired xyz position
+    based on current state and drone dynamics. This is an LQR problem.
+    Control inputs are roll, pitch, yaw commands for the pyparrot interface.
+    These commands are represented as xyz velocity commands. This is because
+    at slow speeds, the quadrotor is roughly level to the ground and travels
+    at a constant velocity when given these commands. They do not actually
+    determine the angles around the three body axes of the drone.
+
+    Because the system is modeling the input to the quadrotor as velocity
+    commands, the commands must be normalized to a much smaller range than is
+    actually possible so as to hold the "small velocities" assumption.
+"""
+
+import numpy as np
+import scipy.linalg
 
 class PositionController:
     def __init__(self, A, B, Q, R):
@@ -18,10 +35,13 @@ class PositionController:
                             [roll, pitch, yaw, vertical_movement]
         cmd_input       : list of commands (the u vector) for to get convergence
                             to desired state from current state.
+
         Reference:
         https://github.com/ssloy/tutorials/blob/master/tutorials/pendulum/lqr.py
+
         Solve the discrete LQR problem for the instance system.
         Return the solution to the Ricatti equation and the K gains matrix.
+
             x[k+1] = Ax[k] + Bu[k]
             cost = sum x[k].T*Q*x[k] + u[k].T*R*u[k]
         """
@@ -55,6 +75,7 @@ class PositionController:
     def set_current_state(self, current_state):
         """
         Called at every state update in a main loop.
+
             current_state: holds the current state of the drone.
                 the state is x-y-z positions and x-y-z linear velocities.
         """
@@ -63,6 +84,7 @@ class PositionController:
     def set_desired_state(self, desired_state):
         """
         Called when the desired waypoint is updated in a main loop.
+
             desired_state: holds the desired x-y-z position of the drone as a
                 3-element list.
         """
@@ -73,15 +95,18 @@ class PositionController:
         Determine x y z velocities required to converge to the desired state
         from the current state. These become roll, pitch, yaw "commands" in the
         pyparrot fly_direct() method.
+
         Our implementation drives a tracking error to zero. The generalized
         formulation of the control law is:
+
             u = -K_lqr * (x - x_d) + u_d
+
         where x_d is desired state and u_d is the input required to maintain
         the desired state. Inputs to the system are velocities, so the
         u_d will be the zero vector to maintain hover at desired coordinates.
         """
         x_er = np.subtract(self.current_state, self.desired_state)
-        u = np.dot(-1 *self.K,  x_er).tolist()[0]
+        u = np.dot(-1 * self.K,  x_er).tolist()[0]
 
         self.cmd_input = u
         return self.get_current_input()
@@ -114,7 +139,7 @@ class MamboPositionController(PositionController):
                       [0.0, 0.0, 1.0]])
         super().__init__(A, B, Q, R)
 
-        self.max_input_power = [30, 30, 30, 30]
+        self.max_input_power = [20, 20, 20, 20]
         self.max_velocity = 1.0 # m/s, this is a guess.
 
     def calculate_cmd_input(self):
@@ -122,14 +147,19 @@ class MamboPositionController(PositionController):
         Determine x y z velocities required to converge to the desired state
         from the current state. These become roll, pitch, yaw "commands" in the
         pyparrot fly_direct() method.
+
         Our implementation drives a tracking error to zero. The generalized
         formulation of the control law is:
+
             u = -K_lqr * (x - x_d) + u_d
+
         where x_d is desired state and u_d is the input required to maintain
         the desired state. Inputs to the system are velocities, so the
         u_d will be the zero vector to maintain hover at desired coordinates.
+
         Final self.cmd_input will be normalized to the power range determined
         for input to the pyparrot fly_direct() method.
+
             returns [r, p, y, vm] : r = roll power
                                     p = pitch power
                                     y = yaw power
@@ -156,8 +186,8 @@ class MamboPositionController(PositionController):
 # test:
 if __name__ == "__main__":
     mambo = MamboPositionController()
+
     mambo.set_desired_state([1, 0, 0])
     mambo.set_current_state([0, 0, 0])
     u = mambo.calculate_cmd_input()
-    print('you need to input this:',u)
-
+    print('u after:',u)
