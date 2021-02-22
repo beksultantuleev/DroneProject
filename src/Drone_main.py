@@ -1,14 +1,4 @@
-"""
-    Drone.py
-    Marcus Abate | 16.30
-    12/1/18
-
-    This class encapsulates many of the standard methods and objects used to
-    run tests and scripts on the Parrot Mambo drone with vision.
-"""
-
 from pyparrot.Minidrone import Mambo
-# from pyparrot.DroneVisionGUI import DroneVisionGUI
 
 class Drone:
     def __init__(self, drone_mac):

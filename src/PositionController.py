@@ -136,7 +136,7 @@ class MamboPositionController(PositionController):
                       [0.0, 0.0, 1.0]])
         R = np.array([[0.5, 0.0, 0.0],
                       [0.0, 0.5, 0.0],
-                      [0.0, 0.0, 1.0]])
+                      [0.0, 0.0, 1]])
         super().__init__(A, B, Q, R)
 
         self.max_input_power = [20, 20, 20, 20]
@@ -188,6 +188,6 @@ if __name__ == "__main__":
     mambo = MamboPositionController()
 
     mambo.set_desired_state([1, 0, 0])
-    mambo.set_current_state([0, 0, 0])
+    mambo.set_current_state([0.5, 0, 0])
     u = mambo.calculate_cmd_input()
     print('u after:',u)

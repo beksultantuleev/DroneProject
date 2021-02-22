@@ -9,11 +9,10 @@ class ModelBasedAgent(Drone):
         super().__init__(drone_mac)
         self.controller = MamboPositionController()
         self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
-        # for use with KalmanFilter (used as u (input))
         self.current_velocities = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
-        self.eps = 0.3  # 0.08
+        self.eps = 0.1  # 0.08
         self.start_measure = False
 
     def sensor_callback(self, args):
@@ -29,6 +28,27 @@ class ModelBasedAgent(Drone):
             self.controller.set_current_state(self.current_state)
 
     def go_to_xyz(self, desired_state):
+        self.desired_state = desired_state
+        self.controller.set_desired_state(self.desired_state)
+        distance = ((self.current_state[0] - self.desired_state[0])**2 +
+                (self.current_state[1] - self.desired_state[1])**2 +
+               (self.current_state[2] - self.desired_state[2])**2)**0.5
+        while distance > self.eps:
+            cmd = self.controller.calculate_cmd_input()
+            self.mambo.fly_direct(roll=cmd[0],
+                                  pitch=cmd[1],
+                                  yaw=cmd[2],
+                                  vertical_movement=cmd[3],
+                                  duration=None)
+            self.mambo.smart_sleep(0.5)
+            distance = ((self.current_state[0] - self.desired_state[0])**2 +
+                (self.current_state[1] - self.desired_state[1])**2 +
+               (self.current_state[2] - self.desired_state[2])**2)**0.5
+            print(f"current state >>{self.current_state}")
+            print(f"cmd >> {cmd}")
+            print(f"distance >> {distance}")
+
+    def go_to_xyz_old(self, desired_state):
         self.desired_state = desired_state
 
         stop_value_x = desired_state[0]  # x
@@ -112,26 +132,6 @@ class ModelBasedAgent(Drone):
                 print(f"cmd >>{cmd}")
                 print(f"pos y {pos_y}")
 
-    def go_to_xyz_imp(self, desired_state):
-        self.desired_state = desired_state
-        self.controller.set_desired_state(self.desired_state)
-        distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-               (self.current_state[2] - self.desired_state[2])**2)**0.5
-        while distance > self.eps:
-            cmd = self.controller.calculate_cmd_input()
-            self.mambo.fly_direct(roll=cmd[0],
-                                  pitch=cmd[1],
-                                  yaw=cmd[2],
-                                  vertical_movement=cmd[3],
-                                  duration=None)
-            self.mambo.smart_sleep(0.5)
-            distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-               (self.current_state[2] - self.desired_state[2])**2)**0.5
-            print(f"current state >>{self.current_state}")
-            print(f"cmd >> {cmd}")
-            print(f"distance >> {distance}")
 
     def flight_function(self, args):
         if self.mambo.sensors.flying_state != 'emergency':
@@ -146,9 +146,9 @@ class ModelBasedAgent(Drone):
                 continue
             '''run the function here'''
             # self.go_to_xyz([1, 1, 0])
-            self.go_to_xyz_imp([1, 0, 1])
+            self.go_to_xyz([1, 0, 1])
 
-        print('landing')
+        print('Landing...')
         self.mambo.safe_land(3)
 
 

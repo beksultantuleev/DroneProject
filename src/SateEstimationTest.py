@@ -2,14 +2,14 @@ from Drone_main import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 
-class StateEstimator(Drone):
+class StateEstimatioinTest(Drone):
     def __init__(self,drone_mac):
         super().__init__(drone_mac)
         self.controller = MamboPositionController()
         self.kalmanfilter = MamboKalman([0,0,0], [0,0,0])
         self.current_velocities = [] # for use with KalmanFilter (used as u (input))
         self.current_state = [] # meters
-        self.desired_state = [-1, 0, 1] # meters
+        self.desired_state = [1, 0, 1] # meters
         self.eps = 0.08
         self.start_measure = False
 
@@ -63,6 +63,6 @@ class StateEstimator(Drone):
 
 
 if __name__ == "__main__":
-    detection_drone = StateEstimator("84:20:96:91:73:F1")
+    detection_drone = StateEstimatioinTest("84:20:96:91:73:F1")
     detection_drone.run()
      #"84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
