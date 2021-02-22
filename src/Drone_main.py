@@ -11,9 +11,9 @@ from pyparrot.Minidrone import Mambo
 # from pyparrot.DroneVisionGUI import DroneVisionGUI
 
 class Drone:
-    def __init__(self, mambo_addr):
-        self.mamboAddr = mambo_addr
-        self.mambo = Mambo(self.mamboAddr, use_wifi=True)
+    def __init__(self, drone_mac):
+        self.drone_mac = drone_mac
+        self.mambo = Mambo(self.drone_mac, use_wifi=True)
         self.mambo.set_user_sensor_callback(self.sensor_callback, args=None)
 
 

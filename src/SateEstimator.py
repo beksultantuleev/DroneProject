@@ -2,14 +2,14 @@ from Drone_main import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 
-class PosCtrlDrone(Drone):
-    def __init__(self,mambo_addr):
-        super().__init__(mambo_addr)
+class StateEstimator(Drone):
+    def __init__(self,drone_mac):
+        super().__init__(drone_mac)
         self.controller = MamboPositionController()
         self.kalmanfilter = MamboKalman([0,0,0], [0,0,0])
-        self.current_vels = [] # for use with KalmanFilter (used as u (input))
+        self.current_velocities = [] # for use with KalmanFilter (used as u (input))
         self.current_state = [] # meters
-        self.desired_state = [1, 0, 1] # meters
+        self.desired_state = [-1, 0, 1] # meters
         self.eps = 0.08
         self.start_measure = False
 
@@ -18,11 +18,11 @@ class PosCtrlDrone(Drone):
             self.current_measurement = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                         self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
                                         self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]
-            self.current_vels = [self.mambo.sensors.speed_x,
+            self.current_velocities = [self.mambo.sensors.speed_x,
                                     self.mambo.sensors.speed_y,
                                     self.mambo.sensors.speed_z]
             self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
-                                                                        self.current_vels)
+                                                                        self.current_velocities)
             self.controller.set_current_state(self.current_state)
 
 
@@ -63,6 +63,6 @@ class PosCtrlDrone(Drone):
 
 
 if __name__ == "__main__":
-    detection_drone = PosCtrlDrone("84:20:96:91:73:F1")
+    detection_drone = StateEstimator("84:20:96:91:73:F1")
     detection_drone.run()
-    #"84:20:96:91:73:F1" #"7A:64:62:66:4B:67"
+     #"84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

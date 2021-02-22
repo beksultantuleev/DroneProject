@@ -51,7 +51,6 @@ class ModelBasedAgent(Drone):
         if desired_state[0] == desired_state[1] == desired_state[2] == 0:
             print("i am already here")
         
-        
 
         # move forward and backward
         if stop_value_x > 0:
@@ -113,83 +112,6 @@ class ModelBasedAgent(Drone):
                 pos_z = self.current_state[2]
                 print(f"pos z {pos_z}")
 
-    def go_to_xyz_imp(self, desired_state):
-        self.desired_state = desired_state
-
-        stop_value_x = desired_state[0]  # x
-        stop_value_y = desired_state[1]  # y
-        stop_value_z = desired_state[2]  # z
-
-        # get initial positions
-        pos_x = self.current_state[0]
-        pos_y = self.current_state[1]
-        pos_z = self.current_state[2]
-
-        if desired_state[0] == desired_state[1] == desired_state[2] == 0:
-            print("i am already here")
-        
-        
-
-        # move forward and backward
-        if stop_value_x > 0:
-            while pos_x < stop_value_x:
-                self.fly_direct_fixed()
-                self.mambo.smart_sleep(0.01)
-                # self.mambo.fly_direct(self.fly_with_position_controller()[0], self.fly_with_position_controller()[1], 0, self.fly_with_position_controller()[3], None)
-                pos_x = self.current_state[0]
-                print(f"pos x {pos_x}")
-                # print(self.fly_with_position_controller())
-
-        elif stop_value_x < 0:
-            while pos_x > stop_value_x:
-                self.mambo.fly_direct(0, -20, 0, 1)
-                self.mambo.smart_sleep(0.5)
-                # self.mambo.fly_direct(self.fly_with_position_controller()[0], self.fly_with_position_controller()[1], 0, self.fly_with_position_controller()[3], 1)
-                pos_x = self.current_state[0]
-                print(f"pos x {pos_x}")
-                # print(self.fly_with_position_controller())
-
-        # move sideways
-        if stop_value_y > 0:
-            self.mambo.turn_degrees(90)
-            while pos_y < stop_value_y:
-                self.fly_direct_fixed()
-                self.mambo.smart_sleep(0.5)
-                # self.mambo.fly_direct(self.fly_with_position_controller()[0], self.fly_with_position_controller()[1], 0, self.fly_with_position_controller()[3], 1)
-                pos_y = self.current_state[1]
-                print(f"pos y {pos_y}")
-                # print(self.fly_with_position_controller())
-            self.mambo.turn_degrees(-90)
-        elif stop_value_y < 0:
-            self.mambo.turn_degrees(-90)
-            self.mambo.smart_sleep(0.5)
-            while pos_y > stop_value_y:
-                self.fly_direct_fixed()
-                self.mambo.smart_sleep(0.5)
-                # self.mambo.fly_direct(self.fly_with_position_controller()[0], self.fly_with_position_controller()[1], 0, self.fly_with_position_controller()[3], 1)
-                pos_y = self.current_state[1]
-                print(f"pos y {pos_y}")
-                # print(self.fly_with_position_controller())
-            self.mambo.turn_degrees(90)
-
-         # move up and down
-        if stop_value_z > 0:
-            while pos_z < stop_value_z:
-                # print("pos z stop: %d" % stop_value_z)
-                self.mambo.fly_direct(0,0,0,10,None)
-                self.mambo.smart_sleep(0.1)
-                # self.mambo.fly_direct(self.fly_with_position_controller()[0], self.fly_with_position_controller()[1], 0, self.fly_with_position_controller()[3], 1)
-                pos_z = self.current_state[2]
-                print("pos z: %f" % pos_z)
-
-        elif stop_value_z < 0:
-            while pos_z > stop_value_z:
-                self.mambo.fly_direct(0,0,0,-30,None)
-                self.mambo.smart_sleep(0.5)
-                # self.mambo.fly_direct(self.fly_with_position_controller()[0], self.fly_with_position_controller()[1], 0, self.fly_with_position_controller()[3], 1)
-                pos_z = self.current_state[2]
-                print(f"pos z {pos_z}")
-    
 
     def square_shape(self):
         self.go_to_xyz([1, 0, 1])
