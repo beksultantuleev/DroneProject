@@ -1,87 +1,72 @@
+# import numpy as np
+
+# class KalmanFilter(object):
+#     def __init__(self, F = None, B = None, H = None, Q = None, R = None, P = None, x0 = None):
+
+#         if(F is None or H is None):
+#             raise ValueError("Set proper system dynamics.")
+
+#         self.n = F.shape[1]
+#         self.m = H.shape[1]
+
+#         self.F = F
+#         self.H = H
+#         self.B = 0 if B is None else B
+#         self.Q = np.eye(self.n) if Q is None else Q
+#         self.R = np.eye(self.n) if R is None else R
+#         self.P = np.eye(self.n) if P is None else P
+#         self.x = np.zeros((self.n, 1)) if x0 is None else x0
+
+#     def predict(self, u = 0):
+#         self.x = np.dot(self.F, self.x) + np.dot(self.B, u)
+#         self.P = np.dot(np.dot(self.F, self.P), self.F.T) + self.Q
+#         return self.x
+
+#     def update(self, z):
+#         y = z - np.dot(self.H, self.x)
+#         S = self.R + np.dot(self.H, np.dot(self.P, self.H.T))
+#         K = np.dot(np.dot(self.P, self.H.T), np.linalg.inv(S))
+#         self.x = self.x + np.dot(K, y)
+#         I = np.eye(self.n)
+#         self.P = np.dot(np.dot(I - np.dot(K, self.H), self.P), 
+#         	(I - np.dot(K, self.H)).T) + np.dot(np.dot(K, self.R), K.T)
+
+# def example():
+# 	dt = 1.0/60
+# 	F = np.array([[1, dt, 0], [0, 1, dt], [0, 0, 1], ])
+# 	H = np.array([1, 0, 0]).reshape(1, 3)
+# 	Q = np.array([[0.05, 0.05, 0.0], [0.05, 0.05, 0.0], [0.0, 0.0, 0.0]])
+# 	R = np.array([0.5]).reshape(1, 1)
+
+# 	x = np.linspace(-10, 10, 100)
+# 	measurements = - (x**2 + 2*x - 2)  + np.random.normal(0, 2, 100)
+
+# 	kf = KalmanFilter(F = F, H = H, Q = Q, R = R)
+# 	predictions = []
+
+# 	for z in measurements:
+# 		predictions.append(np.dot(H,  kf.predict())[0])
+# 		kf.update(z)
+
+# 	import matplotlib.pyplot as plt
+# 	plt.plot(range(len(measurements)), measurements, label = 'Measurements')
+# 	plt.plot(range(len(predictions)), np.array(predictions), label = 'Kalman Filter Prediction')
+# 	plt.legend()
+# 	plt.show()
+
+# if __name__ == '__main__':
+#     example()
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.integrate import odeint
+lis = [1,2,3,4,5,6]
 
-# animate plots?
-animate=True # True / False
-
-# define model
-def drone(v,t,u,load):
-    # inputs
-    #  v    = vehicle velocity (m/s)
-    #  t    = time (sec)
-    #  u    = pitch angle position (-50% to 100%)
-    #  load = passenger load + cargo (kg)
-    Cd = 0.24    # drag coefficient
-    rho = 1.225  # air density (kg/m^3)
-    A = 5.0      # cross-sectional area (m^2)
-    Fp = 30      # thrust parameter (N/%pedal)
-    m = 500      # vehicle mass (kg)
-    # calculate derivative of the velocity
-    dv_dt = (1.0/(m+load)) * (Fp*u - 0.5*rho*Cd*A*v**2)
-    return dv_dt
-
-tf = 30.0                 # final time for simulation
-nsteps = 61               # number of time steps
-delta_t = tf/(nsteps-1)   # how long is each time step?
-ts = np.linspace(0,tf,nsteps) # linearly spaced time vector
-
-# simulate step test operation
-step = np.zeros(nsteps) # u = valve % open
-step[11:] = 50.0       # step up pedal position
-# passenger(s) + cargo load
-load = 200.0 # kg
-# velocity initial condition
-v0 = 0.0
-# set point
-sp = 25.0
-# for storing the results
-vs = np.zeros(nsteps)
-sps = np.zeros(nsteps)
-
-plt.figure(1,figsize=(5,4))
-if animate:
-    plt.ion()
-    plt.show()
-
-# simulate with ODEINT
-for i in range(nsteps-1):
-    u = step[i]
-    # clip inputs to -50% to 100%
-    if u >= 40.0:
-        u = 40.0
-    if u <= -40.0:
-        u = -40.0
-    v = odeint(drone,v0,[0,delta_t],args=(u,load))
-    v0 = v[-1]   # take the last value
-    vs[i+1] = v0 # store the velocity for plotting
-    sps[i+1] = sp
-
-    # plot results
-    if animate:
-        plt.clf()
-        plt.subplot(2,1,1)
-        plt.plot(ts[0:i+1],vs[0:i+1],'b-',linewidth=3)
-        plt.plot(ts[0:i+1],sps[0:i+1],'k--',linewidth=2)
-        plt.ylabel('Velocity (m/s)')
-        plt.legend(['Velocity','Set Point'],loc=2)
-        plt.subplot(2,1,2)
-        plt.plot(ts[0:i+1],step[0:i+1],'r--',linewidth=3)
-        plt.ylabel('pitch angle')    
-        plt.legend(['pitch angle (%)'])
-        plt.xlabel('Time (sec)')
-        plt.pause(0.1)    
-
-if not animate:
-    # plot results
-    plt.subplot(2,1,1)
-    plt.plot(ts,vs,'b-',linewidth=3)
-    plt.plot(ts,sps,'k--',linewidth=2)
-    plt.ylabel('Velocity (m/s)')
-    plt.legend(['Velocity','Set Point'],loc=2)
-    plt.subplot(2,1,2)
-    plt.plot(ts,step,'r--',linewidth=3)
-    plt.ylabel('pitch angle')    
-    plt.legend(['pitch angle (%)'])
-    plt.xlabel('Time (sec)')
-    plt.show()
+A = np.array([[1.0, 0.0, 0.0],
+                      [0.0, 1.0, 0.0],
+                      [0.0, 0.0, 1.0]])
+dt =0.5
+B = np.array([[dt, 0.0, 0.0],
+                      [0.0, dt, 0.0],
+                      [0.0, 0.0, dt]])
+# print(np.eye(len(lis)) * 0.5)
+D = np.zeros((3, 3))
+Rv = np.eye(3)
+print(Rv)

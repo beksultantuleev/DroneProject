@@ -1,12 +1,3 @@
-"""
-  KalmanFilter.py
-  Abbie Lee | 16.30
-
-  Implementation of a Kalman filter for position estimation using the position,
-  velocity and quaternion sensor readings.
-
-  Based on 16.30 Lec 19 Notes from Fall 2018
-"""
 import numpy as np
 
 class KalmanFilter:
@@ -119,3 +110,11 @@ class MamboKalman(KalmanFilter):
                        [0.0, 0.0, 1.0],])
 
         super().__init__(A, B, C, D, Rw, Rv, X0, U0)
+
+if __name__ == "__main__":
+    pos = [1,1,1]
+    # pos = [1,1,1, 1,1,1]
+    speed = [0.7,0.6,0.4]
+    estimate = MamboKalman(pos, speed)
+    x = estimate.get_state_estimate(pos, speed)
+    print(x)
