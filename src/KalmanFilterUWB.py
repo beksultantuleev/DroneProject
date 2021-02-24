@@ -107,22 +107,14 @@ class MamboKalman(KalmanFilterUWB):
         Rw = np.eye(len(X0))
         Rv = np.eye(len(X0))
 
+
         super().__init__(A, B, C, D, Rw, Rv, X0, U0)
 
 if __name__ == "__main__":
-    # pos = [1,1,1]
-    pos = [1,1,1, 1.1,0.9,1.2]
-    speed = [0.7,0.7, 0.6, 0.6, 0.4, 0.4]
+    # [1.1, 0.9, 1.2] additional location  #additional speed [0.7, 0.6, 0.4]
+    pos = [1, 1, 1] #position x,y,z + position from uwb
+    speed = [0.7, 0.6, 0.4] #speedx,speedy,speedz duplicated 
+    # speed = [0.7,0.7, 0.6, 0.6, 0.4, 0.4]
     estimate = MamboKalman(pos, speed)
-    x_comb = estimate.get_state_estimate(pos, speed)
-    first = []
-    second = []
-    for i in range(len(x_comb)):
-        if i%2==0:
-            first.append(x_comb[i])
-        else:
-            second.append(x_comb[i])
-    
-    print(rez)
-        
-    # print(x)
+    kalman_state = estimate.get_state_estimate(pos, speed)
+    print(kalman_state)

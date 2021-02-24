@@ -1,4 +1,4 @@
-from PIDcontroller import PID
+from PID_mainTemp import PID
 
 import time
 import matplotlib.pyplot as plt
