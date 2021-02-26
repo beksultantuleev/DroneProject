@@ -2,6 +2,7 @@ from Drone import Drone
 from PositionController import MamboPositionController
 from KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
+from multiprocessing import Process, Queue
 
 
 class ModelBasedAgentUWB(Drone):
@@ -145,7 +146,9 @@ if __name__ == "__main__":
     modelAgent = ModelBasedAgentUWB("84:20:96:91:73:F1")
 
     modelAgent.start_and_prepare()
-    modelAgent.go_to_xyz([1, 0, 1])
+    waypoint = [[1,0,1],[2,0,1]]
+    for i in waypoint:
+        modelAgent.go_to_xyz(i)
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

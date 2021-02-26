@@ -26,16 +26,16 @@ class PIDcontroller(Drone):
         self.max_values = 20
         self.min_values = 10
         self.error = [0, 0, 0]
-        self.errsum=[0,0,0]
+        self.errsum = [0, 0, 0]
 
         self.Roll = 40
         self.Pitch = 40
         self.Yaw = 0
         self.Throttle = 30
-        
+
         self.last_time = 0.0000
         self.now = 0.0000
-        self.derr = [0,0,0]
+        self.derr = [0, 0, 0]
 
     def sensor_callback(self, args):
         if self.start_measure:
@@ -48,7 +48,7 @@ class PIDcontroller(Drone):
             self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
                                                                       self.current_velocities)
             self.controller.set_current_state(self.current_state)
-    
+
     def get_current_state(self):
         return self.current_state
 
@@ -77,13 +77,13 @@ class PIDcontroller(Drone):
         print(self.cmd_input)
         return self.cmd_input
 
-    def pid(self,desired_state):
+    def pid(self, desired_state):
         self.desired_state = desired_state
         self.error[0] = self.current_state[0] - self.desired_state[0]
         self.error[1] = self.current_state[1] - self.desired_state[1]
         self.error[2] = self.current_state[2] - self.desired_state[2]
         self.now = int(round(time.time() * 1000))
-        
+
         self.timechange = self.now - self.last_time
 
         if (self.timechange > self.sample_time):
@@ -103,10 +103,12 @@ class PIDcontroller(Drone):
                 # print(f"derivatives are {self.derr}")
                 # Calculating output in 30
 
-                self.Roll = 30 - (self.Kp[0]*self.error[0])-(self.Kd[0]*self.derr[0])
-                self.Pitch = 30 +  (self.Kp[1]*self.error[1])+(self.Kd[1]*self.derr[1])
-                self.Throttle = 30 +  (self.Kp[2]*self.error[2])+(self.Kd[2] *
-                                                self.derr[2])-(self.errsum[2]*self.Ki[2])
+                self.Roll = 30 - \
+                    (self.Kp[0]*self.error[0])-(self.Kd[0]*self.derr[0])
+                self.Pitch = 30 + \
+                    (self.Kp[1]*self.error[1])+(self.Kd[1]*self.derr[1])
+                self.Throttle = 30 + (self.Kp[2]*self.error[2])+(self.Kd[2] *
+                                                                 self.derr[2])-(self.errsum[2]*self.Ki[2])
 
                 # Checking min and max threshold and updating on true
                 # Throttle Conditions
@@ -135,38 +137,39 @@ class PIDcontroller(Drone):
                 self.prev_values[0] = self.error[0]
                 self.prev_values[1] = self.error[1]
                 self.prev_values[2] = self.error[2]
-             
+
             self.last_time = self.now
 
             return self.get_current_input(), self.error
-           
-
 
 
 if __name__ == "__main__":
     modelAgent = PIDcontroller("84:20:96:91:73:F1")
     modelAgent.start_and_prepare()
-    waypoints =  [[0,0,0],[1,1,1]]
-    
+    waypoints = [[0, 0, 0], [1, 1, 1]]
+
     # currenstate
-    
+
     # calculate distance
     for desired_state in waypoints:
         distance = ((modelAgent.get_current_state()[0] - desired_state[0])**2 +
                     (modelAgent.get_current_state()[1] - desired_state[1])**2 +
-                (modelAgent.get_current_state()[2] - desired_state[2])**2)**0.5
+                    (modelAgent.get_current_state()[2] - desired_state[2])**2)**0.5
         while distance > 0.3:
             for i in range(size(waypoints, 0)):
                 cmd, error = modelAgent.pid(waypoints[i])
                 modelAgent.mambo.fly_direct(roll=cmd[0],
-                                  pitch=cmd[1],
-                                  yaw=cmd[2],
-                                  vertical_movement=cmd[3],
-                                  duration=None)
+                                            pitch=cmd[1],
+                                            yaw=cmd[2],
+                                            vertical_movement=cmd[3],
+                                            duration=None)
                 modelAgent.mambo.smart_sleep(0.5)
-
+                print(f"cmd inputs >>{cmd}")
+                print(f"error >> {error}")
+            distance = ((modelAgent.get_current_state()[0] - desired_state[0])**2 +
+                        (modelAgent.get_current_state()[1] - desired_state[1])**2 +
+                        (modelAgent.get_current_state()[2] - desired_state[2])**2)**0.5
 
     modelAgent.land_and_disconnect()
-    
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

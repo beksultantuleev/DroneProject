@@ -13,7 +13,7 @@ class ModelBasedAgent(Drone):
         self.current_measurement = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
-        self.eps = 0.1  # 0.08
+        self.eps = 0.2  # 0.08
         self.start_measure = False
 
     def sensor_callback(self, args):
@@ -41,7 +41,7 @@ class ModelBasedAgent(Drone):
                                   yaw=cmd[2],
                                   vertical_movement=cmd[3],
                                   duration=None)
-            self.mambo.smart_sleep(0.5)
+            self.mambo.smart_sleep(0.01)
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
                 (self.current_state[1] - self.desired_state[1])**2 +
                (self.current_state[2] - self.desired_state[2])**2)**0.5
@@ -136,9 +136,11 @@ class ModelBasedAgent(Drone):
 
 if __name__ == "__main__":
     modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
-
+    # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    modelAgent.go_to_xyz([1,0,1])
+    waypoint = [[1,0,1],[2,0,1]]
+    for i in waypoint:
+        modelAgent.go_to_xyz(i)
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
