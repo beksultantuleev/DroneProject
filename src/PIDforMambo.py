@@ -1,4 +1,5 @@
-from Drone_main import Drone
+from numpy.core.fromnumeric import size
+from Drone import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 import numpy as np
@@ -12,14 +13,14 @@ class PIDcontroller(Drone):
         self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
         self.current_velocities = []
         self.current_state = []  # meters
-        self.desired_state = [-10, 0, 1]  # meters #setpoint
+        self.desired_state = [2, 0, 1]  # meters #setpoint
         # self.eps = 0.1  # 0.08
         self.start_measure = False
         # ________________
         self.cmd_input = []
         self.Kp = [1, 1, 1]
         self.Ki = [0, 0, 0.0]
-        self.Kd = [0, 0, 0]
+        self.Kd = [0.25, 0.25, 0.25]
         self.sample_time = 60
         self.prev_values = [0, 0, 0]
         self.max_values = 20
@@ -47,11 +48,10 @@ class PIDcontroller(Drone):
             self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
                                                                       self.current_velocities)
             self.controller.set_current_state(self.current_state)
+    
+    def get_current_state(self):
+        return self.current_state
 
-            self.error[0] = self.current_state[0] - self.desired_state[0]
-            self.error[1] = self.current_state[1] - self.desired_state[1]
-            self.error[2] = self.current_state[2] - self.desired_state[2]
-            self.pid()
     def go_to_xyz(self, desired_state):
         self.desired_state = desired_state
         self.controller.set_desired_state(self.desired_state)
@@ -77,7 +77,11 @@ class PIDcontroller(Drone):
         print(self.cmd_input)
         return self.cmd_input
 
-    def pid(self):
+    def pid(self,desired_state):
+        self.desired_state = desired_state
+        self.error[0] = self.current_state[0] - self.desired_state[0]
+        self.error[1] = self.current_state[1] - self.desired_state[1]
+        self.error[2] = self.current_state[2] - self.desired_state[2]
         self.now = int(round(time.time() * 1000))
         
         self.timechange = self.now - self.last_time
@@ -108,19 +112,19 @@ class PIDcontroller(Drone):
                 # Throttle Conditions
                 if self.Throttle > 30:
                     self.Throttle = self.max_values
-                if self.Throttle < 10:
+                if self.Throttle < -30:
                     self.Throttle = self.min_values
 
                 # Pitch Conditions
                 if self.Pitch > 30:
                     self.Pitch = self.max_values
-                if self.Pitch < 10:
+                if self.Pitch < -30:
                     self.Pitch = self.min_values
 
                 # Roll Conditions
                 if self.Roll > 30:
                     self.Roll = self.max_values
-                if self.Roll < 10:
+                if self.Roll < -30:
                     self.Roll = self.min_values
 
                 # Publishing values on topic 'drone command'
@@ -134,36 +138,35 @@ class PIDcontroller(Drone):
              
             self.last_time = self.now
 
-            return self.get_current_input()
+            return self.get_current_input(), self.error
            
 
-    def flight_function(self, args):
-        if self.mambo.sensors.flying_state != 'emergency':
-
-            print('Sensor calibration...')
-            while self.mambo.sensors.speed_ts == 0:
-                continue
-            self.start_measure = True
-
-            print('getting first state')
-            while self.current_state == []:
-                continue
-            '''run the function here'''
-            # self.go_to_xyz([1, 1, 0])
-            # self.pid()
-            # self.mambo.fly_direct(0, 30, 0, 0, 1)
-            # self.pid()
-            self.mambo.fly_direct(0, -30, 0, 0, 2)
-            print("getting inputs")
-            self.get_current_input()
-
-
-        print('Landing...')
-        self.mambo.safe_land(3)
 
 
 if __name__ == "__main__":
     modelAgent = PIDcontroller("84:20:96:91:73:F1")
-    modelAgent.run()
+    modelAgent.start_and_prepare()
+    waypoints =  [[0,0,0],[1,1,1]]
+    
+    # currenstate
+    
+    # calculate distance
+    for desired_state in waypoints:
+        distance = ((modelAgent.get_current_state()[0] - desired_state[0])**2 +
+                    (modelAgent.get_current_state()[1] - desired_state[1])**2 +
+                (modelAgent.get_current_state()[2] - desired_state[2])**2)**0.5
+        while distance > 0.3:
+            for i in range(size(waypoints, 0)):
+                cmd, error = modelAgent.pid(waypoints[i])
+                modelAgent.mambo.fly_direct(roll=cmd[0],
+                                  pitch=cmd[1],
+                                  yaw=cmd[2],
+                                  vertical_movement=cmd[3],
+                                  duration=None)
+                modelAgent.mambo.smart_sleep(0.5)
+
+
+    modelAgent.land_and_disconnect()
+    
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

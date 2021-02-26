@@ -1,4 +1,4 @@
-from Drone_main import Drone
+from Drone import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 import numpy as np
@@ -10,6 +10,7 @@ class ModelBasedAgent(Drone):
         self.controller = MamboPositionController()
         self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
         self.current_velocities = []
+        self.current_measurement = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
         self.eps = 0.1  # 0.08
@@ -133,27 +134,11 @@ class ModelBasedAgent(Drone):
                 print(f"pos y {pos_y}")
 
 
-    def flight_function(self, args):
-        if self.mambo.sensors.flying_state != 'emergency':
-
-            print('Sensor calibration...')
-            while self.mambo.sensors.speed_ts == 0:
-                continue
-            self.start_measure = True
-
-            print('getting first state')
-            while self.current_state == []:
-                continue
-            '''run the function here'''
-            # self.go_to_xyz([1, 1, 0])
-            self.go_to_xyz([1, 0, 1])
-
-        print('Landing...')
-        self.mambo.safe_land(3)
-
-
 if __name__ == "__main__":
     modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
-    modelAgent.run()
+
+    modelAgent.start_and_prepare()
+    modelAgent.go_to_xyz([1,0,1])
+    modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

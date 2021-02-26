@@ -1,4 +1,4 @@
-from Drone_main import Drone
+from Drone import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 import numpy as np
@@ -10,9 +10,12 @@ class ReflexAgent(Drone):
         super().__init__(drone_mac)
         self.current_measurement = []
         self.desired_state = []
+        self.start_measure = False
+        self.current_state = []
 
     def sensor_callback(self, args):
-        self.current_measurement = list(np.around(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
+        if self.start_measure:
+            self.current_measurement = list(np.around(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                                 self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]), 3))
 
@@ -87,19 +90,11 @@ class ReflexAgent(Drone):
                 pos_z = self.current_measurement[2]
                 print(f"pos z {pos_z}")
 
-    def flight_function(self, args):
-
-        if self.mambo.sensors.flying_state != "emergency":
-            print("Sensor Calibration...")
-            while self.mambo.sensors.speed_ts == 0:
-                continue
-            self.go_to_xyz([2, 0, 0])
-
-        else:
-            print("not gonna fly")
 
 
 if __name__ == "__main__":
     # detection_drone = ReflexAgent("7A:64:62:66:4B:67") #"84:20:96:6c:22:67" #"84:20:96:91:73:F1"
     detection_drone = ReflexAgent("84:20:96:91:73:F1")
-    detection_drone.run()
+    detection_drone.start_and_prepare()
+    detection_drone.go_to_xyz([1,0,1])
+    detection_drone.land_and_disconnect()

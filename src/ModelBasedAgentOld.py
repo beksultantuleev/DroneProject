@@ -1,27 +1,29 @@
-from Drone_main import Drone
+from Drone import Drone
 from PositionController import MamboPositionController
 from KalmanFilter import MamboKalman
 import numpy as np
 waypoint = [[],[],[],[]]
-wypoint.pop(0)
+# wypoint.pop(0)
 class ModelBasedAgent(Drone):
 
     def __init__(self, drone_mac):
         super().__init__(drone_mac)
         self.controller = MamboPositionController()
-        self.kalmanfilter = MamboKalman([0, 0, 1], [0, 0, 0])  # pos and vel
+        self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])  # pos and vel
         self.current_measurement = []
         self.current_state = []
         self.desired_state = []
+        self.start_measure = False
 
     def sensor_callback(self, args):
-        self.current_measurement = list(np.around(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
-                                                            self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                                            self.mambo.sensors.sensors_dict['DronePosition_posz']/-100], dtype=float), 3))
-        self.current_velocity = list(np.around(np.array([self.mambo.sensors.speed_x,
-                                                         self.mambo.sensors.speed_y, self.mambo.sensors.speed_z]), 3))
-        self.current_state = list(np.around(np.array(self.kalmanfilter.get_state_estimate(
-            self.current_measurement, self.current_velocity)), 3))
+        if self.start_measure:
+            self.current_measurement = list(np.around(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
+                                                                self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
+                                                                self.mambo.sensors.sensors_dict['DronePosition_posz']/-100], dtype=float), 3))
+            self.current_velocity = list(np.around(np.array([self.mambo.sensors.speed_x,
+                                                            self.mambo.sensors.speed_y, self.mambo.sensors.speed_z]), 3))
+            self.current_state = list(np.around(np.array(self.kalmanfilter.get_state_estimate(
+                self.current_measurement, self.current_velocity)), 3))
 
         '''you can compare kalman vs non kalman estimators'''
         # print(f" kalman filter>> {self.current_state}")
@@ -150,4 +152,6 @@ class ModelBasedAgent(Drone):
 if __name__ == "__main__":
     # detection_drone = ModelBasedAgent("7A:64:62:66:4B:67") #"84:20:96:6c:22:67" #"84:20:96:91:73:f1"
     detection_drone = ModelBasedAgent("84:20:96:91:73:F1")
-    detection_drone.run()
+    detection_drone.start_and_prepare()
+    detection_drone.go_to_xyz([1,0,1])
+    detection_drone.land_and_disconnect()

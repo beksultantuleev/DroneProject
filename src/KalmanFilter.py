@@ -96,25 +96,29 @@ class MamboKalman(KalmanFilter):
         X0 = np.matrix(X0).T
         U0 = np.matrix(U0).T
         self.dt = 0.5 # sample time in seconds. 2hz over WiFi.
-        A = np.array([[1.0, 0.0, 0.0],
-                      [0.0, 1.0, 0.0],
-                      [0.0, 0.0, 1.0]])
-        B = np.array([[self.dt, 0.0, 0.0],
-                      [0.0, self.dt, 0.0],
-                      [0.0, 0.0, self.dt]])
-        C = np.eye(3)
-        D = np.zeros((3, 3))
-        Rw = np.eye(3)
-        Rv = np.array([[1.0, 0.0, 0.0],
-                       [0.0, 1.0, 0.0],
-                       [0.0, 0.0, 1.0],])
+        A = np.eye(len(X0))
+        B = np.eye(len(X0)) * self.dt
+        C = np.eye(len(X0))
+        D = np.zeros((len(X0), len(X0)))
+        Rw = np.eye(len(X0))
+        Rv = np.eye(len(X0))
 
         super().__init__(A, B, C, D, Rw, Rv, X0, U0)
 
 if __name__ == "__main__":
-    pos = [1,1,1]
+    pos = [2,0,0, 1.9, 0,0]
     # pos = [1,1,1, 1,1,1]
-    speed = [0.7,0.6,0.4]
+    speed = [0.8, 0.1, 0.1, 0.8, 0.1, 0.1]
     estimate = MamboKalman(pos, speed)
     x = estimate.get_state_estimate(pos, speed)
-    print(x)
+    first = []
+    second = []
+    for i in range(len(x)//2):
+        first.append(x[i])
+    for i in range(3,6):
+        second.append(x[i])
+    
+    result = (np.array(first) + np.array(second))/2
+
+
+    print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{result}")
