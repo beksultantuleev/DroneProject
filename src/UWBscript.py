@@ -104,7 +104,7 @@ def ToA_callback(client, userdata, message):
                 #   db_insert(DBdata)
                 # timestamp = [DBdata['fields']["A1"], DBdata['fields']["A2"], DBdata['fields']["A3"], DBdata['fields']["A4"], DBdata['fields']["A5"], DBdata['fields']["A6"]]
                 # print(ts)
-                print(Localisation(ts))
+                print(Localisation(client,ts,i))
                 DBdata['fields'] = {}
                 slot[i, index, :] = [0] * (num_anch)
                 index = []
@@ -113,7 +113,7 @@ def ToA_callback(client, userdata, message):
         raise
 
 
-def Localisation(data):
+def Localisation(client,data,i):
 
     M = 6
     c = 299792458
@@ -167,9 +167,8 @@ def Localisation(data):
         del_f[ii-1, 1] = np.dot((x_t_0[1]-A_n[0, 1, ii]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, ii].reshape(3, 1)))) - np.dot((x_t_0[1]-A_n[0, 1, 0]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, 0].reshape(3, 1))))
         del_f[ii-1, 2] = np.dot((x_t_0[2]-A_n[0, 2, ii]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, ii].reshape(3, 1)))) - np.dot((x_t_0[2]-A_n[0, 2, 0]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, 0].reshape(3, 1))))
     x_t = np.dot(np.linalg.pinv(del_f), (D-f)) + x_t_0
-    print(x_t)
-    # return x_t
-
+    # print("position is %s %s %s and tag is %s" % ( x_t[0], x_t[1], x_t[2], i))
+    client.publish('Position' + str(i), str(x_t), qos=0)
 
 def RepresentsInt(s):
     try:

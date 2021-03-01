@@ -9,6 +9,7 @@ import time
 import collections
 # from influxdb import InfluxDBClient
 import atexit
+from multiprocessing import Process,Pipe
 
 Connected = False  # global variable for the state of the connection
 DEBUG = False
@@ -29,6 +30,8 @@ dict_keys = list(dist.keys())
 broker_address = "192.168.1.200"  # Broker address
 port_id = 1883  # Broker port
 subscriptions_qos = [("tags/#", 0)]
+
+coordinates = [] #list of coordinates from UWB
 
 
 def on_connect(client, userdata, flags, rc):
@@ -104,7 +107,7 @@ def ToA_callback(client, userdata, message):
                 #   db_insert(DBdata)
                 # timestamp = [DBdata['fields']["A1"], DBdata['fields']["A2"], DBdata['fields']["A3"], DBdata['fields']["A4"], DBdata['fields']["A5"], DBdata['fields']["A6"]]
                 # print(ts)
-                print(Localisation(ts))
+                coordinates = Localisation(client,ts,i) #returns list of [xyz]
                 DBdata['fields'] = {}
                 slot[i, index, :] = [0] * (num_anch)
                 index = []
@@ -113,7 +116,8 @@ def ToA_callback(client, userdata, message):
         raise
 
 
-def Localisation(data):
+
+def Localisation(client,data,i):
 
     M = 6
     c = 299792458
@@ -167,9 +171,9 @@ def Localisation(data):
         del_f[ii-1, 1] = np.dot((x_t_0[1]-A_n[0, 1, ii]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, ii].reshape(3, 1)))) - np.dot((x_t_0[1]-A_n[0, 1, 0]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, 0].reshape(3, 1))))
         del_f[ii-1, 2] = np.dot((x_t_0[2]-A_n[0, 2, ii]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, ii].reshape(3, 1)))) - np.dot((x_t_0[2]-A_n[0, 2, 0]), np.reciprocal(np.linalg.norm(x_t_0-A_n[0, :, 0].reshape(3, 1))))
     x_t = np.dot(np.linalg.pinv(del_f), (D-f)) + x_t_0
-    print(x_t)
-    # return x_t
-
+    return x_t
+    # print("position is %s %s %s and tag is %s" % ( x_t[0], x_t[1], x_t[2], i))
+    # client.publish('Position' + str(i), str(x_t), qos=0)
 
 def RepresentsInt(s):
     try:
@@ -179,7 +183,7 @@ def RepresentsInt(s):
         return False
 
 
-def main():
+def runUWB(child_conn):
     # logger = logging.getLogger('root')
     # logging.basicConfig(format='[%(asctime)s %(levelname)s: %(funcName)20s] %(message)s', level=logging.DEBUG)
 
@@ -191,6 +195,9 @@ def main():
     # db_connect()
     client.loop_forever()
 
+    child_conn.send(coordinates) #send list of xyz
+    child_conn.close()
 
-if __name__ == '__main__':
-    main()
+
+# if __name__ == '__main__':
+#     runUWB()

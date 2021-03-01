@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class KalmanFilter:
     def __init__(self, A, B, C, D, Rw, Rv, X0, U0):
         """
@@ -48,7 +49,7 @@ class KalmanFilter:
 
         L[k] = AP[K]C.T(Rv + CP[k]C.T)^-1
         """
-        M = np.linalg.inv(self.Rv  + np.dot(self.C, np.dot(self.P, self.C.T)))
+        M = np.linalg.inv(self.Rv + np.dot(self.C, np.dot(self.P, self.C.T)))
         self.L = np.dot(self.A, np.dot(self.P, np.dot(self.C.T, M)))
 
         return None
@@ -62,10 +63,12 @@ class KalmanFilter:
 
         Y: numpy array of sensor values at timestep k
         """
-        self.X = np.dot(self.A, self.X) + np.dot(self.B, self.U) + np.dot(self.L, Y - self.Yhat)
+        self.X = np.dot(self.A, self.X) + np.dot(self.B,
+                                                 self.U) + np.dot(self.L, Y - self.Yhat)
 
         Acl = self.A - np.dot(self.L, self.C)
-        self.P = np.dot(Acl, np.dot(self.P, Acl.T)) + self.Rv + np.dot(self.L, np.dot(self.Rw, self.L))
+        self.P = np.dot(Acl, np.dot(self.P, Acl.T)) + self.Rv + \
+            np.dot(self.L, np.dot(self.Rw, self.L))
 
         self.Yhat = np.dot(self.C, self.X) + np.dot(self.D, self.U)
         return None
@@ -79,6 +82,7 @@ class KalmanFilter:
         self.update_estim(Y)
 
         return self.X.tolist()[0]
+
 
 class MamboKalman(KalmanFilter):
     def __init__(self, X0, U0):
@@ -95,7 +99,7 @@ class MamboKalman(KalmanFilter):
         """
         X0 = np.matrix(X0).T
         U0 = np.matrix(U0).T
-        self.dt = 0.5 # sample time in seconds. 2hz over WiFi.
+        self.dt = 0.5  # sample time in seconds. 2hz over WiFi.
         A = np.eye(len(X0))
         B = np.eye(len(X0)) * self.dt
         C = np.eye(len(X0))
@@ -105,20 +109,12 @@ class MamboKalman(KalmanFilter):
 
         super().__init__(A, B, C, D, Rw, Rv, X0, U0)
 
+
 if __name__ == "__main__":
-    pos = [2,0,0, 1.9, 0,0]
-    # pos = [1,1,1, 1,1,1]
-    speed = [0.8, 0.1, 0.1, 0.8, 0.1, 0.1]
+    # pos = [2,0,0, 1.9, 0,0]
+    pos = [1, 1, 1]
+    speed = [0.8, 0.1, 0.1]
     estimate = MamboKalman(pos, speed)
     x = estimate.get_state_estimate(pos, speed)
-    first = []
-    second = []
-    for i in range(len(x)//2):
-        first.append(x[i])
-    for i in range(3,6):
-        second.append(x[i])
-    
-    result = (np.array(first) + np.array(second))/2
 
-
-    print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{result}")
+    print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{x}")

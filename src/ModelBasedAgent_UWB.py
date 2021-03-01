@@ -2,8 +2,8 @@ from Drone import Drone
 from PositionController import MamboPositionController
 from KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
-from multiprocessing import Process, Queue
-
+from multiprocessing import Process,Queue,Pipe
+from UWBscript_modified import *
 
 class ModelBasedAgentUWB(Drone):
     def __init__(self, drone_mac):
@@ -20,10 +20,17 @@ class ModelBasedAgentUWB(Drone):
         self.current_measurement_UWB = []
         self.eps = 0.1  # 0.08
         self.start_measure = False
+        #________________________UWB
+        self.parent_conn, self.child_conn = Pipe() #added connections
+        self.proccess = Process(target=runUWB, args=(self.child_conn,))
+        #___________________________
 
     def sensor_callback(self, args):
         if self.start_measure:
-            self.current_measurement_UWB = []  # populate with subscription
+            #UWB_______________________
+            self.proccess.start() #starting process
+            self.current_measurement_UWB = self.parent_conn.recv()  # populate with subscription
+            #UWB________________________
             self.current_measurement = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                         self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
                                         self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + self.current_measurement_UWB
@@ -54,92 +61,8 @@ class ModelBasedAgentUWB(Drone):
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
             print(f"current state >>{self.current_state}")
-            print(f"cmd >> {cmd}")
+            # print(f"cmd >> {cmd}")
             print(f"distance >> {distance}")
-
-    def go_to_xyz_old(self, desired_state):
-        self.desired_state = desired_state
-
-        stop_value_x = desired_state[0]  # x
-        stop_value_y = desired_state[1]  # y
-        stop_value_z = desired_state[2]  # z
-
-        # get initial positions
-        pos_x = self.current_state[0]
-        pos_y = self.current_state[1]
-        pos_z = self.current_state[2]
-
-        if stop_value_x > 0:
-            self.controller.set_desired_state([stop_value_x, 0, stop_value_z])
-            cmd = self.controller.calculate_cmd_input()
-            while pos_x < stop_value_x:
-                if stop_value_z == 0:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=0,
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                else:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=cmd[3],
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                pos_x = self.current_state[0]
-                print(f"cmd >>{cmd}")
-                print(f"pos x {pos_x}")
-        elif stop_value_x < 0:
-            self.controller.set_desired_state([stop_value_x, 0, stop_value_z])
-            cmd = self.controller.calculate_cmd_input()
-            while pos_x > stop_value_x:
-                if stop_value_z == 0:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=0,
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                else:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=cmd[3],
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                pos_x = self.current_state[0]
-                print(f"cmd >>{cmd}")
-                print(f"pos x {pos_x}")
-
-        self.mambo.smart_sleep(1)
-
-        if stop_value_y > 0:
-            self.controller.set_desired_state(self.desired_state)
-            cmd = self.controller.calculate_cmd_input()
-            while pos_y < stop_value_y:
-                self.mambo.fly_direct(roll=cmd[0],
-                                      pitch=cmd[1],
-                                      yaw=cmd[2],
-                                      vertical_movement=cmd[3],
-                                      duration=None)
-                self.mambo.smart_sleep(0.1)
-                pos_y = self.current_state[1]
-                print(f"cmd >>{cmd}")
-                print(f"pos y {pos_y}")
-        elif stop_value_y < 0:
-            self.controller.set_desired_state(self.desired_state)
-            cmd = self.controller.calculate_cmd_input()
-            while pos_y > stop_value_y:
-                self.mambo.fly_direct(roll=cmd[0],
-                                      pitch=cmd[1],
-                                      yaw=cmd[2],
-                                      vertical_movement=cmd[3],
-                                      duration=None)
-                self.mambo.smart_sleep(0.1)
-                pos_y = self.current_state[1]
-                print(f"cmd >>{cmd}")
-                print(f"pos y {pos_y}")
 
 
 if __name__ == "__main__":
