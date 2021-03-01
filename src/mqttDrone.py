@@ -1,209 +1,77 @@
+import paho.mqtt.client as mqtt
+import re
+import numpy as np
 import numpy.matlib
 import array as arr
 import json
 import paho.mqtt.client as mqttClient
 import time
 import collections
-# from influxdb import InfluxDBClient
 import atexit
-from pyparrot.Minidrone import Mambo
-
-import paho.mqtt.client as mqtt
-import logging
-from interpolate import Interpolation
-from datetime import datetime, timedelta
-
-logger = logging.getLogger('robotgroup')
 
 
-class DroneGroup:
-    def init(self, config):
-        self.mqtt_client = None
-        self.config = config
-        self.connect_mqtt()
-        self.mambo = {}  # robot names
-        self._last_seen = {}  # datetime or None
 
-    def connect_mqtt(self):
-        mqtt_config = self.config['mqtt-server']
-        #
-        mqtt_client = mqtt.Client()
-        if 'username' in mqtt_config:
-            mqtt_client.username_pw_set(mqtt_config['username'],
-                                        mqtt_config['password'])
-        mqtt_client.connect(host=mqtt_config['host'])
-        logger.info("MQTT connecting to '%s'", mqtt_config['host'])
-        mqtt_client.subscribe('/robot/+/$online$')
-        mqtt_client.subscribe('/robot/+/$name$')
+class UWBconnection:
+    def __init__(self):
+        self.Connected = False  # global variable for the state of the connection
+        self.DEBUG = False
+        self.num_anch = 7
+        self.num_tag = 5
+        self.buffer_size = 100
+        self.slot = np.zeros((self.num_tag, self.buffer_size, self.num_anch),
+                             dtype=int)  # creo 100 slot toa
+        self.tmp = []
+        self.DBdata = {}
+        self.DBdata['measurement'] = 'TOA_Ranging'
+        self.DBdata['tags'] = {}
+        self.DBdata['tags'] = {'room': 'lab', 'anchors': 0}
+        self.DBdata['fields'] = {}
+        self.DBdata['tags']['anchors'] = 6
+        self.dist = {'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0, 'A5': 0, 'A6': 0}
+        self.dict_keys = list(self.dist.keys())
+        self.broker_address = "192.168.1.200"  # Broker address
+        self.port_id = 1883  # Broker port
+        self.subscriptions_qos = [("Position2", 0)]
 
-        self.mqtt_client = mqtt_client
-        self.mqtt_client.message_callback_add(
-            "/robot/+/$online$", self._on_online)
-        self.mqtt_client.message_callback_add(
-            "/robot/+/$name$", self._on_name)
 
-    def _on_name(self, client, userdata, msg):
-        logging.debug('Got name message: %s: %s',
-                      msg.topic, msg.payload)
-        parts = msg.topic.split('/')
-        mambo_id = parts[2]
-        logging.info("Robot #%s name is %s", mambo_id, repr(msg.payload))
+    def on_connect(self, client, userdata, flags, rc):
+        print("Successfully connected to MQTT with result code %s" % str(rc))
+        print("before message_callback_add 1")
+        client.message_callback_add("Position2", self.pos_callback)
+        print("after message_callback_add")
+
+        (result, _) = client.subscribe(self.subscriptions_qos)
+        if (result == mqtt.MQTT_ERR_SUCCESS):
+            print("Successfully subscribed to MQTT topics with result code %s" %
+                str(result))
+
+
+    def on_message(self, client, userdata, message):
+        print("Received: Topic: %s Body: %s", message.topic, message.payload)
+
+
+    def pos_callback(self, client, userdata, message):
         try:
-            self.mambo[mambo_id] = msg.payload.decode('us-ascii')
-        except UnicodeDecodeError:
-            self.mambo[mambo_id] = 'WFT'
-
-    def _on_online(self, client, userdata, msg):
-        logging.debug('Got alive message: %s: %s',
-                      msg.topic, msg.payload)
-        parts = msg.topic.split('/')
-        robot_id = parts[2]
-        logging.info("Robot #%s state is %i", robot_id, int(msg.payload))
-        if int(msg.payload) == 0:
-            self._last_seen[robot_id] = None
-        else:
-            self._last_seen[robot_id] = datetime.now()
-
-    def run(self):
-        logger.info("Starting mqtt background loop")
-        self.mqtt_client.loop_start()
-        logger.info("mqtt loop started")
-
-    def mambo_list(self):
-        for id in sorted(self._last_seen):
-            yield self.get_mambo(id=id)
-
-    def get_mambo(self, id, online=None):
-        if online is None:
-            online = self._last_seen[id]
-        return Drone(id=id,
-                     mqtt_client=self.mqtt_client,
-                     is_online=online,
-                     name=self.mambo.get(id, None),
-                     last_seen=self._last_seen[id])
-
-# inspired by http://stackoverflow.com/a/17115473/7554925
+            data = message.payload.split()
+            print(data)
+        except:
+            raise
 
 
-class SpeedTable:
-    DATA = [
-        dict(angle=0, left=+1, right=+1),
-        dict(angle=45, left=+1, right=0),
-        dict(angle=90, left=+1, right=-1),
-        dict(angle=135, left=0, right=-1),
-        dict(angle=180, left=-1, right=-1),
-        dict(angle=225, left=-1, right=0),
-        dict(angle=270, left=-1, right=+1),
-        dict(angle=315, left=0, right=+1),
-        dict(angle=360, left=+1, right=+1),
-    ]
-    ANGLES = [i['angle'] for i in DATA]
-    LEFT = [i['left'] for i in DATA]
-    RIGHT = [i['right'] for i in DATA]
+    def main(self):
+        # logger = logging.getLogger('root')
+        # logging.basicConfig(format='[%(asctime)s %(levelname)s: %(funcName)20s] %(message)s', level=logging.DEBUG)
 
-    print(LEFT)
-
-    left_interpolation = Interpolation(x_list=ANGLES, y_list=LEFT)
-    right_interpolation = Interpolation(x_list=ANGLES, y_list=RIGHT)
-
-    @classmethod
-    def from_angle(cls, angle, speed):
-        left = cls.left_interpolation[angle] * speed
-        right = cls.right_interpolation[angle] * speed
-        return dict(left=left, right=right)
+        client = mqtt.Client()
+        # client.on_log = on_log
+        client.on_connect = self.on_connect
+        client.on_message = self.on_message
+        client.connect(self.broker_address, self.port_id)
+        client.loop_forever()
 
 
-class Drone:
-    def init(self, drone_mac, id, mqtt_client, is_online=True, name=None, last_seen=None):
-        self.drone_mac = drone_mac
-        self.id = id
-        self.mqtt_client = mqtt_client
-        self.online = is_online
-        self.last_seen = last_seen
-        self.name = name or 'Unnamed'
-        self.mambo = Mambo(self.drone_mac, use_wifi=True)
-        self.start_measure = False
-        self.mambo.set_user_sensor_callback(self.sensor_callback, args=None)
 
-    def start_and_prepare(self):
-        success = self.mambo.connect(num_retries=3)
-        print(f"Connection established >>{success}")
 
-        if (success):
-            self.mambo.smart_sleep(1)
-            self.mambo.ask_for_state_update()
-            print(
-                f"Battery level is >> {self.mambo.sensors.__dict__['battery']}%")
-            self.mambo.smart_sleep(1)
-
-            print("Taking off!")
-            self.mambo.safe_takeoff(3)
-    
-            if self.mambo.sensors.flying_state != 'emergency':
-
-                print('Sensor calibration...')
-                while self.mambo.sensors.speed_ts == 0:
-                    continue
-                self.start_measure = True
-
-                print('getting first state')
-                while self.current_state == []:
-                    continue
-                '''after this function you need to feed action function such as go to xyz '''
-            
-    def land_and_disconnect(self):
-        print('Landing...')
-        self.mambo.safe_land(3)
-        self.mambo.smart_sleep(2)
-        print('Disconnecting...')
-        self.mambo.disconnect()
-
-    def sensor_callback(self, args):
-        pass
-    
-    
-    # @property
-    # def last_seen_str(self):
-    #     if not self.last_seen:
-    #         return 'disconnected'
-    #     delta = datetime.now() - self.last_seen
-    #     print(self.last_seen, delta)
-
-    #     if delta < timedelta(seconds=60):
-    #         return 'alive'
-    #     if delta < timedelta(minutes=30):
-    #         return 'before {} minutes'.format(delta.seconds // 60)
-    #     return 'disconnected (probably)'
-
-    # @property
-    # def alive_color(self):
-    #     if not self.last_seen:
-    #         return '#FFFFFF'
-    #     delta = datetime.now() - self.last_seen
-    #     print(self.last_seen, delta)
-    #     if delta < timedelta(seconds=60):
-    #         return '#20FF20'
-    #     if delta < timedelta(minutes=30):
-    #         return '#008000'
-    #     return '#ffffff'
-
-    # def set_direction(self, direction, speed):
-    #     """
-    #     Send motors to robot
-
-    #     :param direction:   joystick direction in degrees 
-    #     :param speed:  speed from 0 to 100
-    #     :return: 
-    #     """
-    #     # drop pi/4
-    #     direction = float(direction)
-    #     speeds = SpeedTable.from_angle(
-    #         angle=direction, speed=float(speed))
-    #     self.set_motors(**speeds)
-
-    # def set_motors(self, left, right):
-    #     left, right = int(left), int(right)
-    #     logger.info("left=%s right=%s", left, right)
-    #     self.mqtt_client.publish(
-    #         "/robot/{}/motors".format(self.id),
-    #         '{},{}'.format(left, right))
+if __name__ == '__main__':
+    test = UWBconnection()
+    test.main()

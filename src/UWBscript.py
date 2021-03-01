@@ -62,7 +62,8 @@ def ToA_callback(client, userdata, message):
     ts = [0, 0, 0, 0, 0, 0]
     try:
         data = message.payload.split()
-
+        print("DC")
+        print(data[0])
         if (RepresentsInt(data[2])):
             anch_id = int(data[0])
             tag_id = int(data[1])
@@ -100,11 +101,11 @@ def ToA_callback(client, userdata, message):
                 ts = [DBdata['fields']['A1'], DBdata['fields']['A2'], DBdata['fields']['A3'],
                       DBdata['fields']['A4'], DBdata['fields']['A5'], DBdata['fields']['A6']]
 
-                print(ts)
+                # print(ts)
                 #   db_insert(DBdata)
                 # timestamp = [DBdata['fields']["A1"], DBdata['fields']["A2"], DBdata['fields']["A3"], DBdata['fields']["A4"], DBdata['fields']["A5"], DBdata['fields']["A6"]]
-                # print(ts)
-                print(Localisation(client,ts,i))
+                Localisation(client,ts,i)
+                # print(Localisation(client,ts,i))
                 DBdata['fields'] = {}
                 slot[i, index, :] = [0] * (num_anch)
                 index = []
@@ -127,13 +128,13 @@ def Localisation(client,data,i):
     A_n = np.array([A_n3, A_n1, A_n2, A_n4, A_n5, A_n6])
     n = len(A_n)
 
-    t1 = float(data[0]) * float(15.65e-12)
-    t2 = float(data[1]) * float(15.65e-12)
-    t3 = float(data[2]) * float(15.65e-12)
-    t4 = float(data[3]) * float(15.65e-12)
-    t5 = float(data[4]) * float(15.65e-12)
-    t6 = float(data[5]) * float(15.65e-12)
-
+    t1 = np.float32(data[0]) * np.float32(15.65e-12)
+    t2 = np.float32(data[1]) * np.float32(15.65e-12)
+    t3 = np.float32(data[2]) * np.float32(15.65e-12)
+    t4 = np.float32(data[3]) * np.float32(15.65e-12)
+    t5 = np.float32(data[4]) * np.float32(15.65e-12)
+    t6 = np.float32(data[5]) * np.float32(15.65e-12)
+    print(t1)
     # tolgo dall'inizio ancora riferimento e lascio il valore fuori (tm)
     toa = np.array([[t3, t1, t2, t4, t5, t6]])
     tdoa = toa - toa[0][0]
@@ -142,9 +143,9 @@ def Localisation(client,data,i):
 
 
     D = D.reshape(5, 1)
-    A_diff_one = np.array((A_n3[0][0]-A_n[1:, 0]), dtype='float')
-    A_diff_two = np.array((A_n3[1][0]-A_n[1:, 1]), dtype='float')
-    A_diff_three = np.array((A_n3[2][0]-A_n[1:, 2]), dtype='float')
+    A_diff_one = np.array((A_n3[0][0]-A_n[1:, 0]), dtype='float32')
+    A_diff_two = np.array((A_n3[1][0]-A_n[1:, 1]), dtype='float32')
+    A_diff_three = np.array((A_n3[2][0]-A_n[1:, 2]), dtype='float32')
 
     A = 2 * np.array([A_diff_one, A_diff_two, A_diff_three, D]).T
 
