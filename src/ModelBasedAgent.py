@@ -49,98 +49,18 @@ class ModelBasedAgent(Drone):
             print(f"cmd >> {cmd}")
             print(f"distance >> {distance}")
 
-    def go_to_xyz_old(self, desired_state):
-        self.desired_state = desired_state
-
-        stop_value_x = desired_state[0]  # x
-        stop_value_y = desired_state[1]  # y
-        stop_value_z = desired_state[2]  # z
-
-        # get initial positions
-        pos_x = self.current_state[0]
-        pos_y = self.current_state[1]
-        pos_z = self.current_state[2]
-
-        if stop_value_x > 0:
-            self.controller.set_desired_state([stop_value_x, 0, stop_value_z])
-            cmd = self.controller.calculate_cmd_input()
-            while pos_x < stop_value_x:
-                if stop_value_z == 0:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=0,
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                else:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=cmd[3],
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                pos_x = self.current_state[0]
-                print(f"cmd >>{cmd}")
-                print(f"pos x {pos_x}")
-        elif stop_value_x < 0:
-            self.controller.set_desired_state([stop_value_x, 0, stop_value_z])
-            cmd = self.controller.calculate_cmd_input()
-            while pos_x > stop_value_x:
-                if stop_value_z == 0:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=0,
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                else:
-                    self.mambo.fly_direct(roll=cmd[0],
-                                          pitch=cmd[1],
-                                          yaw=cmd[2],
-                                          vertical_movement=cmd[3],
-                                          duration=None)
-                    self.mambo.smart_sleep(0.1)
-                pos_x = self.current_state[0]
-                print(f"cmd >>{cmd}")
-                print(f"pos x {pos_x}")
-
-        self.mambo.smart_sleep(1)
-
-        if stop_value_y > 0:
-            self.controller.set_desired_state(self.desired_state)
-            cmd = self.controller.calculate_cmd_input()
-            while pos_y < stop_value_y:
-                self.mambo.fly_direct(roll=cmd[0],
-                                      pitch=cmd[1],
-                                      yaw=cmd[2],
-                                      vertical_movement=cmd[3],
-                                      duration=None)
-                self.mambo.smart_sleep(0.1)
-                pos_y = self.current_state[1]
-                print(f"cmd >>{cmd}")
-                print(f"pos y {pos_y}")
-        elif stop_value_y < 0:
-            self.controller.set_desired_state(self.desired_state)
-            cmd = self.controller.calculate_cmd_input()
-            while pos_y > stop_value_y:
-                self.mambo.fly_direct(roll=cmd[0],
-                                      pitch=cmd[1],
-                                      yaw=cmd[2],
-                                      vertical_movement=cmd[3],
-                                      duration=None)
-                self.mambo.smart_sleep(0.1)
-                pos_y = self.current_state[1]
-                print(f"cmd >>{cmd}")
-                print(f"pos y {pos_y}")
-
 
 if __name__ == "__main__":
     modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    waypoint = [[1,0,1],[2,0,1]]
-    for i in waypoint:
-        modelAgent.go_to_xyz(i)
+    # modelAgent.mambo.turn_degrees(90)
+    # modelAgent.go_to_xyz([0,0,1])
+    # modelAgent.mambo.smart_sleep()
+    # modelAgent.mambo.fly_direct(0,0,0,50,1) #test
+    # waypoint = [[1,0,1],[2,0,1]]
+    # for i in waypoint:
+    #     modelAgent.go_to_xyz(i)
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

@@ -15,6 +15,7 @@ class KalmanFilterUWB:
         self.H = np.array([[1.0, 0.0, 0.0],
                        [0.0, 1.0, 0.0],
                        [0.0, 0.0, 1.0],
+
                        [1.0, 0.0, 0.0],
                        [0.0, 1.0, 0.0],
                        [0.0, 0.0, 1.0]])
@@ -23,7 +24,7 @@ class KalmanFilterUWB:
         self.q = q
         
         self.S = []
-        self.z = z
+        self.z = []
         
     # def get_state_estimation(self, q, u, z, p_update_old, FLAG):
     def get_state_estimation(self, q, u, z, p_update_old, FLAG):
@@ -45,8 +46,9 @@ class KalmanFilterUWB:
         else:
             self.p_update = self.p_prediction
             self.q_update = self.q_prediction   
-        # self.S = [self.p_update, self.q_update] #modification part
-        return self.q_update.T.tolist()[0]
+        self.S = [self.p_update, self.q_update] #modification part
+        return self.S
+        # return self.q_update.T.tolist()[0]
 
 
 
@@ -64,10 +66,10 @@ if __name__ == "__main__":
     else:
         FLAG = False
 
-    current_state = state.get_state_estimation(q,u,z,p,FLAG)
+    p_update, q_update = state.get_state_estimation(q,u,z,p,FLAG)
     # # print(f"this is p >>\n{p1}")
     # print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{q1.tolist()}") 
-    print(current_state)
+    print(p_update)
     
     
 

@@ -1,10 +1,10 @@
-from Drone import Drone
+from Drone_mqtt_test import Drone
 from PositionController import MamboPositionController
 # from KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
 # from multiprocessing import Process,Queue,Pipe
 # from UWBscript_modified import *
-from DroneUWBtest import DroneUWB
+import time
 
 class ModelBasedAgentUWB(Drone):
     def __init__(self, drone_mac):
@@ -14,7 +14,7 @@ class ModelBasedAgentUWB(Drone):
         self.q = np.ones((3, 1))
         self.p = p = np.zeros((3, 3))
         # self.kalmanfilter = KalmanFilterUWB(self.q)
-        self.uwbPosition = DroneUWB()
+        # self.Drone = Drone()
         self.current_velocities = []
         self.current_measurement = []
         self.current_state = []  # meters
@@ -22,23 +22,16 @@ class ModelBasedAgentUWB(Drone):
         self.current_measurement_UWB = []
         self.eps = 0.1  # 0.08
         self.start_measure = False
-        #________________________UWB
-        # self.parent_conn, self.child_conn = Pipe() #added connections
-        # self.proccess = Process(target=runUWB, args=(self.child_conn,))
-        #__________________________
 
     def sensor_callback(self, args):
         if self.start_measure:
-            self.uwbPosition.mqtt_connection()
-            self.current_measurement_UWB = self.uwbPosition.pos
-            #UWB_______________________
-            # self.proccess.start() #starting process
-            # self.current_measurement_UWB = self.uwbPosition.get_pos()  # populate with subscription
-            print(self.current_measurement_UWB)
-            #UWB________________________
+            
+            # self.current_measurement_UWB = self.pos
+            # print(self.current_measurement_UWB)
+            # print(self.pos)
             self.current_measurement = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                         self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                        self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + self.current_measurement_UWB
+                                        self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] #+ self.current_measurement_UWB
             self.current_velocities = [self.mambo.sensors.speed_x,
                                        self.mambo.sensors.speed_y,
                                        self.mambo.sensors.speed_z]
@@ -47,6 +40,7 @@ class ModelBasedAgentUWB(Drone):
             # self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
             #                                                           self.current_velocities)
             self.controller.set_current_state(self.current_state)
+            print(self.current_measurement)
 
     def go_to_xyz(self, desired_state):
         self.desired_state = desired_state
@@ -72,14 +66,19 @@ class ModelBasedAgentUWB(Drone):
 
 if __name__ == "__main__":
     modelAgent = ModelBasedAgentUWB("84:20:96:91:73:F1")
+    # time.sleep(1)
+    print("run mqtt") 
+    # modelAgent.run()
     modelAgent.start_and_prepare()
-    print("hello")
-    modelAgent.mambo.fly_direct(0,30,0,0,1)
-
+    # modelAgent.mambo.hover()
+    modelAgent.mambo.smart_sleep(1)
+    # while True:
+    #     time.sleep(0.5)
+    #     print(modelAgent.pos)
     # modelAgent.start_and_prepare()
-    # waypoint = [[1,0,1],[2,0,1]]
-    # for i in waypoint:
-    #     modelAgent.go_to_xyz(i)
+    # print("trying to fly direct")
+    # modelAgent.mambo.fly_direct(0,10,0,0,1)
+    # print("after fly direct")
     modelAgent.land_and_disconnect()
-
+    # modelAgent.stop_client()
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

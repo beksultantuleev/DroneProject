@@ -1,4 +1,5 @@
 from pyparrot.Minidrone import Mambo
+# from subscriber import MqttSubscriber
 
 class Drone:
     def __init__(self, drone_mac):
@@ -6,6 +7,7 @@ class Drone:
         self.mambo = Mambo(self.drone_mac, use_wifi=True)
         self.start_measure = False
         self.mambo.set_user_sensor_callback(self.sensor_callback, args=None)
+        # self.mqttSubscriber = MqttSubscriber()
 
 
     def start_and_prepare(self):
@@ -29,9 +31,9 @@ class Drone:
                     continue
                 self.start_measure = True
 
-                print('getting first state')
-                while self.current_state == []:
-                    continue
+                # print('getting first state')
+                # while self.current_state == []:
+                #     continue
                 '''after this function you need to feed action function such as go to xyz '''
             
     def land_and_disconnect(self):
@@ -40,6 +42,7 @@ class Drone:
         self.mambo.smart_sleep(2)
         print('Disconnecting...')
         self.mambo.disconnect()
+        # self.mqttSubscriber.stop()
 
 
 

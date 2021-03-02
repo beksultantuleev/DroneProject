@@ -11,7 +11,9 @@ import atexit
 
 class DroneUWB:
     def __init__(self):
-        self.broker_address = "192.168.1.200"  # Broker address
+        # self.broker_address = "192.168.1.200"  # Broker address
+        self.broker_address = "localhost"  # Broker address
+
         self.port_id = 1883  # Broker port
         self.subscriptions_qos = [("Position2", 0)]
         self.pos = []
