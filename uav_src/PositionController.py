@@ -188,6 +188,6 @@ if __name__ == "__main__":
     mambo = MamboPositionController()
 
     mambo.set_desired_state([1, 0, 0])
-    mambo.set_current_state([0.5, 0, 0])
+    mambo.set_current_state([0, 0, 0])
     u = mambo.calculate_cmd_input()
     print('input values:',u)

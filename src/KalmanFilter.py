@@ -112,9 +112,9 @@ class MamboKalman(KalmanFilter):
 
 if __name__ == "__main__":
     # pos = [2,0,0, 1.9, 0,0]
-    pos = [1, 1, 1]
+    pos = [1.1, 1.2, 1.3]
     speed = [0.8, 0.1, 0.1]
-    estimate = MamboKalman(pos, speed)
+    estimate = MamboKalman([0,0,0], [0,0,0])
     x = estimate.get_state_estimate(pos, speed)
 
     print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{x}")

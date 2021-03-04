@@ -13,18 +13,20 @@ class KalmanFilterUWB:
         '''
         self.A = np.eye(np.size(q, 0))
         self.G = np.eye(np.size(q, 0)) * 0.5
-        self.H = np.array([[1.0, 0.0, 0.0],
-                           [0.0, 1.0, 0.0],
-                           [0.0, 0.0, 1.0],
-                           [1.0, 0.0, 0.0],
-                           [0.0, 1.0, 0.0],
-                           [0.0, 0.0, 1.0]])
-        self.R = np.array([[0.5, 0, 0, 0, 0, 0],
-                           [0, 0.5, 0, 0, 0, 0],
-                           [0, 0, 0.5, 0, 0, 0],
-                           [0, 0, 0, 0.4, 0, 0],
-                           [0, 0, 0, 0, 0.4, 0],
-                           [0, 0, 0, 0, 0, 100]])
+        self.H = np.eye(3)
+        # self.H = np.array([[1.0, 0.0, 0.0],
+        #                    [0.0, 1.0, 0.0],
+        #                    [0.0, 0.0, 1.0],
+        #                    [1.0, 0.0, 0.0],
+        #                    [0.0, 1.0, 0.0],
+        #                    [0.0, 0.0, 1.0]])
+        self.R = np.eye(3)
+        # self.R = np.array([[0.5, 0, 0, 0, 0, 0],
+        #                    [0, 0.5, 0, 0, 0, 0],
+        #                    [0, 0, 0.5, 0, 0, 0],
+        #                    [0, 0, 0, 0.4, 0, 0],
+        #                    [0, 0, 0, 0, 0.4, 0],
+        #                    [0, 0, 0, 0, 0, 100]])
         self.Q = np.eye(np.size(q, 0))
         self.q = q
 
@@ -46,13 +48,16 @@ class KalmanFilterUWB:
         if self.FLAG:
             self.s_update = np.dot(
                 np.dot(self.H, self.p_prediction), self.H.T) + self.R
-            self.W_gain = np.dot(
-                np.dot(self.p_prediction, self.H.T), np.linalg.inv(self.s_update))
+            # print(f"s_update>>{self.s_update}")
+            self.W_gain = multi_dot(
+                [self.p_prediction, self.H.T, np.linalg.inv(self.s_update)])
+            
             self.q_update = self.q_prediction + \
                 np.dot(self.W_gain,  (self.z - np.dot(self.H, self.q_prediction)))
+            # print(f"q_update>>{self.q_update}")
             self.p_update = np.dot(
                 (np.eye(3)-np.dot(self.W_gain, self.H)), self.p_prediction)
-
+            # print(f"self.p_update >> \n{self.p_update}")
         else:
             self.p_update = self.p_prediction
             self.q_update = self.q_prediction
@@ -62,12 +67,10 @@ class KalmanFilterUWB:
 
 
 if __name__ == "__main__":
-    q = np.ones((3, 1))
+    q = np.zeros((3, 1))
     p = np.zeros((3, 3))
-    # u = np.ones((3, 1)) # current speed_x, speed_y, speed_z
     u = [0.8, 0.1, 0.1]  # current speed_x, speed_y, speed_z
-    # z = np.ones((6, 1)) # current x,y,z and UWB x,y,z
-    z = [2,0,0, 1.9, 0,0]  # current x,y,z and UWB x,y,z
+    z = [1.1, 1.2, 1.3]
     state = KalmanFilterUWB(q)
     UWBdata = 1
     if UWBdata:
@@ -77,5 +80,5 @@ if __name__ == "__main__":
 
     p_update, q_update = state.get_state_estimation(q, u, z, p, FLAG)
     # # print(f"this is p >>\n{p1}")
-    # print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{q1.tolist()}")
-    print(q_update)
+    print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{q_update.T.tolist()[0]}")
+

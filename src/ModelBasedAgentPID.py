@@ -1,5 +1,6 @@
 from Drone import Drone
 from PositionController import MamboPositionController
+from PIDcontroller import PIDcontroller
 from KalmanFilter import MamboKalman
 import numpy as np
 import time
@@ -7,7 +8,8 @@ import time
 class ModelBasedAgent(Drone):
     def __init__(self, drone_mac):
         super().__init__(drone_mac)
-        self.controller = MamboPositionController()
+        # self.controller = MamboPositionController()
+        self.pidController = PIDcontroller()
         self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
         self.current_velocities = []
         self.current_measurement = []
@@ -26,7 +28,8 @@ class ModelBasedAgent(Drone):
                                        self.mambo.sensors.speed_z]
             self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
                                                                       self.current_velocities)
-            self.controller.set_current_state(self.current_state)
+            # self.controller.set_current_state(self.current_state)
+            self.pidController.set_current_state(self.current_state)
 
     def start_and_prepare(self):
         success = self.mambo.connect(num_retries=3)
@@ -57,14 +60,16 @@ class ModelBasedAgent(Drone):
 
     def go_to_xyz(self, desired_state):
         self.desired_state = desired_state
-        self.controller.set_desired_state(self.desired_state)
+        # self.controller.set_desired_state(self.desired_state)
+        self.pidController.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
                 (self.current_state[1] - self.desired_state[1])**2 +
                (self.current_state[2] - self.desired_state[2])**2)**0.5
         while distance > self.eps:
-            cmd = self.controller.calculate_cmd_input()
-            self.mambo.fly_direct(roll=cmd[1],
-                                  pitch=cmd[0],
+            # cmd = self.controller.calculate_cmd_input()
+            cmd = self.pidController.calculate_cmd_input()
+            self.mambo.fly_direct(roll=cmd[0],
+                                  pitch=cmd[1],
                                   yaw=cmd[2],
                                   vertical_movement=cmd[3],
                                   duration=None)
@@ -82,13 +87,8 @@ if __name__ == "__main__":
     modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    # modelAgent.mambo.turn_degrees(90)
     modelAgent.go_to_xyz([1,0,1])
-    # modelAgent.mambo.smart_sleep()
-    # modelAgent.mambo.fly_direct(0,0,0,50,1) #test
-    # waypoint = [[1,0,1],[2,0,1]]
-    # for i in waypoint:
-    #     modelAgent.go_to_xyz(i)
+
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

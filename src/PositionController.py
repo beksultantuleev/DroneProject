@@ -18,6 +18,8 @@
 
 import numpy as np
 import scipy.linalg
+import time
+
 
 class PositionController:
     def __init__(self, A, B, Q, R):
@@ -53,9 +55,9 @@ class PositionController:
         self.Q = Q
         self.R = R
         self.P = np.matrix(scipy.linalg.solve_discrete_are(self.A, self.B,
-                                self.Q, self.R))
+                                                           self.Q, self.R))
         self.K = np.matrix(scipy.linalg.inv(self.B.T*self.P*self.B+self.R)*(
-                                self.B.T*self.P*self.A))
+            self.B.T*self.P*self.A))
 
     def get_eig(self):
         """
@@ -111,6 +113,7 @@ class PositionController:
         self.cmd_input = u
         return self.get_current_input()
 
+
 class MamboPositionController(PositionController):
     def __init__(self):
         """
@@ -122,25 +125,29 @@ class MamboPositionController(PositionController):
             u = [x_vel, y_vel, z_vel]'
             sensing x; fully observable system
         """
-        self.dt = 0.5 # seconds; sample time (2hz on WiFi)
+        self.dt = 0.5  # seconds; sample time (2hz on WiFi)
 
         # This system is in discrete time:
-        A = np.array([[1.0, 0.0, 0.0],
-                      [0.0, 1.0, 0.0],
-                      [0.0, 0.0, 1.0]])
-        B = np.array([[self.dt, 0.0, 0.0],
-                      [0.0, self.dt, 0.0],
-                      [0.0, 0.0, self.dt]])
-        Q = np.array([[1000, 0.0, 0.0],
-                      [0.0, 1000, 0.0],
-                      [0.0, 0.0, 1.0]])
-        R = np.array([[0.5, 0.0, 0.0],
-                      [0.0, 0.5, 0.0],
-                      [0.0, 0.0, 1]])
+        A = np.array(
+            [[1.0, 0.0, 0.0],
+             [0.0, 1.0, 0.0],
+             [0.0, 0.0, 1.0]])
+        B = np.array(
+            [[self.dt, 0.0, 0.0],
+             [0.0, self.dt, 0.0],
+             [0.0, 0.0, self.dt]])
+        Q = np.array(
+            [[0.7, 0.0, 0.0],
+             [0.0, 0.7, 0.0],
+             [0.0, 0.0, 1]])
+        R = np.array(
+            [[2, 0.0, 0.0],
+             [0.0, 2, 0.0],
+             [0.0, 0.0, 1]])
         super().__init__(A, B, Q, R)
 
-        self.max_input_power = [15, 15, 15, 15]
-        self.max_velocity = 1 # m/s, this is a guess. 1.0 before
+        self.max_input_power = [25, 25, 25, 25]
+        self.max_velocity = 1.0  # m/s, this is a guess.
 
     def calculate_cmd_input(self):
         """
@@ -166,8 +173,8 @@ class MamboPositionController(PositionController):
                                     vm = vertical_movement power
         """
         x_er = np.subtract(self.current_state, self.desired_state)
-        u = np.dot(-1 *self.K, x_er).tolist()[0] # python list structure
-        yaw = 0 # shouldn't have to yaw for our purposes.
+        u = np.dot(-1 * self.K, x_er).tolist()[0]  # python list structure
+        yaw = 0  # shouldn't have to yaw for our purposes.
         u_scaled = [0 for i in range(len(u))]
 
         # constraint checks:
@@ -183,11 +190,18 @@ class MamboPositionController(PositionController):
 
         return self.get_current_input()
 
+
 # test:
 if __name__ == "__main__":
     mambo = MamboPositionController()
+    destX = 1
+    num = 0
+    mambo.set_desired_state([destX, 0, 0])
+    while num <destX:
 
-    mambo.set_desired_state([2.5, 3.6, 1])
-    mambo.set_current_state([1.9528889081797725, 1.726831111753007, 0.6802345907310554])
-    u = mambo.calculate_cmd_input()
-    print('input values:',u)
+        mambo.set_current_state([num,0,0])
+        u = mambo.calculate_cmd_input()
+        num +=0.2
+        time.sleep(0.1)
+        print(f"{u} at position>> {num}")
+    # print('input values:', u)

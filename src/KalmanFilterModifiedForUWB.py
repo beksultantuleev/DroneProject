@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import multi_dot
 
 
 class KalmanFilter:
@@ -59,8 +60,9 @@ class KalmanFilter:
 
         L[k] = AP[K]C.T(Rv + CP[k]C.T)^-1
         """
-        S_update = np.linalg.inv(self.R + np.dot(self.H, np.dot(self.P, self.H.T)))
-        self.W = np.dot(self.A, np.dot(self.P, np.dot(self.H.T, S_update)))
+        # print(f"P_update >> \n{self.P}")
+        S_update =  multi_dot([self.H, self.P, self.H.T]) + self.R
+        self.W = multi_dot([self.A, self.P, self.H.T, np.linalg.inv(S_update)])
 
         return None
 
@@ -73,14 +75,21 @@ class KalmanFilter:
 
         Y: numpy array of sensor values at timestep k
         """
+        # print(f"y>> {Y}")
+        # print(f"yhat>> {self.Yhat}")
+        # print(f"Y-yhat>> {Y-self.Yhat}")
+        
+        #self.z or self.q_update in here
         self.z = np.dot(self.A, self.z) + np.dot(self.G,
                                                  self.u) + np.dot(self.W, Y - self.Yhat)
-
+        # print(f"self.z>>\n {self.z}")
         Acl = self.A - np.dot(self.W, self.H)
+        # print(f"Acl>>\n {Acl}")
         self.P = np.dot(Acl, np.dot(self.P, Acl.T)) + self.R + \
             np.dot(self.W, np.dot(self.Q, self.W))
-
+        # print(f"self.P>>\n {self.P}")
         self.Yhat = np.dot(self.H, self.z) + np.dot(self.D, self.u)
+        # print(f"Self.Yhat >> \n {self.Yhat}")
         return None
 
     def get_state_estimate(self, Y, U):
@@ -134,7 +143,7 @@ class MamboKalman(KalmanFilter):
 
 if __name__ == "__main__":
     # pos = [2,0,0, 1.9, 0,0]
-    pos = [1, 1, 1]
+    pos = [1.1, 1.2, 1.3]
     speed = [0.8, 0.1, 0.1]
     estimate = MamboKalman(pos, speed)
     x = estimate.get_state_estimate(pos, speed)
