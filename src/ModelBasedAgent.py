@@ -32,8 +32,8 @@ class ModelBasedAgent(Drone):
         self.desired_state = desired_state
         self.controller.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-               (self.current_state[2] - self.desired_state[2])**2)**0.5
+                    (self.current_state[1] - self.desired_state[1])**2 +
+                    (self.current_state[2] - self.desired_state[2])**2)**0.5
         while distance > self.eps:
             cmd = self.controller.calculate_cmd_input()
             self.mambo.fly_direct(roll=cmd[0],
@@ -43,11 +43,37 @@ class ModelBasedAgent(Drone):
                                   duration=None)
             self.mambo.smart_sleep(0.01)
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-               (self.current_state[2] - self.desired_state[2])**2)**0.5
+                        (self.current_state[1] - self.desired_state[1])**2 +
+                        (self.current_state[2] - self.desired_state[2])**2)**0.5
             print(f"current state >>{self.current_state}")
             print(f"cmd >> {cmd}")
             print(f"distance >> {distance}")
+
+    def start_and_prepare(self):
+        success = self.mambo.connect(num_retries=3)
+        print(f"Connection established >>{success}")
+
+        if (success):
+            self.mambo.smart_sleep(1)
+            self.mambo.ask_for_state_update()
+            print(
+                f"Battery level is >> {self.mambo.sensors.__dict__['battery']}%")
+            self.mambo.smart_sleep(1)
+
+            print("Taking off!")
+            self.mambo.safe_takeoff(5)  # we have extended from 3 to 10
+
+            if self.mambo.sensors.flying_state != 'emergency':
+
+                print('Sensor calibration...')
+                while self.mambo.sensors.speed_ts == 0:
+                    continue
+                self.start_measure = True
+
+                print('getting first state')
+                while self.current_state == []:
+                    continue
+                '''after this function you need to feed action function such as go to xyz '''
 
 
 if __name__ == "__main__":
@@ -55,7 +81,7 @@ if __name__ == "__main__":
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
     # modelAgent.mambo.turn_degrees(90)
-    # modelAgent.go_to_xyz([0,0,1])
+    modelAgent.go_to_xyz([1, 0, 1])
     # modelAgent.mambo.smart_sleep()
     # modelAgent.mambo.fly_direct(0,0,0,50,1) #test
     # waypoint = [[1,0,1],[2,0,1]]

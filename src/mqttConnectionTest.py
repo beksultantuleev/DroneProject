@@ -29,7 +29,7 @@ class UWBconnection:
         self.DBdata['tags']['anchors'] = 6
         self.dist = {'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0, 'A5': 0, 'A6': 0}
         self.dict_keys = list(self.dist.keys())
-        self.broker_address = "192.168.1.200"  # Broker address
+        self.broker_address = "192.168.1.200"  # Broker address or localhost
         self.port_id = 1883  # Broker port
         self.subscriptions_qos = [("Position2", 0)]
 

@@ -18,7 +18,7 @@ class Drone:
     def connect_mqtt(self):
         mqtt_client = mqtt.Client()
         mqtt_client.connect(self.broker_address, self.port_id)
-        mqtt_client.subscribe('Position2')
+        mqtt_client.subscribe('Position3')
 
         self.mqtt_client = mqtt_client
         self.mqtt_client.message_callback_add(
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     ark.run() #start loop
     while True:
         print(ark.pos)
-        print("hello")
+        # print("hello")
         time.sleep(0.5)
     # ark.mambo.safe_takeoff(2)
     # ark.mambo.hover()
