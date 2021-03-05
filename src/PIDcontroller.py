@@ -107,7 +107,7 @@ if __name__ == "__main__":
     mambo = PIDcontroller()
     #====================
     # mambo.set_current_state([0,0,0])
-    # mambo.set_desired_state([1,0,1])
+    # mambo.set_desired_state([1,0,0])
     # u = mambo.calculate_cmd_input()
     # print(u)
     #===================

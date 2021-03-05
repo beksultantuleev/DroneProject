@@ -104,8 +104,8 @@ class MamboKalman(KalmanFilter):
         B = np.eye(len(X0)) * self.dt
         C = np.eye(len(X0))
         D = np.zeros((len(X0), len(X0)))
-        Rw = np.eye(len(X0))
-        Rv = np.eye(len(X0))
+        Rw = np.eye(len(X0))  #made it 10
+        Rv = np.eye(len(X0))  #made it 0.5
 
         super().__init__(A, B, C, D, Rw, Rv, X0, U0)
 

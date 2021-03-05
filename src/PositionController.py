@@ -186,22 +186,48 @@ class MamboPositionController(PositionController):
 
             # scaling command input to power maximums:
             u_scaled[i] = u[i] / self.max_velocity * self.max_input_power[i]
-        self.cmd_input = [u_scaled[0], u_scaled[1], yaw, u_scaled[2]]
-
+        self.cmd_input = [u_scaled[1], u_scaled[0], yaw, u_scaled[2]]
+        '''r p y t'''
         return self.get_current_input()
 
 
 # test:
 if __name__ == "__main__":
     mambo = MamboPositionController()
-    destX = 1
-    num = 0
-    mambo.set_desired_state([destX, 0, 0])
-    while num <destX:
+    mambo.set_current_state([0,0,0])
+    mambo.set_desired_state([1,0,0])
+    u = mambo.calculate_cmd_input()
+    print(u)
+     #===================
+    # destX = 1
+    # num = 0
+    # mambo.set_desired_state([destX, 0, 0])
+    # while num <destX:
 
-        mambo.set_current_state([num,0,0])
-        u = mambo.calculate_cmd_input()
-        num +=0.2
-        time.sleep(0.1)
-        print(f"{u} at position>> {num}")
-    # print('input values:', u)
+    #     mambo.set_current_state([num,0,0])
+    #     u = mambo.calculate_cmd_input()
+    #     num +=0.1
+    #     time.sleep(0.1)
+    #     print(f"{u} at position>> {num}")
+#========================================
+    # destY = 2
+    # num = 0
+    # mambo.set_desired_state([0, destY, 0])
+    # while num <destY:
+
+    #     mambo.set_current_state([0,num,0])
+    #     u = mambo.calculate_cmd_input()
+    #     num +=0.5
+    #     time.sleep(0.1)
+    #     print(f"{u} at position>> {num}")
+#========================================
+    # destZ = 3
+    # num = 0
+    # mambo.set_desired_state([0, 0, destZ])
+    # while num <destZ:
+
+    #     mambo.set_current_state([0,0,num])
+    #     u = mambo.calculate_cmd_input()
+    #     num +=0.5
+    #     time.sleep(0.1)
+    #     print(f"{u} at position>> {num}")
