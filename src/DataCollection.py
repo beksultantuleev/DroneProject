@@ -1,21 +1,15 @@
 from Drone import Drone
 from PositionController import MamboPositionController
-from PIDcontroller import PIDcontroller
-from KalmanFilterUWB import KalmanFilterUWB
+from KalmanFilter import KalmanFilterUWB
 import numpy as np
 import time
 import logging
 
-class ModelBasedAgent(Drone):
+class DataCollection(Drone):
     def __init__(self, drone_mac):
         super().__init__(drone_mac)
-        # self.controller = MamboPositionController()
-        self.pidController = PIDcontroller()
-        #==========================
-        self.p = np.zeros((3, 3))
-        self.q = np.zeros((3, 1))
-        self.kalmanfilterUWB = KalmanFilterUWB(self.q)
-        #===========================
+        self.controller = MamboPositionController()
+        self.kalmanfilter = KalmanFilterUWB([0, 0, 0], [0, 0, 0])
         self.current_velocities = []
         self.current_measurement = []
         self.current_state = []  # meters
@@ -23,7 +17,6 @@ class ModelBasedAgent(Drone):
         self.eps = 0.2  # 0.08
         self.start_measure = False
         logging.basicConfig(filename = 'position_log2.csv', format='%(asctime)s, XYZ, %(message)s', level=logging.DEBUG)
-
 
     def sensor_callback(self, args):
         if self.start_measure:
@@ -33,10 +26,10 @@ class ModelBasedAgent(Drone):
             self.current_velocities = [self.mambo.sensors.speed_x,
                                        self.mambo.sensors.speed_y,
                                        self.mambo.sensors.speed_z]
-            self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
-                self.q, self.current_velocities, self.current_measurement, self.p, True)
-            self.current_state = self.q.T.tolist()[0]
-            self.pidController.set_current_state(self.current_state)
+            # self.current_state = self.kalmanfilter.get_state_estimate(self.current_measurement,
+            #                                                           self.current_velocities)
+            # self.controller.set_current_state(self.current_state)
+            logging.info(f"{self.current_measurement[0]}, {self.current_measurement[1]}, {self.current_measurement[2]}")
 
     def start_and_prepare(self):
         success = self.mambo.connect(num_retries=3)
@@ -65,38 +58,11 @@ class ModelBasedAgent(Drone):
                 '''after this function you need to feed action function such as go to xyz '''
 
 
-    def go_to_xyz(self, desired_state):
-        self.desired_state = desired_state
-        # self.controller.set_desired_state(self.desired_state)
-        self.pidController.set_desired_state(self.desired_state)
-        distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-               (self.current_state[2] - self.desired_state[2])**2)**0.5
-        while distance > self.eps:
-            # cmd = self.controller.calculate_cmd_input()
-            cmd = self.pidController.calculate_cmd_input()
-            self.mambo.fly_direct(roll=cmd[0],
-                                  pitch=cmd[1],
-                                  yaw=cmd[2],
-                                  vertical_movement=cmd[3],
-                                  duration=None)
-            # self.mambo.smart_sleep(0.5)
-            time.sleep(0.3)
-            distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                (self.current_state[1] - self.desired_state[1])**2 +
-               (self.current_state[2] - self.desired_state[2])**2)**0.5
-            print(f"KALMAN STATE >>{self.current_state}")
-            print(f"current measurement >>{self.current_measurement}")
-            print(f"CMD input >> {cmd}")
-            print(f"distance >> {distance}")
-
 
 if __name__ == "__main__":
-    modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
+    modelAgent = DataCollection("84:20:96:91:73:F1")
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    modelAgent.go_to_xyz([1,0,1])
+    modelAgent.mambo.hover()
 
     modelAgent.land_and_disconnect()
-
-    # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

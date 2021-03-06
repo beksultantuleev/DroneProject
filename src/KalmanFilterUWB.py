@@ -11,33 +11,40 @@ class KalmanFilterUWB:
         p_pred = A*Pup*A.T + GQG.T |c + du
         z = [x,y,z, x1,y1,z1]
         '''
+        self.z = []
         self.A = np.eye(np.size(q, 0))
         self.G = np.eye(np.size(q, 0)) * 0.5
-        # self.H = np.eye(3)
         self.H = np.array([[1.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0],
                            [0.0, 0.0, 1.0],
                            [1.0, 0.0, 0.0],
                            [0.0, 1.0, 0.0],
                            [0.0, 0.0, 1.0]])
-        # self.R = np.eye(3)*15  #measurement noise
         self.R = np.array([[0.5, 0, 0, 0, 0, 0],
                            [0, 0.5, 0, 0, 0, 0],
                            [0, 0, 0.5, 0, 0, 0],
                            [0, 0, 0, 0.25, 0, 0],
                            [0, 0, 0, 0, 0.25, 0],
                            [0, 0, 0, 0, 0, 100]])
-        self.Q = np.eye(np.size(q, 0)) *0.5 #process noise
+        self.Q = np.eye(np.size(q, 0)) * 0.5  # process noise
         self.q = q
 
         self.S = []
-        self.z = []
 
     # def get_state_estimation(self, q, u, z, p_update_old, FLAG):
+
     def get_state_estimation(self, q, u, z, p_update_old, FLAG):
         self.q = q
         self.u = np.matrix(u).T  # transpose it
         self.z = np.matrix(z).T
+
+        if len(self.z) == 3:
+            self.H = np.eye(3)
+            self.R = np.array([[15, 0, 0],
+                               [0, 15, 0],
+                               [0, 0, 1]
+                               ])  # measurement noise
+
         self.p_update_old = p_update_old
         self.FLAG = FLAG
 
@@ -51,7 +58,7 @@ class KalmanFilterUWB:
             # print(f"s_update>>{self.s_update}")
             self.W_gain = multi_dot(
                 [self.p_prediction, self.H.T, np.linalg.inv(self.s_update)])
-            
+
             self.q_update = self.q_prediction + \
                 np.dot(self.W_gain,  (self.z - np.dot(self.H, self.q_prediction)))
             # print(f"q_update>>{self.q_update}")
@@ -81,4 +88,3 @@ if __name__ == "__main__":
     p_update, q_update = state.get_state_estimation(q, u, z, p, FLAG)
     # # print(f"this is p >>\n{p1}")
     print(f"our UAV is here >>\tx\ty\tz\n\t\t\t{q_update.T.tolist()[0]}")
-

@@ -1,6 +1,6 @@
 from pyparrot.Minidrone import Mambo
 from PositionController import MamboPositionController
-from KalmanFilter import MamboKalman
+from KalmanFilter import KalmanFilterUWB
 import numpy as np
 from subscriber import MqttSubscriber
 

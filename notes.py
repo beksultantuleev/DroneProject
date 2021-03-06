@@ -1,26 +1,12 @@
-from time import ctime, time
-# import numpy as np
-# import scipy.linalg
-# dt = 0.5
-# A = np.array(
-#     [[1.0, 0.0, 0.0],
-#      [0.0, 1.0, 0.0],
-#      [0.0, 0.0, 1.0]])
-# B = np.array(
-#     [[dt, 0.0, 0.0],
-#      [0.0, dt, 0.0],
-#      [0.0, 0.0, dt]])
-# Q = np.array(
-#     [[0.7, 0.0, 0.0],
-#      [0.0, 0.7, 0.0],
-#      [0.0, 0.0, 1]])
-# R = np.array(
-#     [[2, 0.0, 0.0],
-#      [0.0, 2, 0.0],
-#      [0.0, 0.0, 1]])
+import numpy as np
 
-# P = np.matrix(scipy.linalg.solve_discrete_are(A, B,
-#                                               Q, R))
-# print(P)
+# a = np.array([[1,12],[2,13],[3,14],[4,15],[5,16],[6,17],[7,18],[8,19]])
 
-print(f"timestamp {ctime()}")
+# print(np.mean(a,0))
+c = []
+for i in range(3):
+    b = [np.random.randint(0,10),np.random.randint(0,10),np.random.randint(0,10)]
+    c.append(b)
+print(np.array(c))
+print(np.mean(np.array(c), 0))
+print(np.mean(np.array(c), 0)[0])

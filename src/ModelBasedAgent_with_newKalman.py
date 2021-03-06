@@ -1,6 +1,6 @@
 from Drone import Drone
 from PositionController import MamboPositionController
-from KalmanFilter import MamboKalman
+from KalmanFilter import KalmanFilterUWB
 import numpy as np
 # ==============
 from KalmanFilterUWB import KalmanFilterUWB
@@ -12,7 +12,7 @@ class ModelBasedAgent(Drone):
         super().__init__(drone_mac)
         self.controller = MamboPositionController()
         self.controllerPID = PIDcontroller()
-        self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
+        self.kalmanfilter = KalmanFilterUWB([0, 0, 0], [0, 0, 0])
         # =======================
         self.p = np.zeros((3, 3))
         self.q = np.zeros((3, 1))
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    modelAgent.go_to_xyz([1, 1, 1])
+    modelAgent.go_to_xyz([1, 0, 1])
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

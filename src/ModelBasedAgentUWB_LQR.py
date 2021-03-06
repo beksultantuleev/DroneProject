@@ -4,7 +4,7 @@ from KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
 from subscriber import MqttSubscriber
 import time
-# from time import time, ctime
+
 
 
 class ModelBasedAgentUWB(Drone):
@@ -29,12 +29,15 @@ class ModelBasedAgentUWB(Drone):
         self.FLAG = False
         self.checker = False
         self.initial_pos = [0, 0, 0]
+        self.avrg_initial_pos = []
 
     def sensor_callback(self, args):
         if self.start_measure:
             if self.UWB_Data_Storing:
                 # print(self.UWB_Data_Storing)
-                self.initial_pos = self.mqttSubscriber.pos
+                for i in range(20):
+                    self.initial_pos = self.mqttSubscriber.pos
+                    self.avrg_initial_pos.append(self.avrg_initial_pos)
                 self.UWB_Data_Storing = False
 
             self.current_state_UWB = self.mqttSubscriber.pos
@@ -47,14 +50,15 @@ class ModelBasedAgentUWB(Drone):
 
             self.current_measurement = np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                                  self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + np.array([self.initial_pos[0], self.initial_pos[1], 0]))
+                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + np.array([np.mean(np.array(self.avrg_initial_pos))[0], np.mean(np.array(self.avrg_initial_pos))[1], 0]))
             self.current_measurement_combined = list(
                 self.current_measurement) + list(self.mqttSubscriber.pos)
             # print(self.current_measurement_combined)
             self.current_velocities = [self.mambo.sensors.speed_x,
                                        self.mambo.sensors.speed_y,
                                        self.mambo.sensors.speed_z]
-            print(f"FOR KALMAN >>> {self.current_measurement_combined} \nSPEED >>{self.current_velocities}")
+            print(
+                f"FOR KALMAN >>> {self.current_measurement_combined} \nSPEED >>{self.current_velocities}")
             self.p, self.q = self.kalmanfilter.get_state_estimation(
                 self.q, self.current_velocities, self.current_measurement_combined, self.p, self.FLAG)
             self.current_state = self.q.T.tolist()[0]
@@ -125,7 +129,7 @@ if __name__ == "__main__":
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
 
     modelAgent.start_and_prepare()
-    modelAgent.go_to_xyz([1.9, 3, 1])
+    modelAgent.go_to_xyz([2.6, 6, 1.5])
     # modelAgent.mambo.hover()
     # modelAgent.go_to_xyz([2.5, 3.6, 1.1])
 
