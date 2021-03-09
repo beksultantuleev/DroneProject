@@ -32,8 +32,8 @@ class PathDrawing:
             x.append(i[0])
         plt.plot(x, y, color, label=draw_object, marker='.')
         plt.legend()
-        plt.xlabel("X axis in time")
-        plt.ylabel("Y axis ")
+        plt.xlabel("TIME")
+        plt.ylabel("Distance ")
         plt.tight_layout()
         plt.style.use('ggplot')
 
@@ -65,7 +65,7 @@ class PathDrawing:
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Mar-09-2021-182649", False)
+    test = PathDrawing("Mar-09-2021-201931", False)
     # test.list_of_objects()
     test.draw_via_time("Distance", "red")
 

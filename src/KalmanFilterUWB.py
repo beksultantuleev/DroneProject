@@ -43,8 +43,8 @@ class KalmanFilterUWB:
         if len(self.z) == 3:
             self.H = np.eye(3)
             self.R = np.array(
-                [[0.5, 0, 0],
-                 [0, 0.5, 0],
+                [[0.3, 0, 0],
+                 [0, 0.3, 0],
                  [0, 0, 0.5]
                  ])  # measurement noise
 
