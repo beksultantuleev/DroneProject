@@ -4,6 +4,7 @@ import numpy as np
 import time
 from KalmanFilterUWB import KalmanFilterUWB
 from BlackBoxGenerator import Logger
+import threading
 
 
 class ModelBasedAgent(Drone):
@@ -20,7 +21,7 @@ class ModelBasedAgent(Drone):
         self.current_measurement = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
-        self.eps = 0.2  # 0.08
+        self.eps = 0.15  # 0.08
         self.start_measure = False
         self.black_box = Logger()
 
@@ -58,7 +59,8 @@ class ModelBasedAgent(Drone):
                 while self.mambo.sensors.speed_ts == 0:
                     continue
                 self.start_measure = True
-                time.sleep(0.2)
+                # self.mambo.smart_sleep(0.2) #istead of time sleep 
+                # time.sleep(0.2)
                 print('getting first state')
                 while self.current_state == []:
                     continue
@@ -77,13 +79,13 @@ class ModelBasedAgent(Drone):
                                   yaw=cmd[2],
                                   vertical_movement=cmd[3],
                                   duration=None)
-            # self.mambo.smart_sleep(0.5)
-            time.sleep(0.3)
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
-            self.black_box.start_logging(["IMU", self.current_measurement], [
-                                         "Kalman", self.current_state], ["CMD", cmd], ["time", [time.ctime()]])
+            #logging
+            thread = threading.Thread(target=self.black_box.start_logging(["IMU", self.current_measurement], [
+                                         "Kalman", self.current_state], ["CMD", cmd],["Distance", [distance]] , ["Time", [time.time()]]))
+            thread.start()
             print(f"KALMAN STATE >>{self.current_state}")
             print(f"current measurement >>{self.current_measurement}")
             print(f"CMD input >> {cmd}")
@@ -95,7 +97,9 @@ if __name__ == "__main__":
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
 
-    modelAgent.go_to_xyz([0, 0, 1])
+    modelAgent.go_to_xyz([1, 0, 1])
+    # modelAgent.mambo.senso
+    # modelAgent.mambo.smart_sleep(10)
 
     modelAgent.land_and_disconnect()
 

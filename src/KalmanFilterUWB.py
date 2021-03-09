@@ -13,20 +13,22 @@ class KalmanFilterUWB:
         '''
         self.z = []
         self.A = np.eye(np.size(q, 0))
-        self.G = np.eye(np.size(q, 0)) * 0.5
-        self.H = np.array([[1.0, 0.0, 0.0],
-                           [0.0, 1.0, 0.0],
-                           [0.0, 0.0, 1.0],
-                           [1.0, 0.0, 0.0],
-                           [0.0, 1.0, 0.0],
-                           [0.0, 0.0, 1.0]])
-        self.R = np.array([[0.5, 0, 0, 0, 0, 0],
-                           [0, 0.5, 0, 0, 0, 0],
-                           [0, 0, 0.5, 0, 0, 0],
-                           [0, 0, 0, 0.25, 0, 0],
-                           [0, 0, 0, 0, 0.25, 0],
-                           [0, 0, 0, 0, 0, 100]])
-        self.Q = np.eye(np.size(q, 0)) * 0.5  # process noise
+        self.G = np.eye(np.size(q, 0)) * 0.5  # for 2 Hz we multiply by 0.5
+        self.H = np.array(
+            [[1.0, 0.0, 0.0],
+             [0.0, 1.0, 0.0],
+             [0.0, 0.0, 1.0],
+             [1.0, 0.0, 0.0],
+             [0.0, 1.0, 0.0],
+             [0.0, 0.0, 1.0]])
+        self.R = np.array(
+            [[0.5, 0, 0, 0, 0, 0],
+             [0, 0.5, 0, 0, 0, 0],
+             [0, 0, 0.5, 0, 0, 0],
+             [0, 0, 0, 0.25, 0, 0],
+             [0, 0, 0, 0, 0.25, 0],
+             [0, 0, 0, 0, 0, 100]])
+        self.Q = np.eye(np.size(q, 0))   # process noise it was * 0.5
         self.q = q
 
         self.S = []
@@ -40,10 +42,11 @@ class KalmanFilterUWB:
 
         if len(self.z) == 3:
             self.H = np.eye(3)
-            self.R = np.array([[15, 0, 0],
-                               [0, 15, 0],
-                               [0, 0, 1]
-                               ])  # measurement noise
+            self.R = np.array(
+                [[0.5, 0, 0],
+                 [0, 0.5, 0],
+                 [0, 0, 0.5]
+                 ])  # measurement noise
 
         self.p_update_old = p_update_old
         self.FLAG = FLAG

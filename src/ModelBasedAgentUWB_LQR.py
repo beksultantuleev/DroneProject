@@ -29,7 +29,8 @@ class ModelBasedAgentUWB(Drone):
         self.FLAG = False
         self.checker = False
         self.initial_pos = [0, 0, 0]
-        self.avrg_initial_pos = []
+        self.initial_pos_samples = []
+        self.mqttSubscriber_pos_samples = []
 
     def sensor_callback(self, args):
         if self.start_measure:
@@ -37,7 +38,7 @@ class ModelBasedAgentUWB(Drone):
                 # print(self.UWB_Data_Storing)
                 for i in range(20):
                     self.initial_pos = self.mqttSubscriber.pos
-                    self.avrg_initial_pos.append(self.avrg_initial_pos)
+                    self.initial_pos_samples.append(self.initial_pos)
                 self.UWB_Data_Storing = False
 
             self.current_state_UWB = self.mqttSubscriber.pos
@@ -50,9 +51,13 @@ class ModelBasedAgentUWB(Drone):
 
             self.current_measurement = np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                                  self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + np.array([np.mean(np.array(self.avrg_initial_pos))[0], np.mean(np.array(self.avrg_initial_pos))[1], 0]))
+                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + np.array([np.mean(np.array(self.initial_pos_samples))[0], np.mean(np.array(self.initial_pos_samples))[1], 0]))
+            for i in range(3):
+                self.mqttSubscriber_pos_samples.append(self.mqttSubscriber.pos)
+                # np.mean(np.array(self.mqttSubscriber_pos_samples))[0]
+
             self.current_measurement_combined = list(
-                self.current_measurement) + list(self.mqttSubscriber.pos)
+                self.current_measurement) + list(self.mqttSubscriber.pos) #try to put here the avrg uwb data
             # print(self.current_measurement_combined)
             self.current_velocities = [self.mambo.sensors.speed_x,
                                        self.mambo.sensors.speed_y,
@@ -63,6 +68,7 @@ class ModelBasedAgentUWB(Drone):
                 self.q, self.current_velocities, self.current_measurement_combined, self.p, self.FLAG)
             self.current_state = self.q.T.tolist()[0]
             self.controller.set_current_state(self.current_state)
+            time.sleep(0.5)#
             # print(f"TIMESTAMP in ms>>>> {time.time()*1000}")
             # print(f"updated Q>>>{self.q.T.tolist()[0]}")
             # print(f">>>first current state {self.current_state}")

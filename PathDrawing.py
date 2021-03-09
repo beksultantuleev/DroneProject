@@ -1,6 +1,7 @@
 import json
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class PathDrawing:
@@ -21,30 +22,53 @@ class PathDrawing:
         for object in data:
             print(object)
 
+    def draw_via_time(self, draw_object, color):
+        x = []
+        y = []
+        data = self.open_file()
+        for i in data[draw_object]:
+            y.append(i[0])
+        for i in data["Time"]:
+            x.append(i[0])
+        plt.plot(x, y, color, label=draw_object, marker='.')
+        plt.legend()
+        plt.xlabel("X axis in time")
+        plt.ylabel("Y axis ")
+        plt.tight_layout()
+        plt.style.use('ggplot')
+
     def draw(self, draw_object, color):
         x = []
         y = []
-        z = []          
+        z = []
         data = self.open_file()
         for i in data[draw_object]:
             x.append(i[0])
             y.append(i[1])
-            z.append(i[2])
+            if self.in_3d:
+                z.append(i[2])
         if self.in_3d:
-            self.ax.plot3D(x, y, z, color)
+            self.ax.plot3D(x, -np.array(y), z, color, label=draw_object, marker='.')
         else:
-            plt.plot(x, y, color, label=draw_object)
-        plt.xlabel("meters")
-        plt.ylabel("meters")
+            plt.plot(x, -np.array(y), color, label=draw_object, marker='.')
+            
+        plt.ylim(-0.5, 0.5)
         plt.legend()
+        plt.xlabel("X axis in meters")
+        plt.ylabel("Y axis in meters")
+        plt.tight_layout()
+        plt.style.use('ggplot')
+
 
     def show(self):
         plt.show()
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Mar-06-2021", False)
+    test = PathDrawing("Mar-09-2021-182649", False)
     # test.list_of_objects()
-    test.draw("IMU", "red")
-    test.draw("Kalman", "black")
+    test.draw_via_time("Distance", "red")
+
+    # test.draw("IMU", "red")
+    # test.draw("Kalman", "green")
     test.show()

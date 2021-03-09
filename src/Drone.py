@@ -40,7 +40,7 @@ class Drone:
     def land_and_disconnect(self):
         print('Landing...')
         self.mambo.safe_land(3)
-        self.mambo.smart_sleep(2)
+        self.mambo.smart_sleep(1)
         print('Disconnecting...')
         self.mambo.disconnect()
         # self.mqttSubscriber.stop()

@@ -3,14 +3,22 @@ from datetime import date
 import json
 import ast
 from collections import defaultdict
+import time
+import os
+import threading
 
 
 class Logger:
     def __init__(self):
         today = date.today()
         today = today.strftime("%b-%d-%Y")
-        self.filename = "logs/raw_log_" + today + ".json"
-        self.final_log_name = "logs/"+today + ".json"
+        clock = time.ctime()[11:-5].replace(':', "")
+        self.filename = "logs/raw/raw_" + today + "-" + clock + ".json"
+        self.final_log_name = "logs/" + today + "-" + clock + ".json"
+
+    # def start(self, *args):
+    #     thread = threading.Thread(target=self.start_logging)
+    #     thread.start()
 
     def start_logging(self, *args):
         logging.basicConfig(filename=self.filename,
@@ -32,5 +40,7 @@ class Logger:
 
 if __name__ == "__main__":
     test = Logger()
-    test.start_logging(["imu_data", [4, 3, 5]], ["UWB_data", [5353, 464, 456]], [
-                       "imu_data", [234, 345, 53]], ["UWB_data", [4, 2, 4, 5]])
+    thread = threading.Thread(target=test.start_logging(["IMU", [4, 3, 5]], ["UWB", [5353, 464, 456]], [
+        "IMU", [234, 345, 53]], ["UWB", [4, 2, 4]],  [
+        "IMU", [234, 345, 53]]))
+    thread.start()

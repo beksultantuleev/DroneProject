@@ -6,7 +6,7 @@ import time
 class LQRcontroller:
     def __init__(self):
 
-        self.dt = 0.5
+        self.dt = 0.6
         self.A = np.array(
             [[1.0, 0.0, 0.0],
              [0.0, 1.0, 0.0],
@@ -20,14 +20,14 @@ class LQRcontroller:
              [0.0, 0.7, 0.0],
                 [0.0, 0.0, 1]])
         self.R = np.array(
-            [[2, 0.0, 0.0],
-             [0.0, 2, 0.0],
+            [[0.5, 0.0, 0.0],
+             [0.0, 0.5, 0.0],
                 [0.0, 0.0, 1]])
         self.desired_state = []
         self.current_state = []
         self.cmd_input = []
-        self.max_input_power = np.ones((1, 3))[0] * 25
-        self.max_velocity = 1
+        self.max_input_power = np.ones((1, 3))[0] * 20
+        self.max_velocity = 1.2
 
     def dlqr(self):
         '''Solve the discrete time lqr controller
@@ -59,7 +59,7 @@ class LQRcontroller:
 
         # velocities needed to get to desited state
         u = np.dot(self.dlqr(), distance).tolist()[0]
-        # print(u)
+        # print(f"speed {u}")
         u_scaled = [0 for i in range(len(u))]  # [0,0,0]
         # print(u_scaled)
         for i in range(len(u)):
@@ -77,21 +77,21 @@ if __name__ == "__main__":
 
     mambo = LQRcontroller()
     # ====================
-    mambo.set_current_state([0, 0, 0])
-    mambo.set_desired_state([1, 0, 1])
-    u = mambo.calculate_cmd_input()
-    print(u)
+    # mambo.set_current_state([0, 0, 0])
+    # mambo.set_desired_state([1, 0, 1])
+    # u = mambo.calculate_cmd_input()
+    # print(u)
     # ===================
-    # destX = 1
-    # num = 0
-    # mambo.set_desired_state([destX, 0, 0])
-    # while num <destX:
+    destX = 1
+    num = 0
+    mambo.set_desired_state([destX, 0, 0])
+    while num <destX:
 
-    #     mambo.set_current_state([num,0,0])
-    #     u = mambo.calculate_cmd_input()
-    #     num +=0.1
-    #     time.sleep(0.1)
-    #     print(f"{u} at position>> {num}")
+        mambo.set_current_state([num,0,0])
+        u = mambo.calculate_cmd_input()
+        num +=0.1
+        time.sleep(0.2)
+        print(f"{u} at position>> {num}")
 # ========================================
     # destY = 2
     # num = 0
