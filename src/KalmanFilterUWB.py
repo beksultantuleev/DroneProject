@@ -13,7 +13,7 @@ class KalmanFilterUWB:
         '''
         self.z = []
         self.A = np.eye(np.size(q, 0))
-        self.G = np.eye(np.size(q, 0)) * 0.5  # for 2 Hz we multiply by 0.5
+        self.G = np.eye(np.size(q, 0)) * 0.2  # for 2 Hz we multiply by 0.5. im trying 0.2
         self.H = np.array(
             [[1.0, 0.0, 0.0],
              [0.0, 1.0, 0.0],
@@ -24,7 +24,7 @@ class KalmanFilterUWB:
         self.R = np.array(
             [[0.5, 0, 0, 0, 0, 0],
              [0, 0.5, 0, 0, 0, 0],
-             [0, 0, 0.5, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0.25, 0, 0],
              [0, 0, 0, 0, 0.25, 0],
              [0, 0, 0, 0, 0, 100]])
@@ -43,10 +43,10 @@ class KalmanFilterUWB:
         if len(self.z) == 3:
             self.H = np.eye(3)
             self.R = np.array(
-                [[0.3, 0, 0],
-                 [0, 0.3, 0],
-                 [0, 0, 0.5]
-                 ])  # measurement noise
+                [[0.5, 0, 0],
+                 [0, 0.5, 0],
+                 [0, 0, 0]
+                 ])  # measurement noise //0.3 >>2- meters instead of 1 //8 is good
 
         self.p_update_old = p_update_old
         self.FLAG = FLAG

@@ -2,7 +2,8 @@ import json
 from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import numpy as np
-
+# import matplotlib
+# matplotlib.use('Agg')
 
 class PathDrawing:
     def __init__(self, date, in_3d):
@@ -48,11 +49,11 @@ class PathDrawing:
             if self.in_3d:
                 z.append(i[2])
         if self.in_3d:
-            self.ax.plot3D(x, -np.array(y), z, color, label=draw_object, marker='.')
+            self.ax.plot3D(x, np.array(y), z, color, label=draw_object, marker='.')
         else:
-            plt.plot(x, -np.array(y), color, label=draw_object, marker='.')
+            plt.plot(x, np.array(y), color, label=draw_object, marker='.')
             
-        plt.ylim(-0.5, 0.5)
+        plt.xlim(5, -5)
         plt.legend()
         plt.xlabel("X axis in meters")
         plt.ylabel("Y axis in meters")
@@ -65,10 +66,11 @@ class PathDrawing:
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Mar-09-2021-201931", False)
+    test = PathDrawing("Mar-11-2021-125002", True)
     # test.list_of_objects()
-    test.draw_via_time("Distance", "red")
+    # test.draw_via_time("Distance", "red")
 
-    # test.draw("IMU", "red")
-    # test.draw("Kalman", "green")
+    test.draw("IMU", "red")
+    test.draw("Kalman", "green")
+    test.draw("UWB", "blue")
     test.show()

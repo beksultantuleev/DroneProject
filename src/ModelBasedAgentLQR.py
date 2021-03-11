@@ -21,7 +21,7 @@ class ModelBasedAgent(Drone):
         self.current_measurement = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
-        self.eps = 0.15  # 0.08
+        self.eps = 0.2  # 0.08
         self.start_measure = False
         self.black_box = Logger()
 
@@ -93,7 +93,7 @@ class ModelBasedAgent(Drone):
 
 
 if __name__ == "__main__":
-    modelAgent = ModelBasedAgent("84:20:96:91:73:F1")
+    modelAgent = ModelBasedAgent("84:20:96:6c:22:67")
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
 
@@ -104,3 +104,4 @@ if __name__ == "__main__":
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
+#"84:20:96:6c:22:67"

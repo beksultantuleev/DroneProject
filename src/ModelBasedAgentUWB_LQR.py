@@ -4,7 +4,8 @@ from KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
 from subscriber import MqttSubscriber
 import time
-
+from BlackBoxGenerator import Logger
+import threading
 
 
 class ModelBasedAgentUWB(Drone):
@@ -29,12 +30,14 @@ class ModelBasedAgentUWB(Drone):
         self.FLAG = False
         self.checker = False
         self.initial_pos = [0, 0, 0]
-        self.initial_pos_samples = []
+        self.initial_pos_samples = [0,0,0]
         self.mqttSubscriber_pos_samples = []
+        self.black_box = Logger()
 
     def sensor_callback(self, args):
         if self.start_measure:
             if self.UWB_Data_Storing:
+                # self.initial_pos = self.mqttSubscriber.pos
                 # print(self.UWB_Data_Storing)
                 for i in range(20):
                     self.initial_pos = self.mqttSubscriber.pos
@@ -51,7 +54,7 @@ class ModelBasedAgentUWB(Drone):
 
             self.current_measurement = np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                                  self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + np.array([np.mean(np.array(self.initial_pos_samples))[0], np.mean(np.array(self.initial_pos_samples))[1], 0]))
+                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100] + np.array([np.mean(np.array(self.initial_pos_samples))[0], np.mean(np.array(self.initial_pos_samples))[1], 0]))#np.mean(np.array(self.initial_pos_samples))[0], np.mean(np.array(self.initial_pos_samples))[1], 0
             for i in range(3):
                 self.mqttSubscriber_pos_samples.append(self.mqttSubscriber.pos)
                 # np.mean(np.array(self.mqttSubscriber_pos_samples))[0]
@@ -62,16 +65,10 @@ class ModelBasedAgentUWB(Drone):
             self.current_velocities = [self.mambo.sensors.speed_x,
                                        self.mambo.sensors.speed_y,
                                        self.mambo.sensors.speed_z]
-            print(
-                f"FOR KALMAN >>> {self.current_measurement_combined} \nSPEED >>{self.current_velocities}")
             self.p, self.q = self.kalmanfilter.get_state_estimation(
                 self.q, self.current_velocities, self.current_measurement_combined, self.p, self.FLAG)
             self.current_state = self.q.T.tolist()[0]
             self.controller.set_current_state(self.current_state)
-            time.sleep(0.5)#
-            # print(f"TIMESTAMP in ms>>>> {time.time()*1000}")
-            # print(f"updated Q>>>{self.q.T.tolist()[0]}")
-            # print(f">>>first current state {self.current_state}")
 
     def start_and_prepare(self):
         success = self.mambo.connect(num_retries=3)
@@ -93,7 +90,7 @@ class ModelBasedAgentUWB(Drone):
                 while self.mambo.sensors.speed_ts == 0:
                     continue
                 self.start_measure = True
-                time.sleep(0.2)
+                # time.sleep(0.2)
                 print('getting first state')
                 while self.current_state == []:
                     continue
@@ -112,13 +109,16 @@ class ModelBasedAgentUWB(Drone):
                                   yaw=cmd[2],
                                   vertical_movement=cmd[3],
                                   duration=None)
-            time.sleep(0.3)
+            # time.sleep(0.3)
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
-            print(f"current state >>{self.current_state}")
-            print(f"desired state >>{self.desired_state}")
-            print(f"cmd >> {cmd}")
+            thread = threading.Thread(target=self.black_box.start_logging(["IMU", list(self.current_measurement)], [
+                                         "Kalman", list(self.current_state)], ["UWB", list(self.mqttSubscriber.pos)],["Distance", [distance]] , ["Time", [time.time()]]))
+            thread.start()
+            print(f"KALMAN STATE >>{self.current_state}")
+            print(f"current measurement >>{self.current_measurement}")
+            print(f"CMD input >> {cmd}")
             print(f"distance >> {distance}")
 
     def land_and_disconnect(self):

@@ -6,7 +6,7 @@ import time
 class LQRcontroller:
     def __init__(self):
 
-        self.dt = 0.6
+        self.dt = 0.4 #make lower to have higher data refresh rate
         self.A = np.array(
             [[1.0, 0.0, 0.0],
              [0.0, 1.0, 0.0],
@@ -15,14 +15,14 @@ class LQRcontroller:
             [[self.dt, 0.0, 0.0],
              [0.0, self.dt, 0.0],
                 [0.0, 0.0, self.dt]])
-        self.Q = np.array(
-            [[0.7, 0.0, 0.0],
-             [0.0, 0.7, 0.0],
-                [0.0, 0.0, 1]])
+        self.Q = np.array(  #Q controls state accuracy 
+            [[2, 0.0, 0.0],
+             [0.0, 2, 0.0],
+                [0.0, 0.0, 1]]) #0.7 is good for kalman 0.3
         self.R = np.array(
             [[0.5, 0.0, 0.0],
              [0.0, 0.5, 0.0],
-                [0.0, 0.0, 1]])
+                [0.0, 0.0, 1]]) #R controls input accuracy 
         self.desired_state = []
         self.current_state = []
         self.cmd_input = []

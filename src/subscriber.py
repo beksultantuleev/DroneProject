@@ -16,7 +16,7 @@ class MqttSubscriber:
         self.receive = True
         self.start_loc = None
         self.end_loc = None
-        self.pos = [0,0,0]
+        self.pos = [] #[0,0,0]
         self.checker = False
 
     def __on_connect(self, client, userdata, flags, rc):
