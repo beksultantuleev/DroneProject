@@ -8,8 +8,8 @@ import threading
 
 
 class ModelBasedAgent(Drone):
-    def __init__(self, drone_mac):
-        super().__init__(drone_mac)
+    def __init__(self, drone_mac, use_wifi):
+        super().__init__(drone_mac, use_wifi)
         self.controllerLQR = LQRcontroller()
         # self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
         # =======================
@@ -93,7 +93,7 @@ class ModelBasedAgent(Drone):
 
 
 if __name__ == "__main__":
-    modelAgent = ModelBasedAgent("84:20:96:6c:22:67")
+    modelAgent = ModelBasedAgent("84:20:96:6c:22:67", True)
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
 
