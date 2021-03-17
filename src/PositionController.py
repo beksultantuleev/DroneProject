@@ -57,7 +57,7 @@ class PositionController:
         self.P = np.matrix(scipy.linalg.solve_discrete_are(self.A, self.B,
                                                            self.Q, self.R))
         self.K = np.matrix(scipy.linalg.inv(self.B.T*self.P*self.B+self.R)*(
-            self.B.T*self.P*self.A))
+            self.B.T*self.P*self.A)) #The feedback gain is a matrix K
 
     def get_eig(self):
         """

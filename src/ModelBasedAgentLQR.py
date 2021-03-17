@@ -61,9 +61,9 @@ class ModelBasedAgent(Drone):
                 self.start_measure = True
                 # self.mambo.smart_sleep(0.2) #istead of time sleep 
                 # time.sleep(0.2)
-                print('getting first state')
-                while self.current_state == []:
-                    continue
+                # print('getting first state')
+                # while self.current_state == []:
+                #     continue
                 '''after this function you need to feed action function such as go to xyz '''
 
     def go_to_xyz(self, desired_state):
@@ -97,10 +97,19 @@ if __name__ == "__main__":
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
 
-    modelAgent.go_to_xyz([1, 0, 1])
+    # modelAgent.go_to_xyz([1, 0, 1])
     # modelAgent.mambo.senso
     # modelAgent.mambo.smart_sleep(10)
+    counter = 0
+    while counter<6:
+        t = time.time()
+        modelAgent.mambo.fly_direct(0,5, 0, 0, 0.1)
 
+
+        elapsed = time.time() - t
+        counter += elapsed
+        print(counter)
+    modelAgent.land_and_disconnect()
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

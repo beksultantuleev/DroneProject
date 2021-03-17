@@ -13,7 +13,7 @@ class KalmanFilterUWB:
         '''
         self.z = []
         self.A = np.eye(np.size(q, 0))
-        self.G = np.eye(np.size(q, 0)) * 0.2  # for 2 Hz we multiply by 0.5. im trying 0.2
+        self.G = np.eye(np.size(q, 0)) * 0.5  # for 2 Hz we multiply by 0.5. im trying 0.2
         self.H = np.array(
             [[1.0, 0.0, 0.0],
              [0.0, 1.0, 0.0],
@@ -24,9 +24,9 @@ class KalmanFilterUWB:
         self.R = np.array(
             [[0.5, 0, 0, 0, 0, 0],
              [0, 0.5, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0.25, 0, 0],
-             [0, 0, 0, 0, 0.25, 0],
+             [0, 0, 0.1, 0, 0, 0],
+             [0, 0, 0, 0.4, 0, 0],
+             [0, 0, 0, 0, 0.4, 0],
              [0, 0, 0, 0, 0, 100]])
         self.Q = np.eye(np.size(q, 0))   # process noise it was * 0.5
         self.q = q
@@ -56,8 +56,7 @@ class KalmanFilterUWB:
             [self.A, self.p_update_old, self.A.T]) + multi_dot([self.G, self.Q, self.G.T])
 
         if self.FLAG:
-            self.s_update = np.dot(
-                np.dot(self.H, self.p_prediction), self.H.T) + self.R
+            self.s_update =np.dot( np.dot(self.H, self.p_prediction), self.H.T) + self.R
             # print(f"s_update>>{self.s_update}")
             self.W_gain = multi_dot(
                 [self.p_prediction, self.H.T, np.linalg.inv(self.s_update)])
@@ -79,8 +78,8 @@ class KalmanFilterUWB:
 if __name__ == "__main__":
     q = np.zeros((3, 1))
     p = np.zeros((3, 3))
-    u = [0.8, 0.1, 0.1]  # current speed_x, speed_y, speed_z
-    z = [1.1, 1.2, 1.3]
+    u = [-0.005948105826973915, 0.024361811578273773, 0.08351237326860428]  # current speed_x, speed_y, speed_z
+    z = [2.160002965490799, 1.8479933549208636, 0.67, 2.087214621705423, 1.7037266472093189, 1.0890499582945756]
     state = KalmanFilterUWB(q)
     UWBdata = 1
     if UWBdata:

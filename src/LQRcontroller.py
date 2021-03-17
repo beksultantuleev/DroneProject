@@ -6,7 +6,7 @@ import time
 class LQRcontroller:
     def __init__(self):
 
-        self.dt = 0.4 #make lower to have higher data refresh rate
+        self.dt = 0.5  # make lower to have higher data refresh rate
         self.A = np.array(
             [[1.0, 0.0, 0.0],
              [0.0, 1.0, 0.0],
@@ -15,19 +15,19 @@ class LQRcontroller:
             [[self.dt, 0.0, 0.0],
              [0.0, self.dt, 0.0],
                 [0.0, 0.0, self.dt]])
-        self.Q = np.array(  #Q controls state accuracy 
+        self.Q = np.array(  # Q controls state accuracy
             [[2, 0.0, 0.0],
              [0.0, 2, 0.0],
-                [0.0, 0.0, 1]]) #0.7 is good for kalman 0.3
+                [0.0, 0.0, 1]])  # 0.7 is good for kalman 0.3
         self.R = np.array(
             [[0.5, 0.0, 0.0],
              [0.0, 0.5, 0.0],
-                [0.0, 0.0, 1]]) #R controls input accuracy 
+                [0.0, 0.0, 1]])  # R controls input accuracy
         self.desired_state = []
         self.current_state = []
         self.cmd_input = []
-        self.max_input_power = np.ones((1, 3))[0] * 20
-        self.max_velocity = 1.2
+        self.max_input_power = np.ones((1, 3))[0] * 15
+        self.max_velocity = 1
 
     def dlqr(self):
         '''Solve the discrete time lqr controller
@@ -41,7 +41,7 @@ class LQRcontroller:
         self.K = np.matrix(scipy.linalg.inv(
             self.B.T*self.P*self.B+self.R)*(self.B.T*self.P*self.A))
         # print(f"optimal K is {self.K}")
-        return -self.K  # optimal K value
+        return -self.K  # #The feedback gain is a matrix K
 
     def get_current_input(self):
         return self.cmd_input
@@ -68,6 +68,19 @@ class LQRcontroller:
             if u[i] < -self.max_velocity:
                 u[i] = -self.max_velocity
             u_scaled[i] = u[i]/self.max_velocity * self.max_input_power[i]
+
+            for i in range(len(u)):
+                if u_scaled[i]>0:
+                    if abs(u_scaled[i]) < 0.1:
+                        u_scaled[i] = 0
+                    elif (abs(u_scaled[i]) >= 0.1 and abs(u_scaled[i]) <= 5):
+                        u_scaled[i] = 5
+                else:
+                    if abs(u_scaled[i]) < 0.1:
+                        u_scaled[i] = 0
+                    elif (abs(u_scaled[i]) >= 0.1 and abs(u_scaled[i]) <= 5):
+                        u_scaled[i] = -5
+
         # print(u_scaled)
         self.cmd_input = [u_scaled[1], u_scaled[0], 0, u_scaled[2]]
         return self.get_current_input()
@@ -77,19 +90,19 @@ if __name__ == "__main__":
 
     mambo = LQRcontroller()
     # ====================
-    # mambo.set_current_state([0, 0, 0])
-    # mambo.set_desired_state([1, 0, 1])
+    # mambo.set_current_state([2.856162490569086, 1.6476563160477171, 0.5728390665465914])
+    # mambo.set_desired_state([2.5, 3.65, 1])
     # u = mambo.calculate_cmd_input()
     # print(u)
     # ===================
     destX = 1
     num = 0
     mambo.set_desired_state([destX, 0, 0])
-    while num <destX:
+    while num < destX:
 
-        mambo.set_current_state([num,0,0])
+        mambo.set_current_state([num, 0, 0])
         u = mambo.calculate_cmd_input()
-        num +=0.1
+        num += 0.1
         time.sleep(0.2)
         print(f"{u} at position>> {num}")
 # ========================================
