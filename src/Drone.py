@@ -53,8 +53,9 @@ class Drone:
 
 
 if __name__ == "__main__":
-    mambo1 = Drone("84:20:96:6c:22:67", True)
-    mambo1.mambo.safe_takeoff(5)
+    mac = "d0:3a:49:f7:e6:22"
+    mambo1 = Drone(mac, False)
+    mambo1.start_and_prepare()
     # mambo1.start_and_prepare()
     # # mambo1.mambo.turn_degrees(90)
     # mambo1.land_and_disconnect()
