@@ -3,9 +3,10 @@ from pyparrot.Minidrone import Mambo
 # from subscriber import MqttSubscriber
 
 class Drone:
-    def __init__(self, drone_mac):
+    def __init__(self, drone_mac, use_wifi):
         self.drone_mac = drone_mac
-        self.mambo = Mambo(self.drone_mac, use_wifi=True)
+        self.use_wifi = use_wifi
+        self.mambo = Mambo(self.drone_mac, use_wifi=use_wifi)
         self.start_measure = False
         self.mambo.set_user_sensor_callback(self.sensor_callback, args=None)
         # self.mqttSubscriber = MqttSubscriber()
@@ -52,7 +53,7 @@ class Drone:
 
 
 if __name__ == "__main__":
-    mambo1 = Drone("84:20:96:6c:22:67")
+    mambo1 = Drone("84:20:96:6c:22:67", True)
     mambo1.mambo.safe_takeoff(5)
     # mambo1.start_and_prepare()
     # # mambo1.mambo.turn_degrees(90)
