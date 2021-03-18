@@ -57,9 +57,11 @@ if __name__ == "__main__":
     mambo1 = Drone(mac, False)
     mambo1.start_and_prepare()
     # mambo1.mambo.safe_takeoff(5)
+    mambo1.mambo.fly_direct(0,30,0,1,1)
+    # mambo1.mambo.safe_takeoff(5)
     # mambo1.start_and_prepare()
     # # mambo1.mambo.turn_degrees(90)
-    # mambo1.land_and_disconnect()
+    mambo1.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
     # "84:20:96:6c:22:67" <<<uwb attached new drone

@@ -24,6 +24,7 @@ class ModelBasedAgent(Drone):
         self.eps = 0.2  # 0.08
         self.start_measure = False
         self.black_box = Logger()
+        self.duration = None
 
     def sensor_callback(self, args):
         if self.start_measure:
@@ -38,6 +39,8 @@ class ModelBasedAgent(Drone):
                 self.q, self.current_velocities, self.current_measurement, self.p, True)
             self.current_state = self.q.T.tolist()[0]
             self.controllerLQR.set_current_state(self.current_state)
+            # print(f'current meas >> {self.current_measurement}')
+            # print(f'current state {self.current_state}')
 
     def start_and_prepare(self):
         success = self.mambo.connect(num_retries=3)
@@ -61,9 +64,9 @@ class ModelBasedAgent(Drone):
                 self.start_measure = True
                 # self.mambo.smart_sleep(0.2) #istead of time sleep 
                 # time.sleep(0.2)
-                # print('getting first state')
-                # while self.current_state == []:
-                #     continue
+                print('getting first state')
+                while not self.current_state:
+                    self.mambo.smart_sleep(1)
                 '''after this function you need to feed action function such as go to xyz '''
 
     def go_to_xyz(self, desired_state):
@@ -74,11 +77,14 @@ class ModelBasedAgent(Drone):
                     (self.current_state[2] - self.desired_state[2])**2)**0.5
         while distance > self.eps:
             cmd = self.controllerLQR.calculate_cmd_input()
+            if self.use_wifi ==False:
+                self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
                                   yaw=cmd[2],
                                   vertical_movement=cmd[3],
-                                  duration=None)
+                                  duration=self.duration)
+            # time.sleep(0.5)
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
@@ -93,23 +99,13 @@ class ModelBasedAgent(Drone):
 
 
 if __name__ == "__main__":
-    modelAgent = ModelBasedAgent("84:20:96:6c:22:67", True)
+    mac = "D0:3A:49:F7:E6:22"
+    modelAgent = ModelBasedAgent(mac, False)
+    
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-
-    # modelAgent.go_to_xyz([1, 0, 1])
-    # modelAgent.mambo.senso
-    # modelAgent.mambo.smart_sleep(10)
-    counter = 0
-    while counter<6:
-        t = time.time()
-        modelAgent.mambo.fly_direct(0,5, 0, 0, 0.1)
-
-
-        elapsed = time.time() - t
-        counter += elapsed
-        print(counter)
-    modelAgent.land_and_disconnect()
+    # modelAgent.mambo.turn_degrees(180)
+    modelAgent.go_to_xyz([1, 0, 1])
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
