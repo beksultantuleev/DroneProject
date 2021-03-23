@@ -53,7 +53,7 @@ class PathDrawing:
         else:
             plt.plot(x, np.array(y), color, label=draw_object, marker='.')
             
-        plt.xlim(5, -5)
+        plt.ylim(5, -5)
         plt.legend()
         plt.xlabel("X axis in meters")
         plt.ylabel("Y axis in meters")
@@ -66,11 +66,11 @@ class PathDrawing:
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Mar-12-2021-161142", True)
-    # test.list_of_objects()
+    test = PathDrawing("Mar-18-2021-155546", True)
+    test.list_of_objects()
     # test.draw_via_time("Distance", "red")
 
     test.draw("IMU", "red")
     test.draw("Kalman", "green")
-    test.draw("UWB", "blue")
+    # test.draw("UWB", "blue")
     test.show()

@@ -1,12 +1,12 @@
 from pyparrot.Minidrone import Mambo
 import bluepy
 
-
+mac = "D0:3A:49:F7:E6:22"
 mamboAddr = "84:20:96:91:73:F1"
 # make my mambo object
 # remember you can't use the claw with the camera installed so this must be BLE
 
-mambo = Mambo(mamboAddr, use_wifi=False)
+mambo = Mambo(mac, use_wifi=False)
 print("trying to connect")
 success = mambo.connect(num_retries=3)
 print("connected: %s" % success)

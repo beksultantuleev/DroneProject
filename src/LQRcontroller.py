@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.linalg
 import time
+from numpy.linalg import multi_dot
 
 
 class LQRcontroller:
@@ -22,7 +23,7 @@ class LQRcontroller:
         self.R = np.array(
             [[0.5, 0.0, 0.0],
              [0.0, 0.5, 0.0],
-                [0.0, 0.0, 1]])  # R controls input accuracy
+                [0.0, 0.0, 1]])  # R controls inpu5t accuracy
         self.desired_state = []
         self.current_state = []
         self.cmd_input = []
@@ -39,7 +40,7 @@ class LQRcontroller:
             self.A, self.B, self.Q, self.R))
         # compute the LQR gain
         self.K = np.matrix(scipy.linalg.inv(
-            self.B.T*self.P*self.B+self.R)*(self.B.T*self.P*self.A))
+            self.B.T*self.P*self.B+self.R)*multi_dot([self.B.T,self.P,self.A]))
         # print(f"optimal K is {self.K}")
         return -self.K  # #The feedback gain is a matrix K
 
