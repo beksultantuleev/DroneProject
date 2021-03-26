@@ -69,21 +69,21 @@ class PIDcontroller:
                     (self.Kd[2]*self.derr[2])-(self.errsum[2]*self.Ki[2])
                 # Checking min and max threshold and updating on true
                 # Throttle Conditions
-                if self.Throttle > 30:
+                if self.Throttle > self.max_values:
                     self.Throttle = self.max_values
-                if self.Throttle < -30:
+                if self.Throttle < self.min_values:
                     self.Throttle = self.min_values
 
                 # Pitch Conditions
-                if self.Pitch > 30:
+                if self.Pitch > self.max_values:
                     self.Pitch = self.max_values
-                if self.Pitch < -30:
+                if self.Pitch < self.min_values:
                     self.Pitch = self.min_values
 
                 # Roll Conditions
-                if self.Roll > 30:
+                if self.Roll > self.max_values:
                     self.Roll = self.max_values
-                if self.Roll < -30:
+                if self.Roll < self.min_values:
                     self.Roll = self.min_values
 
                 # Publishing values on topic 'drone command'
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     # u = mambo.calculate_cmd_input()
     # print(u)
     # ===================
-    destX = -3
+    destX = -10
     num = 0
     mambo.set_desired_state([destX, 0, 0])
     while num >destX:
