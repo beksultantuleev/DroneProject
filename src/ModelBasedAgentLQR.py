@@ -104,7 +104,7 @@ if __name__ == "__main__":
     
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    # modelAgent.mambo.turn_degrees(180)
+    modelAgent.mambo.turn_degrees(180)
     # modelAgent.go_to_xyz([1, 0, 1])
     modelAgent.land_and_disconnect()
 
