@@ -1,6 +1,6 @@
 {
     "editor.letterSpacing": 1,
-    "editor.fontFamily": "Cantarell",
+    // "editor.fontFamily": "Cantarell",
     "terminal.integrated.fontFamily": "monospace",
     "python.pythonPath": "FedoraDroneVenv/bin/python"
 }
