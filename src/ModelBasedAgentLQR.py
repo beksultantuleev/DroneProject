@@ -11,7 +11,6 @@ class ModelBasedAgent(Drone):
     def __init__(self, drone_mac, use_wifi):
         super().__init__(drone_mac, use_wifi)
         self.controllerLQR = LQRcontroller()
-        # self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
         # =======================
         self.p = np.zeros((3, 3))
         self.q = np.zeros((3, 1))
@@ -21,10 +20,12 @@ class ModelBasedAgent(Drone):
         self.current_measurement = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
-        self.eps = 0.2  # 0.08
+        self.eps = 0.15  # 0.08
         self.start_measure = False
         self.black_box = Logger()
         self.duration = None
+        self.title = "ModelBasedAgentLQR"
+        self.initialTime = None
 
     def sensor_callback(self, args):
         if self.start_measure:
@@ -64,13 +65,26 @@ class ModelBasedAgent(Drone):
                 self.start_measure = True
                 # self.mambo.smart_sleep(0.2) #istead of time sleep 
                 # time.sleep(0.2)
-                print('getting first state')
-                while not self.current_state:
-                    self.mambo.smart_sleep(1)
+                if self.use_wifi:
+                    print('getting first state')
+                    while  self.current_state:
+                        continue
+                else:
+                    print(f'getting first state...>>{self.current_state}')
+                    while self.current_state == []:
+                        self.mambo.smart_sleep(0.1)
+                        print(f'current state in WHILE>>{self.current_state}')
+                self.initialTime = time.time()
+                        
+                    
+                
+                print(f'first state AFTER while>>{self.current_state}')
+                
                 '''after this function you need to feed action function such as go to xyz '''
 
     def go_to_xyz(self, desired_state):
         self.desired_state = desired_state
+        self.initialTime = time.time()
         self.controllerLQR.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
                     (self.current_state[1] - self.desired_state[1])**2 +
@@ -90,12 +104,14 @@ class ModelBasedAgent(Drone):
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
             #logging
             thread = threading.Thread(target=self.black_box.start_logging(["IMU", self.current_measurement], [
-                                         "Kalman", self.current_state], ["CMD", cmd],["Distance", [distance]] , ["Time", [time.time()]]))
+                                         "Kalman", self.current_state], ["CMD", cmd],["Distance", [distance]] , ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]]))
             thread.start()
+            print("===============================Start")
             print(f"KALMAN STATE >>{self.current_state}")
             print(f"current measurement >>{self.current_measurement}")
             print(f"CMD input >> {cmd}")
-            print(f"distance >> {distance}")
+            print(f"desired state >> {self.desired_state}")
+            print(f"distance left >> {distance}")
 
 
 if __name__ == "__main__":
@@ -104,9 +120,8 @@ if __name__ == "__main__":
     
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
-    modelAgent.mambo.turn_degrees(180)
-    # print(test)
-    # modelAgent.go_to_xyz([1, 0, 1])
+    # modelAgent.mambo.turn_degrees(180)
+    modelAgent.go_to_xyz([1, 0, 1])
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

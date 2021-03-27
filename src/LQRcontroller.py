@@ -27,7 +27,7 @@ class LQRcontroller:
         self.desired_state = []
         self.current_state = []
         self.cmd_input = []
-        self.max_input_power = np.ones((1, 3))[0] * 15
+        self.max_input_power = np.ones((1, 3))[0] * 10
         self.max_velocity = 1
 
     def dlqr(self):

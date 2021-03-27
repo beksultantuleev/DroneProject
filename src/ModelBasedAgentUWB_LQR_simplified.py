@@ -39,6 +39,8 @@ class ModelBasedAgentUWB(Drone):
         self.initial_pos_bool = True
         self.current_measurement_combined = []
         self.rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
+        self.initialTime = None
+        self.title = "ModelBasedAgendUWB"
 
         #
 
@@ -119,6 +121,7 @@ class ModelBasedAgentUWB(Drone):
 
     def go_to_xyz(self, desired_state):
         self.desired_state = desired_state#list(np.dot(self.rotation_matrix, desired_state)) #rotate positions
+        self.initialTime = time.time()
         self.controllerLQR.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
                     (self.current_state[1] - self.desired_state[1])**2 +
@@ -136,7 +139,7 @@ class ModelBasedAgentUWB(Drone):
             
             # logging
             thread = threading.Thread(target=self.black_box.start_logging(["IMU", self.current_measurement], [
-                "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [time.time()]]))
+                "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]]))
             thread.start()
             print("===============================Start")
             print(f"UWB >>{list(self.mqttSubscriber.pos)}")
