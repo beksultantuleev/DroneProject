@@ -40,7 +40,7 @@ class ModelBasedAgentUWB(Drone):
         self.current_measurement_combined = []
         self.rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
         self.initialTime = None
-        self.title = "ModelBasedAgendUWB"
+        self.title = "ModelBasedAgendUWB_LQR"
 
         #
 

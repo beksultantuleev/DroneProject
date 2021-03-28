@@ -41,6 +41,12 @@ class PathDrawing:
                 nameOfGraph.add(i[0])
         except:
             nameOfGraph.add("no title")
+        for i, sec in enumerate(x):
+                # if  i<len(time)-1: #i != 0 and
+                #     continue
+
+                plt.annotate(f" {sec}s", xy=(x[i], y[i]), xytext=(x[i]+0.05,y[i]+0.05),  arrowprops = dict(arrowstyle="simple")) #works
+                
         plt.title(nameOfGraph.pop())
         
         plt.plot(x, y, color, label=draw_object, marker='.')
@@ -98,7 +104,7 @@ class PathDrawing:
                     self.ax.set_zlim(0, 2)
                 else:
                     self.ax.plot3D(x, y,  z, color, label=draw_object, marker='.')
-                    plt.xlabel("X axis in meters in last else")
+                    plt.xlabel("X axis in meters")
                     plt.ylabel("Y axis in meters")
                     plt.ylim(-3,3)
 
@@ -110,14 +116,14 @@ class PathDrawing:
                 if  i<len(time)-1: #i != 0 and
                     continue
                 if self.hitcounter<2:
-                    self.ax.text(x[i], y[i], z[i]+0.01, f"{draw_object} end {sec}s", size=10, color='g')
+                    self.ax.text(x[i], y[i], z[i]+0.005, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
                 elif self.hitcounter<3:
-                    self.ax.text(x[i], y[i], z[i]+0.03, f"{draw_object} end {sec}s", size=10, color='g')
+                    self.ax.text(x[i], y[i], z[i]+0.02, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
                 else:
-                    self.ax.text(x[i], y[i], z[i]+0.05, f"{draw_object} end {sec}s", size=10, color='g')
+                    self.ax.text(x[i], y[i], z[i]+0.04, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
         else:
             try:
-                if list(nameOfGraph)[0] in "ModelBasedAgentUWB":
+                if "ModelBasedAgentUWB" in list(nameOfGraph)[0]:
                     
                     plt.plot(x,y,color, label=draw_object, marker='.')
                     plt.xlabel("X axis in meters")
@@ -129,50 +135,38 @@ class PathDrawing:
                     plt.xlabel("X axis in meters")
                     plt.ylabel("Y axis in meters")
                     plt.ylim(-2,2)
-                for i, sec in enumerate(time):
-                    if  i<len(time)-1: #i != 0 and
-                        continue
-                    if self.hitcounter<2:
-                        plt.annotate(f"{draw_object} end {sec}s", xy=(x[i], y[i]), xytext=(x[i],y[i]-0.7),  arrowprops = dict(arrowstyle="simple")) #works
-                    elif self.hitcounter<3:
-                        plt.annotate(f'{draw_object} end {sec}s', xy=(x[i], y[i]), xytext=(x[i],y[i]-1.2),  arrowprops = dict(arrowstyle="simple")) #works
-                    else:
-                        plt.annotate(f'{draw_object} end {sec}s', xy=(x[i], y[i]), xytext=(x[i],y[i]-2),  arrowprops = dict(arrowstyle="simple")) #works
             except:
                 plt.plot(x, np.array(y), color, label=draw_object, marker='.')
                 plt.xlabel("X axis in meters")
                 plt.ylabel("Y axis in meters")
-                # plt.ylim(0,3)
-                for i, sec in enumerate(time):
-                    # plt.text(x[i], y[i], f"{sec}",size=10, zorder=5, color='g') #works
-                    if  i<len(time)-1: #i != 0 and
-                        continue
-                    # np.random.seed(98)
-                    if self.hitcounter<2:
-                        plt.annotate(f"{draw_object}end {sec}s", xy=(x[i], y[i]), xytext=(x[i],y[i]-0.7),  arrowprops = dict(arrowstyle="simple")) #works
-                    elif self.hitcounter<3:
-                        plt.annotate(f'{draw_object}end {sec}s', xy=(x[i], y[i]), xytext=(x[i],y[i]-1.2),  arrowprops = dict(arrowstyle="simple")) #works
-                    else:
-                        plt.annotate(f'{draw_object}end {sec}s', xy=(x[i], y[i]), xytext=(x[i],y[i]-2),  arrowprops = dict(arrowstyle="simple")) #works
+            for i, sec in enumerate(time):
+                if  i<len(time)-1: #i != 0 and
+                    continue
+                # np.random.seed(98)
+                if self.hitcounter<2:
+                    plt.annotate(f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s", xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]-0.7),  arrowprops = dict(arrowstyle="fancy")) #works
+                elif self.hitcounter<3:
+                    plt.annotate(f'{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s', xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]+0.7),  arrowprops = dict(arrowstyle="fancy")) #works
+                else:
+                    plt.annotate(f'{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s', xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]-1.2),  arrowprops = dict(arrowstyle="fancy")) #works
         
 
         plt.title(nameOfGraph.pop())
         plt.legend()
-        
-        plt.tight_layout()
-        plt.style.use('ggplot')
 
 
     def show(self):
+        plt.tight_layout()
+        plt.style.use('ggplot')
         plt.show()
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Mar-12-2021-195722", False) #Mar-12-2021-195722 #Mar-27-2021-125520
+    test = PathDrawing("Mar-27-2021-205831", False) #Mar-12-2021-195722 #Mar-12-2021-195846 #Mar-27-2021-125520
     # test.list_of_objects()
-    # test.draw_via_time("Distance", "red")
+    test.draw_via_time("Distance", "red")
 
     # test.draw("IMU", "red")
-    test.draw("Kalman", "green")
-    test.draw("UWB", "blue")
+    # test.draw("Kalman", "green")
+    # test.draw("UWB", "blue")
     test.show()
