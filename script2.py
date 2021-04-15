@@ -1,9 +1,9 @@
 import numpy as np
 import time
 
-title = set()
-title.add("f")
-title.add("f")
-print(list(title)[0])
-# a = np.random.randint(0,10)
-# print(a)
+rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
+
+pos = [1,0,1]
+
+result = list(np.dot(rotation_matrix, pos))
+print(result)

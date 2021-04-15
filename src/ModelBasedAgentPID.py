@@ -67,12 +67,12 @@ class ModelBasedAgent(Drone):
                 # time.sleep(0.2)
                 if self.use_wifi:
                     print('getting first state')
-                    while  self.current_state:
+                    while  self.current_state ==[]:
                         continue
                 else:
                     print(f'getting first state...>>{self.current_state}')
                     while self.current_state == []:
-                        self.mambo.smart_sleep(0.01)
+                        self.mambo.smart_sleep(0.1)
                         print(f'current state in WHILE>>{self.current_state}')
                 
                 '''after this function you need to feed action function such as go to xyz '''
