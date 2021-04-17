@@ -2,21 +2,32 @@ from math import nan
 from operator import mod
 from numpy.core.numeric import NaN
 from Drone import Drone
-from LQRcontroller import LQRcontroller
-from KalmanFilterUWB import KalmanFilterUWB
+from controllers.LQRcontroller import LQRcontroller
+from controllers.PIDcontroller import PIDcontroller
+from filters.KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
-from subscriber import MqttSubscriber
+from UWB_subscriber.subscriber import MqttSubscriber
 import time
-from BlackBoxGenerator import Logger
+from makeLogs.BlackBoxGenerator import Logger
 import threading
-from subscriber import MqttSubscriber
+
+# from subscriber import MqttSubscriber
 
 
 class ModelBasedAgentUWB(Drone):
-    def __init__(self, drone_mac, use_wifi):
+    def __init__(self, drone_mac, use_wifi, controller):
         super().__init__(drone_mac, use_wifi)
-        self.controllerLQR = LQRcontroller()
-        # self.kalmanfilter = MamboKalman([0, 0, 0], [0, 0, 0])
+        # ================== Controller setup
+        self.controller = controller.lower()
+        if self.controller == "lqr":
+            self.title = "ModelBasedAgendUWB_LQR"
+            self.controller = LQRcontroller()
+        elif self.controller == "pid":
+            self.title = "ModelBasedAgendUWB_PID"
+            self.controller = PIDcontroller()
+        else:
+            raise ValueError("NO such controller found")
+        # ==================
         # =======================
         self.p = np.zeros((3, 3))
         self.q = np.zeros((3, 1))
@@ -40,9 +51,6 @@ class ModelBasedAgentUWB(Drone):
         self.current_measurement_combined = []
         self.rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
         self.initialTime = None
-        self.title = "ModelBasedAgendUWB_LQR"
-
-        #
 
     def getUWB_avrg_pos(self):
         # print( self.mqttSubscriber.pos)

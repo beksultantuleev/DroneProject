@@ -1,20 +1,29 @@
 from Drone import Drone
-from LQRcontroller import LQRcontroller
+from controllers.LQRcontroller import LQRcontroller
+from controllers.PIDcontroller import PIDcontroller
 import numpy as np
 import time
-from KalmanFilterUWB import KalmanFilterUWB
-from BlackBoxGenerator import Logger
-import threading
+from filters.KalmanFilterUWB import KalmanFilterUWB
+from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgent(Drone):
-    def __init__(self, drone_mac, use_wifi):
+    def __init__(self, drone_mac, use_wifi, controller):
         super().__init__(drone_mac, use_wifi)
-        self.controllerLQR = LQRcontroller()
-        # =======================
+        # ==================Kalman setup
         self.p = np.zeros((3, 3))
         self.q = np.zeros((3, 1))
         self.kalmanfilterUWB = KalmanFilterUWB(self.q)
+        # ================== Controller setup
+        self.controller = controller.lower()
+        if self.controller == "lqr":
+            self.title = "ModelBasedAgentLQR"
+            self.controller = LQRcontroller()
+        elif self.controller == "pid":
+            self.title = "ModelBasedAgentPID"
+            self.controller = PIDcontroller()
+        else:
+            raise ValueError("NO such controller found")
         # ==================
         self.current_velocities = []
         self.current_measurement = []
@@ -24,7 +33,6 @@ class ModelBasedAgent(Drone):
         self.start_measure = False
         self.black_box = Logger()
         self.duration = None
-        self.title = "ModelBasedAgentLQR"
         self.initialTime = None
 
     def sensor_callback(self, args):
@@ -39,7 +47,7 @@ class ModelBasedAgent(Drone):
             self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
                 self.q, self.current_velocities, self.current_measurement, self.p, True)
             self.current_state = self.q.T.tolist()[0]
-            self.controllerLQR.set_current_state(self.current_state)
+            self.controller.set_current_state(self.current_state)
             # print(f'current meas >> {self.current_measurement}')
             # print(f'current state {self.current_state}')
 
@@ -66,7 +74,7 @@ class ModelBasedAgent(Drone):
                 self.start_measure = True
                 # self.mambo.smart_sleep(0.2) #istead of time sleep
                 if self.use_wifi:
-                    print('getting first state')
+                    print(f'getting first state...>>{self.current_state}')
                     while self.current_state == []:
                         continue
                 else:
@@ -82,12 +90,12 @@ class ModelBasedAgent(Drone):
     def go_to_xyz(self, desired_state):
         self.desired_state = desired_state
         self.initialTime = time.time()
-        self.controllerLQR.set_desired_state(self.desired_state)
+        self.controller.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
                     (self.current_state[1] - self.desired_state[1])**2 +
                     (self.current_state[2] - self.desired_state[2])**2)**0.5
         while distance > self.eps:
-            cmd = self.controllerLQR.calculate_cmd_input()
+            cmd = self.controller.calculate_cmd_input()
             if self.use_wifi == False:
                 self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
@@ -100,25 +108,23 @@ class ModelBasedAgent(Drone):
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
             # logging in thread
-            # self.black_box.start_logging(["IMU", self.current_measurement], [
-            #                              "Kalman", self.current_state], ["CMD", cmd], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
+            self.black_box.start_logging(["IMU", self.current_measurement], [
+                                         "Kalman", self.current_state], ["CMD", cmd], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
             print("===============================Start")
             print(f"KALMAN STATE >>{self.current_state}")
             print(f"current measurement >>{self.current_measurement}")
             print(f"CMD input >> {cmd}")
             print(f"desired state >> {self.desired_state}")
+            print(f"controller >> {self.title}")
             print(f"distance left >> {distance}")
 
 
 if __name__ == "__main__":
-    import threading
     mambo1 = "D0:3A:49:F7:E6:22"
     mambo2 = "D0:3A:0B:C5:E6:22"
-    drone1 = ModelBasedAgent(mambo2, False)
-    square = [[0.5, 0, 1], [0.5, -0.5, 1], [0.5, -0.5, 1], [0.5, 0.5, 1]]
+    drone1 = ModelBasedAgent(mambo1, False, "pid")
     drone1.start_and_prepare()
-    for points in square:
-        drone1.go_to_xyz(points)
+    drone1.go_to_xyz([1, 0, 1])
     drone1.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone

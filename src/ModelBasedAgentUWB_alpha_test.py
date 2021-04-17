@@ -2,25 +2,35 @@ from math import nan
 from operator import mod
 from numpy.core.numeric import NaN
 from Drone import Drone
-from LQRcontroller import LQRcontroller
-from KalmanFilterUWB import KalmanFilterUWB
+from controllers.LQRcontroller import LQRcontroller
+from controllers.PIDcontroller import PIDcontroller
+from filters.KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
-from subscriber import MqttSubscriber
+from UWB_subscriber.subscriber import MqttSubscriber
 import time
-from BlackBoxGenerator import Logger
+from makeLogs.BlackBoxGenerator import Logger
 import threading
-from subscriber import MqttSubscriber
 
 
 class ModelBasedAgentUWB(Drone):
-    def __init__(self, drone_mac, use_wifi, local):
+    def __init__(self, drone_mac, use_wifi, controller, local):
         super().__init__(drone_mac, use_wifi)
-        self.controllerLQR = LQRcontroller()
-        # =======================
+        # ================== Controller setup
+        self.controller = controller.lower()
+        if self.controller == "lqr":
+            self.title = "ModelBasedAgendUWB_LQR"
+            self.controller = LQRcontroller()
+        elif self.controller == "pid":
+            self.title = "ModelBasedAgendUWB_PID"
+            self.controller = PIDcontroller()
+        else:
+            raise ValueError("NO such controller found")
+        # ===================Kalman setup
         self.p = np.zeros((3, 3))
         self.q = np.zeros((3, 1))
         self.kalmanfilterUWB = KalmanFilterUWB(self.q)
         # ==================
+        
         self.current_velocities = []
         self.current_measurement = []
         self.current_state = []  # meters
@@ -39,7 +49,6 @@ class ModelBasedAgentUWB(Drone):
         self.current_measurement_combined = []
         self.rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
         self.initialTime = None
-        self.title = "ModelBasedAgendUWB_LQR"
         self.local = local
 
         #
@@ -74,7 +83,7 @@ class ModelBasedAgentUWB(Drone):
                 self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
                     self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
                 self.current_state = self.q.T.tolist()[0]
-                self.controllerLQR.set_current_state(self.current_state)
+                self.controller.set_current_state(self.current_state)
             else:
                 '''multiply curren measurement on rotation matrix'''
                 self.current_measurement = list(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
@@ -91,7 +100,7 @@ class ModelBasedAgentUWB(Drone):
                     self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
                 self.current_state = self.q.T.tolist()[0]
                 # self.current_state = list(np.dot(self.rotation_matrix, self.current_state))
-                self.controllerLQR.set_current_state(self.current_state)
+                self.controller.set_current_state(self.current_state)
             # print(f"UWB real >>{self.mqttSubscriber.pos}")
             # print(f"UWB avrg >>{self.getUWB_avrg_pos()}")
             # print(f"current meas>>{self.current_measurement}")
@@ -139,12 +148,12 @@ class ModelBasedAgentUWB(Drone):
             self.desired_state = list(np.dot(self.rotation_matrix, desired_state)) #list(np.dot(self.rotation_matrix, desired_state)) #rotate positions
 
         self.initialTime = time.time()
-        self.controllerLQR.set_desired_state(self.desired_state)
+        self.controller.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
                     (self.current_state[1] - self.desired_state[1])**2 +
                     (self.current_state[2] - self.desired_state[2])**2)**0.5  
         while distance > self.eps:
-            cmd = self.controllerLQR.calculate_cmd_input()
+            cmd = self.controller.calculate_cmd_input()
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
                                   yaw=cmd[2],
@@ -178,7 +187,7 @@ class ModelBasedAgentUWB(Drone):
 
 
 if __name__ == "__main__":
-    modelAgent = ModelBasedAgentUWB("84:20:96:6c:22:67", True, local=True)
+    modelAgent = ModelBasedAgentUWB("84:20:96:6c:22:67", True, "pid", local=True)
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
 # modelAgent.mambo.hover()
