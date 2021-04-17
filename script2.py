@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import random
+from matplotlib import pyplot as plt
 
 
 
@@ -14,7 +15,7 @@ for x in range(-radius, radius+1):
     for y in range(-radius, radius+1):
         if x*x + y*y <= radius*radius:
             deltas.add((x,y))
-print(deltas)
+
 randPoints = []
 excluded = set()
 i = 0
@@ -26,3 +27,10 @@ while i<qty:
     i += 1
     excluded.update((x+dx, y+dy) for (dx,dy) in deltas)
 # print (randPoints)
+x = []
+y = []
+for xy in randPoints:
+    x.append(xy[0])
+    y.append(xy[1])
+plt.plot(x, y)
+plt.show()

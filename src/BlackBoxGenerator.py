@@ -16,11 +16,11 @@ class Logger:
         self.filename = "logs/raw/raw_" + today + "-" + clock + ".json"
         self.final_log_name = "logs/" + today + "-" + clock + ".json"
 
-    # def start(self, *args):
-    #     thread = threading.Thread(target=self.start_logging)
-    #     thread.start()
-
     def start_logging(self, *args):
+        thread = threading.Thread(target=self.logging(*args))
+        thread.start()
+
+    def logging(self, *args):
         logging.basicConfig(filename=self.filename,
                             format='{%(message)s}', level=logging.DEBUG)
         for data in args:
@@ -40,7 +40,6 @@ class Logger:
 
 if __name__ == "__main__":
     test = Logger()
-    thread = threading.Thread(target=test.start_logging(["IMU", [4, 3, 5]], ["UWB", [5353, 464, 456]], [
-        "IMU", [234, 345, 53]], ["UWB", [4, 2, 4]],  [
-        "IMU", [234, 345, 53]]))
-    thread.start()
+    test.start_logging(["IMU", [4, 3, 5]], ["UWB", [5353, 464, 456]], [
+        "IMU", [234, 345, 21]], ["UWB", [4, 2, 4]],  [
+        "IMU", [234, 345, 21]])

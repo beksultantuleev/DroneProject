@@ -62,23 +62,21 @@ class ModelBasedAgent(Drone):
                 print('Sensor calibration...')
                 while self.mambo.sensors.speed_ts == 0:
                     continue
+                    # self.mambo.smart_sleep(0.1)
                 self.start_measure = True
-                # self.mambo.smart_sleep(0.2) #istead of time sleep 
-                # time.sleep(0.2)
+                # self.mambo.smart_sleep(0.2) #istead of time sleep
                 if self.use_wifi:
                     print('getting first state')
-                    while  self.current_state ==[]:
+                    while self.current_state == []:
                         continue
                 else:
                     print(f'getting first state...>>{self.current_state}')
                     while self.current_state == []:
                         self.mambo.smart_sleep(0.1)
                         print(f'current state in WHILE>>{self.current_state}')
-                        
-                    
-                
+
                 print(f'first state AFTER while>>{self.current_state}')
-                
+
                 '''after this function you need to feed action function such as go to xyz '''
 
     def go_to_xyz(self, desired_state):
@@ -90,21 +88,20 @@ class ModelBasedAgent(Drone):
                     (self.current_state[2] - self.desired_state[2])**2)**0.5
         while distance > self.eps:
             cmd = self.controllerLQR.calculate_cmd_input()
-            if self.use_wifi ==False:
+            if self.use_wifi == False:
                 self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
                                   yaw=cmd[2],
                                   vertical_movement=cmd[3],
                                   duration=self.duration)
-            # time.sleep(0.5)
+
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
-            #logging
-            thread = threading.Thread(target=self.black_box.start_logging(["IMU", self.current_measurement], [
-                                         "Kalman", self.current_state], ["CMD", cmd],["Distance", [distance]] , ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]]))
-            thread.start()
+            # logging in thread
+            # self.black_box.start_logging(["IMU", self.current_measurement], [
+            #                              "Kalman", self.current_state], ["CMD", cmd], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
             print("===============================Start")
             print(f"KALMAN STATE >>{self.current_state}")
             print(f"current measurement >>{self.current_measurement}")
@@ -114,14 +111,15 @@ class ModelBasedAgent(Drone):
 
 
 if __name__ == "__main__":
-    mac = "D0:3A:49:F7:E6:22"
-    modelAgent = ModelBasedAgent(mac, False)
-    
-    # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
-    modelAgent.start_and_prepare()
-    # modelAgent.mambo.turn_degrees(180)
-    modelAgent.go_to_xyz([2, 0, 1])
-    modelAgent.land_and_disconnect()
+    import threading
+    mambo1 = "D0:3A:49:F7:E6:22"
+    mambo2 = "D0:3A:0B:C5:E6:22"
+    drone1 = ModelBasedAgent(mambo2, False)
+    square = [[0.5, 0, 1], [0.5, -0.5, 1], [0.5, -0.5, 1], [0.5, 0.5, 1]]
+    drone1.start_and_prepare()
+    for points in square:
+        drone1.go_to_xyz(points)
+    drone1.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
-#"84:20:96:6c:22:67"
+# "84:20:96:6c:22:67"
