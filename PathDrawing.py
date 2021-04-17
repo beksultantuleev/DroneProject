@@ -162,11 +162,11 @@ class PathDrawing:
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Mar-27-2021-205831", False) #Mar-12-2021-195722 #Mar-12-2021-195846 #Mar-27-2021-125520
+    test = PathDrawing("Apr-17-2021-210755", False) #Mar-12-2021-195722 #Mar-12-2021-195846 #Mar-27-2021-125520
     # test.list_of_objects()
-    test.draw_via_time("Distance", "red")
+    # test.draw_via_time("Distance", "red")
 
-    # test.draw("IMU", "red")
-    # test.draw("Kalman", "green")
+    test.draw("IMU", "red")
+    test.draw("Kalman", "green")
     # test.draw("UWB", "blue")
     test.show()
