@@ -122,9 +122,10 @@ class ModelBasedAgent(Drone):
 if __name__ == "__main__":
     mambo1 = "D0:3A:49:F7:E6:22"
     mambo2 = "D0:3A:0B:C5:E6:22"
-    drone1 = ModelBasedAgent(mambo1, False, "pid")
+    drone1 = ModelBasedAgent(mambo2, False, "pid")
     drone1.start_and_prepare()
-    drone1.go_to_xyz([1, 0, 1])
+    drone1.mambo.turn_degrees(180)
+    # drone1.go_to_xyz([1, 0, 1])
     drone1.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
