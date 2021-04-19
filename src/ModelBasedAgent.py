@@ -8,7 +8,7 @@ from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgent(Drone):
-    def __init__(self, drone_mac, use_wifi, controller):
+    def __init__(self, drone_mac, use_wifi, controller, start_loggin = True):
         super().__init__(drone_mac, use_wifi)
         # ==================Kalman setup
         self.p = np.zeros((3, 3))
@@ -25,6 +25,7 @@ class ModelBasedAgent(Drone):
         else:
             raise ValueError("NO such controller found")
         # ==================
+        self.start_loggin = start_loggin
         self.current_velocities = []
         self.current_measurement = []
         self.current_state = []  # meters
@@ -108,21 +109,23 @@ class ModelBasedAgent(Drone):
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
             # logging in thread
-            self.black_box.start_logging(["IMU", self.current_measurement], [
+            if self.start_loggin:
+                self.black_box.start_logging(["IMU", self.current_measurement], [
                                          "Kalman", self.current_state], ["CMD", cmd], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
             print("===============================Start")
-            print(f"KALMAN STATE >>{self.current_state}")
-            print(f"current measurement >>{self.current_measurement}")
-            print(f"CMD input >> {cmd}")
-            print(f"desired state >> {self.desired_state}")
+            print(f"logging >> {self.start_loggin}")
             print(f"controller >> {self.title}")
+            print(f"current measurement >>{self.current_measurement}")
+            print(f"KALMAN STATE >>{self.current_state}")
+            print(f"CMD input >> {cmd}")        
+            print(f"desired state >> {self.desired_state}")
             print(f"distance left >> {distance}")
 
 
 if __name__ == "__main__":
     mambo1 = "D0:3A:49:F7:E6:22"
     mambo2 = "D0:3A:0B:C5:E6:22"
-    drone1 = ModelBasedAgent(mambo2, False, "pid")
+    drone1 = ModelBasedAgent(mambo2, False, "pid", False)
     drone1.start_and_prepare()
     drone1.mambo.turn_degrees(180)
     # drone1.go_to_xyz([1, 0, 1])
