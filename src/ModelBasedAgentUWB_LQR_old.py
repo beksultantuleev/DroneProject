@@ -1,17 +1,16 @@
 from Drone import Drone
-from PositionController import MamboPositionController
-from KalmanFilterUWB import KalmanFilterUWB
+from controllers.LQRcontroller import LQRcontroller
+from filters.KalmanFilterUWB import KalmanFilterUWB
 import numpy as np
-from subscriber import MqttSubscriber
+from UWB_subscriber.subscriber import MqttSubscriber
 import time
-from BlackBoxGenerator import Logger
-import threading
+from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgentUWB(Drone):
     def __init__(self, drone_mac):
         super().__init__(drone_mac)
-        self.controller = MamboPositionController()
+        self.controller = LQRcontroller()
         self.p = np.zeros((3, 3))
         self.q = np.zeros((3, 1))
         self.kalmanfilter = KalmanFilterUWB(self.q)
@@ -113,9 +112,9 @@ class ModelBasedAgentUWB(Drone):
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
                         (self.current_state[1] - self.desired_state[1])**2 +
                         (self.current_state[2] - self.desired_state[2])**2)**0.5
-            thread = threading.Thread(target=self.black_box.start_logging(["IMU", list(self.current_measurement)], [
-                                         "Kalman", list(self.current_state)], ["UWB", list(self.mqttSubscriber.pos)],["Distance", [distance]] , ["Time", [time.time()]]))
-            thread.start()
+            self.black_box.start_logging(["IMU", list(self.current_measurement)], [
+                                         "Kalman", list(self.current_state)], ["UWB", list(self.mqttSubscriber.pos)],["Distance", [distance]] , ["Time", [time.time()]])
+
             print(f"KALMAN STATE >>{self.current_state}")
             print(f"current measurement >>{self.current_measurement}")
             print(f"CMD input >> {cmd}")

@@ -9,7 +9,6 @@ import numpy as np
 from UWB_subscriber.subscriber import MqttSubscriber
 import time
 from makeLogs.BlackBoxGenerator import Logger
-import threading
 
 
 class ModelBasedAgentUWB(Drone):
@@ -30,7 +29,7 @@ class ModelBasedAgentUWB(Drone):
         self.q = np.zeros((3, 1))
         self.kalmanfilterUWB = KalmanFilterUWB(self.q)
         # ==================
-        
+
         self.current_velocities = []
         self.current_measurement = []
         self.current_state = []  # meters
@@ -50,36 +49,37 @@ class ModelBasedAgentUWB(Drone):
         self.rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
         self.initialTime = None
         self.local = local
-
         #
 
-    def getUWB_avrg_pos(self):
+    def getUWB_avrg_pos(self, number):
         # print( self.mqttSubscriber.pos)
         a = self.mqttSubscriber.pos
-        for i in range(30):
+        for i in range(number):
             if a:
                 self.UWB_positions.append(a)
         if not len(self.UWB_positions) == 0:
             return (list(np.mean(self.UWB_positions, axis=0)))
 
-
     def sensor_callback(self, args):
-        if self.getUWB_avrg_pos() and self.initial_pos_bool:
-            self.initial_pos = self.getUWB_avrg_pos()
+        if self.getUWB_avrg_pos(30) and self.initial_pos_bool:
+            self.initial_pos = self.getUWB_avrg_pos(30)
             self.initial_pos_bool = False
         if self.start_measure:
             if self.local:
                 '''i want to take curr measurement and add (initial pos- mqttsupsPos)'''
                 self.current_measurement = list(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
-                                                        self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                                        self.mambo.sensors.sensors_dict['DronePosition_posz']/-100])) #+ np.array([self.initial_pos[0], self.initial_pos[1], 0]))
+                                                          self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
+                                                          self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]))  # + np.array([self.initial_pos[0], self.initial_pos[1], 0]))
                 self.current_velocities = [self.mambo.sensors.speed_x,
-                                        self.mambo.sensors.speed_y,
-                                        self.mambo.sensors.speed_z]
+                                           self.mambo.sensors.speed_y,
+                                           self.mambo.sensors.speed_z]
                 '''convert global to local in localization var'''
-                self.localization = list(np.array(self.initial_pos) - np.array(self.mqttSubscriber.pos))
+                self.localization = list(
+                    np.array(self.initial_pos) - np.array(self.mqttSubscriber.pos))
                 '''here we set x,y,z location according to uav, where x+ moves straight, y+ moves to right'''
-                self.current_measurement_combined = self.current_measurement + [self.localization[1],self.localization[0], self.current_measurement[2]]
+                self.current_measurement_combined = self.current_measurement + \
+                    [self.localization[1], self.localization[0],
+                        self.current_measurement[2]]
                 self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
                     self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
                 self.current_state = self.q.T.tolist()[0]
@@ -87,14 +87,15 @@ class ModelBasedAgentUWB(Drone):
             else:
                 '''multiply curren measurement on rotation matrix'''
                 self.current_measurement = list(np.array([self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
-                                                        self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
-                                                        self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]) + np.dot(self.rotation_matrix, np.array([self.initial_pos[0], self.initial_pos[1], 0])))
+                                                          self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
+                                                          self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]) + np.dot(self.rotation_matrix, np.array([self.initial_pos[0], self.initial_pos[1], 0])))
                 self.current_velocities = [self.mambo.sensors.speed_x,
-                                        self.mambo.sensors.speed_y,
-                                        self.mambo.sensors.speed_z]
+                                           self.mambo.sensors.speed_y,
+                                           self.mambo.sensors.speed_z]
                 '''each mqtt pos is multiplied to rotation matrix'''
-                self.current_measurement_combined = self.current_measurement + list(np.dot(self.rotation_matrix, self.mqttSubscriber.pos))
-                    #list(self.mqttSubscriber.pos)  # self.getUWB_avrg_pos()
+                self.current_measurement_combined = self.current_measurement + \
+                    list(np.dot(self.rotation_matrix, self.mqttSubscriber.pos))
+                # list(self.mqttSubscriber.pos)  # self.getUWB_avrg_pos()
 
                 self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
                     self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
@@ -132,7 +133,7 @@ class ModelBasedAgentUWB(Drone):
                 # time.sleep(0.2)
                 if self.use_wifi:
                     print('getting first state')
-                    while  self.current_state ==[]:
+                    while self.current_state == []:
                         continue
                 else:
                     print(f'getting first state...>>{self.current_state}')
@@ -142,16 +143,18 @@ class ModelBasedAgentUWB(Drone):
                 '''after this function you need to feed action function such as go to xyz '''
 
     def go_to_xyz(self, desired_state):
-        if self.localization: #local
+        if self.localization:  # local
             self.desired_state = desired_state
-        else: #global
-            self.desired_state = list(np.dot(self.rotation_matrix, desired_state)) #list(np.dot(self.rotation_matrix, desired_state)) #rotate positions
+        else:  # global
+            # list(np.dot(self.rotation_matrix, desired_state)) #rotate positions
+            self.desired_state = list(
+                np.dot(self.rotation_matrix, desired_state))
 
         self.initialTime = time.time()
         self.controller.set_desired_state(self.desired_state)
         distance = ((self.current_state[0] - self.desired_state[0])**2 +
                     (self.current_state[1] - self.desired_state[1])**2 +
-                    (self.current_state[2] - self.desired_state[2])**2)**0.5  
+                    (self.current_state[2] - self.desired_state[2])**2)**0.5
         while distance > self.eps:
             cmd = self.controller.calculate_cmd_input()
             self.mambo.fly_direct(roll=cmd[0],
@@ -161,17 +164,18 @@ class ModelBasedAgentUWB(Drone):
                                   duration=None)
             time.sleep(0.25)
             distance = ((self.current_state[0] - self.desired_state[0])**2 +
-                        (self.current_state[1] - self.desired_state[1])**2 )**0.5 #+ (self.current_state[2] - self.desired_state[2])**2
-            
+                        (self.current_state[1] - self.desired_state[1])**2)**0.5  # + (self.current_state[2] - self.desired_state[2])**2
+
             # logging
-            thread = threading.Thread(target=self.black_box.start_logging(["IMU", self.current_measurement], [
-                "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]]))
-            thread.start()
+            self.black_box.start_logging(["IMU", self.current_measurement], [
+                "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
+
             print("===============================Start")
             print(f"UWB >>{list(self.mqttSubscriber.pos)}")
-            print(f"current meas_combined>>{self.current_measurement_combined}")
+            print(
+                f"current meas_combined>>{self.current_measurement_combined}")
             print(f"initial pos (avrg) {self.initial_pos}")
-            print(f"KALMAN STATE >>{self.current_state}")           
+            print(f"KALMAN STATE >>{self.current_state}")
             print(f"Desired state >>{self.desired_state}")
             print(f"CMD input >> {cmd}")
             print(f"distance >> {distance}")
@@ -187,7 +191,8 @@ class ModelBasedAgentUWB(Drone):
 
 
 if __name__ == "__main__":
-    modelAgent = ModelBasedAgentUWB("84:20:96:6c:22:67", True, "pid", local=True)
+    modelAgent = ModelBasedAgentUWB(
+        "84:20:96:6c:22:67", True, "pid", local=True)
     # modelAgent = ModelBasedAgent("7A:64:62:66:4B:67")
     modelAgent.start_and_prepare()
 # modelAgent.mambo.hover()

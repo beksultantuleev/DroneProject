@@ -146,9 +146,9 @@ class ModelBasedAgentUWB(Drone):
                         (self.current_state[1] - self.desired_state[1])**2 )**0.5 #+ (self.current_state[2] - self.desired_state[2])**2
             
             # logging
-            thread = threading.Thread(target=self.black_box.start_logging(["IMU", self.current_measurement], [
-                "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]]))
-            thread.start()
+            self.black_box.start_logging(["IMU", self.current_measurement], [
+                "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
+
             print("===============================Start")
             print(f"UWB >>{list(self.mqttSubscriber.pos)}")
             print(f"current meas_combined>>{self.current_measurement_combined}")
