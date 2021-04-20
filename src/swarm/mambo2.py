@@ -1,4 +1,3 @@
-from ModelBasedAgent import ModelBasedAgent
 import sys
 import os
 import inspect
@@ -6,6 +5,8 @@ currentdir = os.path.dirname(os.path.abspath(
     inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
+
+from ModelBasedAgent import ModelBasedAgent
 
 
 mambo1 = "D0:3A:49:F7:E6:22"
@@ -19,3 +20,4 @@ for points in square:
     drone2.go_to_xyz(points)
 drone2.mambo.turn_degrees(180)
 drone2.land_and_disconnect()
+
