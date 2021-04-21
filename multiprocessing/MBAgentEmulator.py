@@ -1,7 +1,7 @@
 from multiprocessing import Process, Queue, Pipe
 from UWBemulator import UWBscript
 '''this should be our MB Agent'''
-
+"this is like each mambo"
 if __name__ == '__main__':
     parent_conn, child_conn = Pipe()
     p = Process(target=UWBscript, args=(child_conn,))
