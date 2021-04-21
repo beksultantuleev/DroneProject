@@ -50,7 +50,7 @@ class MqttSubscriber:
     #     return
 
 if __name__ == '__main__':
-    mqttSubscriber = MqttSubscriber("192.168.1.200", topic="Position3")
+    mqttSubscriber = MqttSubscriber("192.168.1.200", topic="Position1")
     mqttSubscriber.start()
     # tmp = mqttSubscriber.pos
     # tmp1 = tmp

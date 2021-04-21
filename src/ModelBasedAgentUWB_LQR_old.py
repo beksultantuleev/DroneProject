@@ -22,7 +22,7 @@ class ModelBasedAgentUWB(Drone):
         self.start_measure = False
         self.current_state_UWB = []
         self.mqttSubscriber = MqttSubscriber(
-            "192.168.1.200", 1883, "Position3")  # change to 192.168.1.200
+            "192.168.1.200", 1883, "Position1")  # change to 192.168.1.200
         self.mqttSubscriber.start()
         self.UWB_Data_Storing = True
         self.current_measurement_combined = []

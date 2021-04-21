@@ -125,7 +125,8 @@ class ModelBasedAgent(Drone):
 if __name__ == "__main__":
     mambo1 = "D0:3A:49:F7:E6:22"
     mambo2 = "D0:3A:0B:C5:E6:22"
-    drone1 = ModelBasedAgent(mambo1, False, "pid", False)
+    mambo3 = "D0:3A:B1:DC:E6:20"
+    drone1 = ModelBasedAgent(mambo3, False, "pid", False)
     drone1.start_and_prepare()
     # drone1.mambo.turn_degrees(180)
     drone1.go_to_xyz([1, 0, 1])
