@@ -45,7 +45,7 @@ class PathDrawing:
 
                 plt.annotate(f" {sec}s", xy=(x[i], y[i]), xytext=(x[i]+0.05,y[i]+0.05),  arrowprops = dict(arrowstyle="simple")) #works
                 
-        plt.title(nameOfGraph.pop())
+        plt.title(list(nameOfGraph)[0])
         
         plt.plot(x, y, color, label=draw_object, marker='.')
         plt.legend()
@@ -57,6 +57,7 @@ class PathDrawing:
     def draw(self, draw_object, color):
         self.hitcounter+=1
         nameOfGraph = set()
+        is_local = set()
         x = []
         y = []
         z = []
@@ -64,11 +65,12 @@ class PathDrawing:
         data = self.open_file()
         try:
             for i in data["Title"]:
-                # print(i[0])
                 nameOfGraph.add(i[0])
-                # print(nameOfGraph.pop())
+            for t in data["Local"]:
+                is_local.add(t[0])
         except:
             nameOfGraph.add("no title")
+            is_local.add("unknown")
 
         for i in data[draw_object]:
             x.append(i[0])
@@ -77,39 +79,16 @@ class PathDrawing:
                 z.append(i[2])
         for i in data["Time"]:
             time.append(i[0])
-        if self.in_3d:
-            try:
-                if list(nameOfGraph)[0] in "ModelBasedAgentUWB":
-                    if draw_object == "IMU":
-                        pass
-                        # self.ax.plot3D(y, x,  z, color, label=draw_object, marker='.')
-                        # plt.xlabel("X axis in meters first if")
-                        # plt.ylabel("Y axis in meters")
-                        # plt.ylim(0, 6)
-                        # plt.xlim(0, 3)
-                    elif draw_object == "UWB":
-                        self.ax.plot3D(x, y,  z, color, label=draw_object, marker='.')
-                        plt.xlabel("X axis in meters first if")
-                        plt.ylabel("Y axis in meters")
-                        plt.ylim(0, 6)
-                        plt.xlim(0, 6)    
-                    else:
-                        self.ax.plot3D(x,y,  z, color, label=draw_object, marker='.')
-                        plt.xlabel("X axis in meters which one??")
-                        plt.ylabel("Y axis in meters")
-                        plt.ylim(0, 6)
-                        plt.xlim(0, 6)
-                    self.ax.set_zlim(0, 2)
-                else:
-                    self.ax.plot3D(x, y,  z, color, label=draw_object, marker='.')
-                    plt.xlabel("X axis in meters")
-                    plt.ylabel("Y axis in meters")
-                    plt.ylim(-3,3)
+        
+        if self.in_3d: #3d graphs
 
-            except:
-                self.ax.plot3D(x,y,  z, color, label=draw_object, marker='.')
-                plt.xlabel("Y axis in meters in except??")
-                plt.ylabel("X axis in meters")
+            self.ax.plot3D(x, y,  z, color, label=draw_object, marker='.')
+            plt.xlabel("X axis in meters  ?????")
+            plt.ylabel("Y axis in meters")
+            plt.ylim(0,8)
+            plt.xlim(0,8)
+
+            #labeling time of function for 3d
             for i, sec in enumerate(time):
                 if  i<len(time)-1: #i != 0 and
                     continue
@@ -119,24 +98,24 @@ class PathDrawing:
                     self.ax.text(x[i], y[i], z[i]+0.02, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
                 else:
                     self.ax.text(x[i], y[i], z[i]+0.04, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
-        else:
-            try:
-                if "ModelBasedAgentUWB" in list(nameOfGraph)[0]:
-                    
-                    plt.plot(x,y,color, label=draw_object, marker='.')
-                    plt.xlabel("X axis in meters")
-                    plt.ylabel("Y axis in meters")
-                    plt.ylim(0,6)
-                    plt.xlim(0.5,5)
-                else:
-                    plt.plot(x, np.array(y), color, label=draw_object, marker='.')
-                    plt.xlabel("X axis in meters")
-                    plt.ylabel("Y axis in meters")
-                    plt.ylim(-2,2)
-            except:
+        
+        else: #2d graphs
+
+            if "ModelBasedAgentUWB" in list(nameOfGraph)[0]:
+                
+                plt.plot(x,y,color, label=draw_object, marker='.')
+                plt.xlabel("X axis in meters")
+                plt.ylabel("Y axis in meters")
+                plt.ylim(0,6)
+                plt.xlim(0.5,5)
+            else:
                 plt.plot(x, np.array(y), color, label=draw_object, marker='.')
                 plt.xlabel("X axis in meters")
                 plt.ylabel("Y axis in meters")
+                plt.ylim(-2,2)
+            
+            
+            #labeling time of function for 2d
             for i, sec in enumerate(time):
                 if  i<len(time)-1: #i != 0 and
                     continue
@@ -149,7 +128,8 @@ class PathDrawing:
                     plt.annotate(f'{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s', xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]-1.2),  arrowprops = dict(arrowstyle="fancy")) #works
         
 
-        plt.title(nameOfGraph.pop())
+
+        plt.title(list(nameOfGraph)[0])
         plt.legend()
 
 
@@ -166,5 +146,5 @@ if __name__ == "__main__":
 
     # test.draw("IMU", "red")
     test.draw("Kalman", "green")
-    test.draw("UWB", "blue")
+    # test.draw("UWB", "blue")
     test.show()

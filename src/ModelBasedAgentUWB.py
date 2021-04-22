@@ -11,6 +11,8 @@ from makeLogs.BlackBoxGenerator import Logger
 class ModelBasedAgentUWB(Drone):
     def __init__(self, drone_mac, use_wifi, controller, local, start_loggin=True):
         super().__init__(drone_mac, use_wifi)
+
+        self.local = local
         # ================== Controller setup
         self.controller = controller.lower()
         if self.controller == "lqr":
@@ -27,11 +29,13 @@ class ModelBasedAgentUWB(Drone):
         self.kalmanfilterUWB = KalmanFilterUWB(self.q)
         # ==================
         self.current_velocities = []
-        self.current_measurement = []
+        self.current_measurement_IMU = []
+        self.current_measurement_IMU_global = []
+        self.current_measurement_combined = []
         self.current_state = []  # meters
         self.desired_state = []  # meters
-        self.current_state_UWB = []
-        self.eps = 0.2  # 0.08
+        self.current_measurement_UWB = []
+        self.eps = 0.1  # it was 0.2
         self.start_measure = False
         self.black_box = Logger()
         # ================
@@ -44,7 +48,6 @@ class ModelBasedAgentUWB(Drone):
         self.current_measurement_combined = []
         self.rotation_matrix = np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]])
         self.initialTime = None
-        self.local = local
         self.duration = None
         self.start_loggin = start_loggin
         #
@@ -81,12 +84,6 @@ class ModelBasedAgentUWB(Drone):
                 self.current_measurement_combined = self.current_measurement_IMU + \
                     list(np.dot(self.rotation_matrix, self.current_measurement_UWB))
 
-                "next thing is same so i put it down"
-                # "then we put combined locations into kalman filter"
-                # self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
-                #     self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
-                # self.current_state = self.q.T.tolist()[0]
-                # self.controller.set_current_state(self.current_state)
             else:
                 # global
                 "in xyz, where x is north, 1x3"
@@ -96,7 +93,7 @@ class ModelBasedAgentUWB(Drone):
 
                 "in xyz, where x is north, + it makes IMU + initial UWB, 1x3"
                 self.current_measurement_IMU_global = list(np.array(
-                    self.current_measurement_IMU) + np.dot(self.rotation_matrix, [self.initial_pos[0], self.initial_pos[1], self.current_measurement_IMU[2]]))  # mod here?
+                    self.current_measurement_IMU) + np.dot(self.rotation_matrix,  [self.initial_pos[0], self.initial_pos[1], self.current_measurement_IMU[2]]))  # mod here? instead of just self.initial_pos
 
                 "in xyz, where x is north, in raw data, 1x3"
                 self.current_measurement_UWB = list(
@@ -154,7 +151,7 @@ class ModelBasedAgentUWB(Drone):
             self.desired_state = desired_state
         else:  # global
             self.desired_state = list(
-                np.dot(self.rotation_matrix, desired_state))  # fix this
+                np.dot(self.rotation_matrix, desired_state)) 
 
         self.initialTime = time.time()
         self.controller.set_desired_state(self.desired_state)
@@ -175,11 +172,11 @@ class ModelBasedAgentUWB(Drone):
 
             # logging
             if self.start_loggin:
-                self.black_box.start_logging(["IMU", self.current_measurement], [
-                    "Kalman", self.current_state], ["UWB", list(self.mqttSubscriber.pos)], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
+                self.black_box.start_logging(["IMU", self.current_measurement_IMU], [
+                    "Kalman", self.current_state], ["UWB", self.current_measurement_UWB], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title], ["Local", [self.local]]])
 
             print("===============================Start")
-            print(f"UWB >>{list(self.mqttSubscriber.pos)}")
+            print(f"UWB >>{self.current_measurement_UWB}")
             print(
                 f"current meas_combined>>{self.current_measurement_combined}")
             print(f"initial pos (avrg) {self.initial_pos}")
@@ -203,11 +200,11 @@ if __name__ == "__main__":
     mambo2 = "D0:3A:0B:C5:E6:22"
     mambo3 = "D0:3A:B1:DC:E6:20"
     modelAgent = ModelBasedAgentUWB(
-        mambo3, use_wifi=False, controller="pid", local=True)
+        mambo2, use_wifi=False, controller="lqr", local=False)
     modelAgent.start_and_prepare()
 
-    modelAgent.go_to_xyz([1, 0, 1])
-    # modelAgent.go_to_xyz([2.3, 6, 1])
+    # modelAgent.go_to_xyz([2, 0, 1])
+    modelAgent.go_to_xyz([2.5, 3.6, 1])
 
     modelAgent.land_and_disconnect()
 
