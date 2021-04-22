@@ -64,37 +64,41 @@ class ModelBasedAgentUWB(Drone):
             self.initial_pos_bool = False
         if self.start_measure:
             if self.local:
-                "in xyz, where x is north"
+                "in xyz, where x is north, 1x3"
                 self.current_measurement_IMU = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                                 self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]
-                "in xyz, where y is north, + this make it in local scale"
+
+                "in xyz, where y is north, + this make it in local scale, 1x3"
                 self.current_measurement_UWB = list(
                     np.array(self.mqttSubscriber.pos) - np.array(self.initial_pos))
 
-                "in xyz, where x is north"
+                "in xyz, where x is north, 1x3"
                 self.current_velocities = [self.mambo.sensors.speed_x,
                                            self.mambo.sensors.speed_y,
                                            self.mambo.sensors.speed_z]
                 "for kalman filter i want xyz(imu) + rotated(xyz_uwb)"
                 self.current_measurement_combined = self.current_measurement_IMU + \
                     list(np.dot(self.rotation_matrix, self.current_measurement_UWB))
-                "then we put combined locations into kalman filter"
-                self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
-                    self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
-                self.current_state = self.q.T.tolist()[0]
-                self.controller.set_current_state(self.current_state)
+
+                "next thing is same so i put it down"
+                # "then we put combined locations into kalman filter"
+                # self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
+                #     self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
+                # self.current_state = self.q.T.tolist()[0]
+                # self.controller.set_current_state(self.current_state)
             else:
                 # global
-                "in xyz, where x is north"
+                "in xyz, where x is north, 1x3"
                 self.current_measurement_IMU = [self.mambo.sensors.sensors_dict['DronePosition_posx']/100,
                                                 self.mambo.sensors.sensors_dict['DronePosition_posy']/100,
                                                 self.mambo.sensors.sensors_dict['DronePosition_posz']/-100]
-                "in xyz, where x is north, + it makes IMU + initial UWB"
-                self.current_measurement_IMU_global = list(np.array(
-                    self.current_measurement_IMU) + np.dot(self.rotation_matrix, self.initial_pos))
 
-                "in xyz, where x is north, in raw data"
+                "in xyz, where x is north, + it makes IMU + initial UWB, 1x3"
+                self.current_measurement_IMU_global = list(np.array(
+                    self.current_measurement_IMU) + np.dot(self.rotation_matrix, [self.initial_pos[0], self.initial_pos[1], self.current_measurement_IMU[2]]))  # mod here?
+
+                "in xyz, where x is north, in raw data, 1x3"
                 self.current_measurement_UWB = list(
                     np.dot(self.rotation_matrix, self.mqttSubscriber.pos))
 
@@ -106,16 +110,11 @@ class ModelBasedAgentUWB(Drone):
                 self.current_measurement_combined = self.current_measurement_IMU_global + \
                     self.current_measurement_UWB
 
-                self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
-                    self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
-                self.current_state = self.q.T.tolist()[0]
-                self.controller.set_current_state(self.current_state)
-            # print(f"UWB real >>{self.mqttSubscriber.pos}")
-            # print(f"UWB avrg >>{self.getUWB_avrg_pos()}")
-            # print(f"current meas>>{self.current_measurement}")
-            # print(f"current meas_combined>>{self.current_measurement_combined}")
-            # print(f"kalman>>{self.current_state}")
-            # print(f"velocity >>{self.current_velocities}")
+            "then we put combined locations into kalman filter"
+            self.p, self.q = self.kalmanfilterUWB.get_state_estimation(
+                self.q, self.current_velocities, self.current_measurement_combined, self.p, True)
+            self.current_state = self.q.T.tolist()[0]
+            self.controller.set_current_state(self.current_state)
 
     def start_and_prepare(self):
         success = self.mambo.connect(num_retries=3)
@@ -204,11 +203,11 @@ if __name__ == "__main__":
     mambo2 = "D0:3A:0B:C5:E6:22"
     mambo3 = "D0:3A:B1:DC:E6:20"
     modelAgent = ModelBasedAgentUWB(
-        mambo3, use_wifi=False, controller="pid", local=False)
+        mambo3, use_wifi=False, controller="pid", local=True)
     modelAgent.start_and_prepare()
 
-    # modelAgent.go_to_xyz([2, 0, 1])
-    modelAgent.go_to_xyz([2.3, 6, 1])
+    modelAgent.go_to_xyz([1, 0, 1])
+    # modelAgent.go_to_xyz([2.3, 6, 1])
 
     modelAgent.land_and_disconnect()
 
