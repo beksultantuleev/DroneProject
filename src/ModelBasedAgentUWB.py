@@ -35,7 +35,7 @@ class ModelBasedAgentUWB(Drone):
         self.current_state = []  # meters
         self.desired_state = []  # meters
         self.current_measurement_UWB = []
-        self.eps = 0.1  # it was 0.2
+        self.eps = 0.2  # it was 0.2
         self.start_measure = False
         self.black_box = Logger()
         # ================
@@ -173,18 +173,20 @@ class ModelBasedAgentUWB(Drone):
             # logging
             if self.start_loggin:
                 self.black_box.start_logging(["IMU", self.current_measurement_IMU], [
-                    "Kalman", self.current_state], ["UWB", self.current_measurement_UWB], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title], ["Local", [self.local]]])
+                    "Kalman", self.current_state], ["UWB", self.current_measurement_UWB], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title], ["Local", [str(self.local)]]])
 
             print("===============================Start")
-            print(f"UWB >>{self.current_measurement_UWB}")
-            print(
-                f"current meas_combined>>{self.current_measurement_combined}")
+            print(f"controller >> {self.title}")
+            print(f" Local >>> {self.local}. logging >> {self.start_loggin}")         
             print(f"initial pos (avrg) {self.initial_pos}")
+            print(f"UWB >>{self.current_measurement_UWB}")
             print(f"KALMAN STATE >>{self.current_state}")
             print(f"Desired state >>{self.desired_state}")
             print(f"CMD input >> {cmd}")
             print(f"distance >> {distance}")
-            # print("===============================end")
+            # print(
+            #     f"current meas_combined>>{self.current_measurement_combined}")
+
 
     def land_and_disconnect(self):
         print('Landing...')
