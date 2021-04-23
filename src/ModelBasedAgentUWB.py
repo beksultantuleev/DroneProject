@@ -35,7 +35,7 @@ class ModelBasedAgentUWB(Drone):
         self.current_state = []  # meters
         self.desired_state = []  # meters
         self.current_measurement_UWB = []
-        self.eps = 0.2  # it was 0.2
+        self.eps = 0.15  # it was 0.2
         self.start_measure = False
         self.black_box = Logger()
         # ================
@@ -161,7 +161,14 @@ class ModelBasedAgentUWB(Drone):
         while distance > self.eps:
             cmd = self.controller.calculate_cmd_input()
             if self.use_wifi == False:
-                self.duration = 0.5
+                if distance>2:
+                    self.duration = 1
+                
+                #try to make uav fly longer if it apploaches to desired state
+                elif distance <0.2:
+                    self.duration =1
+                else:
+                    self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
                                   yaw=cmd[2],
@@ -173,7 +180,7 @@ class ModelBasedAgentUWB(Drone):
             # logging
             if self.start_loggin:
                 self.black_box.start_logging(["IMU", self.current_measurement_IMU], [
-                    "Kalman", self.current_state], ["UWB", self.current_measurement_UWB], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title], ["Local", [str(self.local)]]])
+                    "Kalman", self.current_state], ["UWB", self.current_measurement_UWB], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]], ["Local", [self.local]])
 
             print("===============================Start")
             print(f"controller >> {self.title}")
@@ -202,12 +209,12 @@ if __name__ == "__main__":
     mambo2 = "D0:3A:0B:C5:E6:22"
     mambo3 = "D0:3A:B1:DC:E6:20"
     modelAgent = ModelBasedAgentUWB(
-        mambo2, use_wifi=False, controller="lqr", local=False)
+        mambo2, use_wifi=False, controller="pid", local=False)
     modelAgent.start_and_prepare()
 
     # modelAgent.go_to_xyz([2, 0, 1])
-    modelAgent.go_to_xyz([2.5, 3.6, 1])
-
+    # modelAgent.go_to_xyz([2.5, 3.6, 1])
+    modelAgent.go_to_xyz([2.5, 6, 1])
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
