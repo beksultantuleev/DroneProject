@@ -9,9 +9,10 @@ from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgentUWB(Drone):
-    def __init__(self, drone_mac, use_wifi, controller, local, start_loggin=True):
+    def __init__(self, drone_mac, use_wifi, controller, local, start_loggin=True, topic = "Position1"):
         super().__init__(drone_mac, use_wifi)
-
+        
+        self.topic = topic
         self.local = local
         # ================== Controller setup
         self.controller = controller.lower()
@@ -40,7 +41,7 @@ class ModelBasedAgentUWB(Drone):
         self.black_box = Logger()
         # ================
         self.mqttSubscriber = MqttSubscriber(
-            "192.168.1.200", 1883, "Position1")
+            "192.168.1.200", 1883, self.topic)
         self.mqttSubscriber.start()
         self.UWB_positions = []
         self.initial_pos = []
