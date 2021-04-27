@@ -9,7 +9,7 @@ from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgentUWB(Drone):
-    def __init__(self, drone_mac, use_wifi, controller, local, start_loggin=True, topic = "Position1"):
+    def __init__(self, drone_mac, use_wifi, controller, local, start_loggin=True, topic = "Position3"):
         super().__init__(drone_mac, use_wifi)
         
         self.topic = topic
@@ -207,15 +207,15 @@ class ModelBasedAgentUWB(Drone):
 
 if __name__ == "__main__":
     mambo1 = "D0:3A:49:F7:E6:22"
-    mambo2 = "D0:3A:0B:C5:E6:22"
-    mambo3 = "D0:3A:B1:DC:E6:20"
+    mambo2 = "D0:3A:0B:C5:E6:22" #new tag
+    mambo3 = "D0:3A:B1:DC:E6:20" #with no sticker
     modelAgent = ModelBasedAgentUWB(
-        mambo2, use_wifi=False, controller="pid", local=False)
+        mambo3, use_wifi=False, controller="pid", local=True, topic="Position1")
     modelAgent.start_and_prepare()
 
-    # modelAgent.go_to_xyz([2, 0, 1])
+    modelAgent.go_to_xyz([1, 0, 1])
     # modelAgent.go_to_xyz([2.5, 3.6, 1])
-    modelAgent.go_to_xyz([2.5, 6, 1])
+    # modelAgent.go_to_xyz([2.5, 6, 1])
     modelAgent.land_and_disconnect()
 
     # "84:20:96:91:73:F1"<<new drone #"7A:64:62:66:4B:67" <<-Old drone
