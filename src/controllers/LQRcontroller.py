@@ -17,8 +17,8 @@ class LQRcontroller:
              [0.0, self.dt, 0.0],
                 [0.0, 0.0, self.dt]])
         self.Q = np.array(  # Q controls state accuracy
-            [[2, 0.0, 0.0],
-             [0.0, 2, 0.0],
+            [[1, 0.0, 0.0],
+             [0.0, 1, 0.0],
                 [0.0, 0.0, 1]])  # 0.7 is good for kalman 0.3
         self.R = np.array(
             [[0.5, 0.0, 0.0],
@@ -40,7 +40,7 @@ class LQRcontroller:
             self.A, self.B, self.Q, self.R))
         # compute the LQR gain
         self.K = np.matrix(scipy.linalg.inv(
-            self.B.T*self.P*self.B+self.R)*multi_dot([self.B.T,self.P,self.A]))
+            self.B.T*self.P*self.B+self.R)*multi_dot([self.B.T, self.P, self.A]))
         # print(f"optimal K is {self.K}")
         return -self.K  # #The feedback gain is a matrix K
 
@@ -71,7 +71,7 @@ class LQRcontroller:
             u_scaled[i] = u[i]/self.max_velocity * self.max_input_power[i]
 
             for i in range(len(u)):
-                if u_scaled[i]>0:
+                if u_scaled[i] > 0:
                     if abs(u_scaled[i]) < 0.1:
                         u_scaled[i] = 0
                     elif (abs(u_scaled[i]) >= 0.1 and abs(u_scaled[i]) <= 5):

@@ -38,7 +38,7 @@ class SwarmLauncher():
 if __name__ == "__main__":
     swarm = SwarmLauncher()
     swarm.addUav("UWBmambo1.py")
-    # swarm.addUav("UWBmambo2.py")
+    swarm.addUav("UWBmambo2.py")
 
     # swarm.getFinalBashCommand()
     swarm.launch()

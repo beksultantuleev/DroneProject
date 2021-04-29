@@ -20,10 +20,11 @@ mambo3 = "D0:3A:B1:DC:E6:20" #with no sticker
 
 
 drone1 = ModelBasedAgentUWB(
-    drone_mac=mambo3, use_wifi=False,
+    drone_mac=mambo1, use_wifi=False,
     controller=swarm.getController(), 
     local=swarm.getCoordinateSystem(),
-    start_loggin=False, topic="Position1")
+    topic="Position1",
+    start_loggin=False)
 drone1.start_and_prepare()
 
 for points in swarm.getWaypoints():

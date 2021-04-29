@@ -9,7 +9,7 @@ from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgentUWB(Drone):
-    def __init__(self, drone_mac, use_wifi, controller, local, start_loggin=True, topic = "Position3"):
+    def __init__(self, drone_mac, use_wifi, controller, local, topic, start_loggin=True):
         super().__init__(drone_mac, use_wifi)
         
         self.topic = topic
@@ -162,14 +162,10 @@ class ModelBasedAgentUWB(Drone):
         while distance > self.eps:
             cmd = self.controller.calculate_cmd_input()
             if self.use_wifi == False:
-                if distance>2:
-                    self.duration = 1
-                
                 #try to make uav fly longer if it apploaches to desired state
-                elif distance <0.2:
-                    self.duration =1
-                else:
-                    self.duration = 0.5
+                if distance>2 or distance<0.2:
+                    self.duration = 1       
+                self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
                                   yaw=cmd[2],

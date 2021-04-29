@@ -98,6 +98,9 @@ class ModelBasedAgent(Drone):
         while distance > self.eps:
             cmd = self.controller.calculate_cmd_input()
             if self.use_wifi == False:
+                #try to make uav fly longer if it apploaches to desired state
+                if distance>2 or distance<0.2:
+                    self.duration = 1       
                 self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
