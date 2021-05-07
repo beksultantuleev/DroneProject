@@ -12,7 +12,7 @@ from ModelBasedAgentUWB import ModelBasedAgentUWB
 # ________________________
 swarm = SwarmLauncher()
 
-# swarm.setWaypoints([1,0,1]) #to set manualy
+swarm.setWaypoints([[1,0,1], [1,0,2], [0,-1,1]]) #to set manualy
 # print(swarm.getWaypoints())
 
 mambo1 = "D0:3A:49:F7:E6:22"

@@ -36,7 +36,7 @@ class ModelBasedAgentUWB(Drone):
         self.current_state = []  # meters
         self.desired_state = []  # meters
         self.current_measurement_UWB = []
-        self.eps = 0.15  # it was 0.2
+        self.eps = 0.18  # it was 0.2
         self.start_measure = False
         self.black_box = Logger()
         # ================

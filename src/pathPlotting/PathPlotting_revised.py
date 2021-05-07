@@ -73,8 +73,13 @@ class PathDrawing:
             is_local.add("unknown")
 
         for i in data[draw_object]:
-            x.append(i[0])
-            y.append(i[1])
+            if list(is_local)[0] and draw_object =="UWB":
+                x.append(i[1])
+                y.append(i[0])
+            else:
+                x.append(i[0])
+                y.append(i[1])
+            
             if self.in_3d:
                 z.append(i[2])
         for i in data["Time"]:
@@ -82,37 +87,39 @@ class PathDrawing:
         
         if self.in_3d: #3d graphs
 
-            self.ax.plot3D(x, y,  z, color, label=draw_object, marker='.')
-            plt.xlabel("X axis in meters  ?????")
+            self.ax.plot3D(y, x,  z, color, label=draw_object, marker='.')
+            plt.xlabel("X axis in meters")
             plt.ylabel("Y axis in meters")
-            plt.ylim(0,8)
-            plt.xlim(0,8)
+            if list(is_local)[0]:
+                plt.xlim(-1,1)
+            else:
+                # plt.ylim(0,6)
+                plt.xlim(1,4)
 
             #labeling time of function for 3d
             for i, sec in enumerate(time):
                 if  i<len(time)-1: #i != 0 and
                     continue
-                if self.hitcounter<2:
-                    self.ax.text(x[i], y[i], z[i]+0.005, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
-                elif self.hitcounter<3:
-                    self.ax.text(x[i], y[i], z[i]+0.02, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
-                else:
-                    self.ax.text(x[i], y[i], z[i]+0.04, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
+                # if list(is_local)[0]:
+                #     self.ax.text(y[i], x[i], z[i]+0.005, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
+                # else:
+                self.ax.text(y[i], x[i], z[i]+0.005, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
+
+                # if self.hitcounter<2:
+                #     self.ax.text(x[i], y[i], z[i]+0.005, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
+                # elif self.hitcounter<3:
+                #     self.ax.text(x[i], y[i], z[i]+0.02, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
+                # else:
+                #     self.ax.text(x[i], y[i], z[i]+0.04, f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}, {np.round(z[-1], 1)}) {sec}s", size=10, color='g')
         
         else: #2d graphs
 
-            if "ModelBasedAgentUWB" in list(nameOfGraph)[0]:
-                
-                plt.plot(x,y,color, label=draw_object, marker='.')
-                plt.xlabel("X axis in meters")
-                plt.ylabel("Y axis in meters")
-                plt.ylim(0,6)
-                plt.xlim(0.5,5)
-            else:
-                plt.plot(x, np.array(y), color, label=draw_object, marker='.')
-                plt.xlabel("X axis in meters")
-                plt.ylabel("Y axis in meters")
-                plt.ylim(-2,2)
+            plt.plot(x, y, color, label=draw_object, marker='.')
+            plt.xlabel("X axis in meters")
+            plt.ylabel("Y axis in meters")
+            plt.ylim(0,6)
+            if list(is_local)[0]:
+                plt.ylim(-1, 1)
             
             
             #labeling time of function for 2d
@@ -121,9 +128,9 @@ class PathDrawing:
                     continue
                 # np.random.seed(98)
                 if self.hitcounter<2:
-                    plt.annotate(f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s", xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]-0.7),  arrowprops = dict(arrowstyle="fancy")) #works
+                    plt.annotate(f"{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s", xy=(x[i], y[i]), xytext=(x[i]-0.3,y[i]-0.3),  arrowprops = dict(arrowstyle="fancy")) #works
                 elif self.hitcounter<3:
-                    plt.annotate(f'{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s', xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]+0.7),  arrowprops = dict(arrowstyle="fancy")) #works
+                    plt.annotate(f'{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s', xy=(x[i], y[i]), xytext=(x[i]-0.3,y[i]+0.3),  arrowprops = dict(arrowstyle="fancy")) #works
                 else:
                     plt.annotate(f'{draw_object} end ({np.round(x[-1],1)},{np.round(y[-1], 1)}) {sec}s', xy=(x[i], y[i]), xytext=(x[i]-0.7,y[i]-1.2),  arrowprops = dict(arrowstyle="fancy")) #works
         
@@ -140,11 +147,12 @@ class PathDrawing:
 
 
 if __name__ == "__main__":
-    test = PathDrawing("Apr-22-2021-151002", True) #Mar-12-2021-195722 #Mar-12-2021-195846 #Mar-27-2021-125520
-    # test.list_of_objects()
-    # test.draw_via_time("Distance", "red")
+    test = PathDrawing("Apr-27-2021-170255", False) #Apr-22-2021-174544 #Apr-27-2021-170255
+    test.list_of_objects()
+    test.draw_via_time("Distance", "red")
 
     # test.draw("IMU", "red")
-    test.draw("Kalman", "green")
+
+    # test.draw("Kalman", "green")
     # test.draw("UWB", "blue")
     test.show()

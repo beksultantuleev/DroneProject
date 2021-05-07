@@ -60,7 +60,7 @@ if __name__ == '__main__':
         # print(tmp[:-2])
         print(mqttSubscriber.pos)
         # print(mqttSubscriber.pos[0:1])
-        time.sleep(0.5)
+        # time.sleep(0.5)
         print(mqttSubscriber.checker)
 
     # mqttSubscriber.get_pos()
