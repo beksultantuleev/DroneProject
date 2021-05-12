@@ -8,7 +8,7 @@ from makeLogs.BlackBoxGenerator import Logger
 
 
 class ModelBasedAgent(Drone):
-    def __init__(self, drone_mac, use_wifi, controller, start_loggin = True):
+    def __init__(self, drone_mac, use_wifi, controller, start_loggin=True):
         super().__init__(drone_mac, use_wifi)
         # ==================Kalman setup
         self.p = np.zeros((3, 3))
@@ -98,6 +98,9 @@ class ModelBasedAgent(Drone):
         while distance > self.eps:
             cmd = self.controller.calculate_cmd_input()
             if self.use_wifi == False:
+                #try to make uav fly longer if it apploaches to desired state
+                if distance>2 or distance<0.2:
+                    self.duration = 1       
                 self.duration = 0.5
             self.mambo.fly_direct(roll=cmd[0],
                                   pitch=cmd[1],
@@ -111,22 +114,22 @@ class ModelBasedAgent(Drone):
             # logging in thread
             if self.start_loggin:
                 self.black_box.start_logging(["IMU", self.current_measurement], [
-                                         "Kalman", self.current_state], ["CMD", cmd], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
+                    "Kalman", self.current_state], ["CMD", cmd], ["Distance", [distance]], ["Time", [np.round((time.time()-self.initialTime), 1)]], ["Title", [self.title]])
             print("===============================Start")
             print(f"logging >> {self.start_loggin}")
             print(f"controller >> {self.title}")
             print(f"current measurement >>{self.current_measurement}")
             print(f"KALMAN STATE >>{self.current_state}")
-            print(f"CMD input >> {cmd}")        
+            print(f"CMD input >> {cmd}")
             print(f"desired state >> {self.desired_state}")
             print(f"distance left >> {distance}")
 
 
 if __name__ == "__main__":
     mambo1 = "D0:3A:49:F7:E6:22"
-    mambo2 = "D0:3A:0B:C5:E6:22"
-    mambo3 = "D0:3A:B1:DC:E6:20"
-    drone1 = ModelBasedAgent(mambo1, False, "pid", False)
+    mambo2 = "D0:3A:0B:C5:E6:22" #new tag
+    mambo3 = "D0:3A:B1:DC:E6:20" #with no sticker
+    drone1 = ModelBasedAgent(mambo1, False, "lqr", False)
     drone1.start_and_prepare()
     # drone1.mambo.turn_degrees(180)
     drone1.go_to_xyz([1, 0, 1])

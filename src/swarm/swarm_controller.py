@@ -38,5 +38,5 @@ if __name__ == "__main__":
     swarm.addUav("mambo1.py")
     # swarm.addUav("mambo2.py")
 
-    # swarm.getFinalBashCommand()
-    swarm.launch()
+    swarm.getFinalBashCommand()
+    # swarm.launch()
